@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>BIU CGPA Calculator — Save & Persist</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#071028; --card:#071827; --accent:#6d28d9; --accent-2:#06b6d4;
+      --muted:#9aa8bf; --glass: rgba(255,255,255,0.03); --radius:12px;
+    }
+    *{box-sizing:border-box;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
+    body{margin:0;min-height:100vh;background:
+      radial-gradient(900px 400px at 10% 10%, rgba(109,40,217,0.06), transparent 8%),
+      linear-gradient(180deg,#041026 0%, #071028 100%);color:#e6eef8;padding:28px;}
+    .wrap{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 360px;gap:20px;}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:18px;border-radius:var(--radius);border:1px solid rgba(255,255,255,0.03);box-shadow:0 12px 40px rgba(2,6,23,0.6)}
+    h1{margin:0 0 8px;font-size:20px}
+    p.lead{margin:0 0 12px;color:var(--muted)}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+    select,input[type="number"],input[type="text"]{padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:#e6eef8;min-width:0}
+    button.btn{padding:10px 12px;border-radius:10px;border:none;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;font-weight:700;cursor:pointer}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
+    .course-list{display:flex;flex-direction:column;gap:10px;max-height:46vh;overflow:auto;padding-right:6px}
+    .course-row{display:flex;gap:8px;align-items:center}
+    .course-row input{width:100%}
+    .small{font-size:13px;color:var(--muted)}
+    .result{font-size:18px;font-weight:800;color:#fff}
+    .legend{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+    .chip{padding:8px 10px;border-radius:999px;background:rgba(255,255,255,0.02);color:var(--muted);font-weight:700}
+    .grade-table{width:100%;border-collapse:collapse;margin-top:12px}
+    .grade-table td{padding:8px;border-bottom:1px dashed rgba(255,255,255,0.03)}
+    .footer-note{margin-top:12px;color:var(--muted);font-size:13px}
+    .history-list{display:flex;flex-direction:column;gap:10px;max-height:36vh;overflow:auto;padding-right:6px}
+    .history-item{padding:10px;border-radius:10px;background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.02)}
+    @media (max-width:980px){.wrap{grid-template-columns:1fr;}}
+    .fade-in{animation:fadeUp .45s ease-out both}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+    .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:12px}
+    .status{font-size:13px;color:var(--muted)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- Main calculator -->
+    <div class="card fade-in" aria-labelledby="title">
+      <div class="topbar">
+        <div>
+          <h1 id="title">BIU CGPA Calculator</h1>
+          <div class="small muted">Add courses, compute GPA and CGPA, then save to your profile.</div>
+        </div>
+        <div>
+          <span id="userStatus" class="status">Not signed in</span>
+        </div>
+      </div>
+
+      <p class="lead">Pick a course from PQ topics or add a custom course. Enter unit and final score (0–100). Click Add, then Calculate.</p>
+
+      <div class="controls" role="region" aria-label="Add course">
+        <select id="courseSelect" aria-label="Select course">
+          <option value="">— pick a course (PQ topics) —</option>
+          <option value="GST 111|GST|2">GST 111 — Communication English (2u)</option>
+          <option value="GST 112|GST|2">GST 112 — People & Culture (2u)</option>
+          <option value="IDS 111|IDS|2">IDS 111 — Rudiments of Faith (2u)</option>
+          <option value="MTH 111|MTH|3">MTH 111 — General Mathematics (3u)</option>
+          <option value="MTH 112|MTH|3">MTH 112 — Elementary Statistics (3u)</option>
+          <option value="CSC 113|CSC|3">CSC 113 — Intro Programming II (3u)</option>
+          <option value="CHM 111|CHM|3">CHM 111 — General Chemistry I (3u)</option>
+          <option value="CSC 111|CSC|3">CSC 111 — Intro to Computer Science (3u)</option>
+          <option value="CHM 113|CHM|3">CHM 113 — Organic & Inorganic Basics (3u)</option>
+          <option value="ZOO 111|ZOO|3">ZOO 111 — Introductory Zoology (3u)</option>
+        </select>
+
+        <input id="unitInput" type="number" min="0" placeholder="Unit" style="width:84px" />
+        <input id="scoreInput" type="number" min="0" max="100" placeholder="Score" style="width:110px" />
+        <button id="addCourse" class="btn">Add</button>
+      </div>
+
+      <div class="course-list" id="courseList" aria-live="polite">
+        <div class="small muted">No courses added yet.</div>
+      </div>
+
+      <div style="display:flex;gap:12px;margin-top:12px;align-items:center">
+        <button id="calcGPA" class="btn">Calculate GPA</button>
+        <button id="clearAll" class="btn" style="background:#ef4444">Clear</button>
+
+        <div style="margin-left:auto;text-align:right">
+          <div class="small">Semester GPA</div>
+          <div id="gpaResult" class="result">—</div>
+        </div>
+      </div>
+
+      <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+        <input id="labelInput" type="text" placeholder="Label (e.g., 2026 Sem1)" style="flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:#e6eef8" />
+        <button id="saveCalc" class="btn">Save Calculation</button>
+      </div>
+
+      <div class="footer-note">
+        <div><strong>How to compute CGPA:</strong> provide previous total units and previous total grade points (or add previous semester courses here). CGPA = (previousPoints + currentPoints) ÷ (previousUnits + currentUnits).</div>
+      </div>
+
+      <div style="margin-top:12px">
+        <div class="small">Previous totals (optional)</div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <input id="prevUnits" type="number" min="0" placeholder="Previous total units" />
+          <input id="prevPoints" type="number" min="0" placeholder="Previous total grade points" />
+          <button id="calcCGPA" class="btn">Compute CGPA</button>
+        </div>
+        <div style="margin-top:8px">
+          <div class="small">CGPA</div>
+          <div id="cgpaResult" class="result">—</div>
+        </div>
+      </div>
+
+      <div class="legend">
+        <div class="chip">Scale: 70–100 = 5; 60–69 = 4; 50–59 = 3; 45–49 = 2; 40–44 = 1; &lt;40 = 0</div>
+        <div class="chip muted">CA 30% + Exam 70% (use final score)</div>
+      </div>
+    </div>
+
+    <!-- Sidebar: grade mapping + saved history -->
+    <aside class="card fade-in" aria-labelledby="guide">
+      <h2 id="guide" style="font-size:16px;margin:0 0 8px">Saved Calculations</h2>
+      <div class="small muted" style="margin-bottom:8px">Your saved GPA/CGPA history (requires sign in).</div>
+
+      <div id="history" class="history-list">
+        <div class="small muted">Sign in to view saved calculations.</div>
+      </div>
+
+      <div style="margin-top:12px">
+        <h3 style="margin:0 0 8px;font-size:15px">Grade mapping</h3>
+        <table class="grade-table" role="table" aria-label="Grade table">
+          <tr><td><strong>70–100</strong></td><td>Grade A — 5 points</td></tr>
+          <tr><td><strong>60–69</strong></td><td>Grade B — 4 points</td></tr>
+          <tr><td><strong>50–59</strong></td><td>Grade C — 3 points</td></tr>
+          <tr><td><strong>45–49</strong></td><td>Grade D — 2 points</td></tr>
+          <tr><td><strong>40–44</strong></td><td>Grade E — 1 point</td></tr>
+          <tr><td><strong>0–39</strong></td><td>Grade F — 0 point</td></tr>
+        </table>
+      </div>
+
+      <div style="margin-top:12px;display:flex;gap:8px">
+        <button id="exportAll" class="btn btn-ghost" style="background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)">Copy All</button>
+        <button id="openProfile" class="btn btn-ghost">Open Profile</button>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <script>
+    // Firebase config (your project)
+    const firebaseConfig = {
+      apiKey: "AIzaSyBsVbLw4mvFTJhmORUXCUNyGc98Rripj3M",
+      authDomain: "biu-students-hub.firebaseapp.com",
+      projectId: "biu-students-hub",
+      storageBucket: "biu-students-hub.firebasestorage.app",
+      messagingSenderId: "128818531382",
+      appId: "1:128818531382:web:190dc5688d1b9d21321c97",
+      measurementId: "G-ELK8KN5SK7"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
+
+    // Grade mapping
+    function scoreToPoint(score){
+      if(score >= 70) return 5;
+      if(score >= 60) return 4;
+      if(score >= 50) return 3;
+      if(score >= 45) return 2;
+      if(score >= 40) return 1;
+      return 0;
+    }
+
+    // UI refs
+    const courseListEl = document.getElementById('courseList');
+    const courseSelect = document.getElementById('courseSelect');
+    const unitInput = document.getElementById('unitInput');
+    const scoreInput = document.getElementById('scoreInput');
+    const addCourseBtn = document.getElementById('addCourse');
+    const calcGPA = document.getElementById('calcGPA');
+    const clearAll = document.getElementById('clearAll');
+    const gpaResult = document.getElementById('gpaResult');
+    const prevUnits = document.getElementById('prevUnits');
+    const prevPoints = document.getElementById('prevPoints');
+    const calcCGPA = document.getElementById('calcCGPA');
+    const cgpaResult = document.getElementById('cgpaResult');
+    const saveCalcBtn = document.getElementById('saveCalc');
+    const labelInput = document.getElementById('labelInput');
+    const historyEl = document.getElementById('history');
+    const userStatus = document.getElementById('userStatus');
+    const exportAllBtn = document.getElementById('exportAll');
+    const openProfileBtn = document.getElementById('openProfile');
+
+    let courses = [];
+
+    function renderCourses(){
+      courseListEl.innerHTML = '';
+      if(courses.length === 0){
+        courseListEl.innerHTML = '<div class="small muted">No courses added yet.</div>';
+        return;
+      }
+      courses.forEach((c, idx) => {
+        const row = document.createElement('div');
+        row.className = 'course-row';
+        row.innerHTML = `
+          <div style="flex:1">
+            <div style="font-weight:700">${c.code}</div>
+            <div class="small muted">${c.title || ''}</div>
+          </div>
+          <div style="width:72px;text-align:center">${c.unit}u</div>
+          <div style="width:84px;text-align:center">${c.score}</div>
+          <div style="width:84px;text-align:center">GP ${c.point}</div>
+          <div><button class="btn btn-ghost" data-idx="${idx}" style="background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)">Remove</button></div>
+        `;
+        courseListEl.appendChild(row);
+      });
+      courseListEl.querySelectorAll('button[data-idx]').forEach(b => {
+        b.addEventListener('click', (e) => {
+          const i = Number(e.currentTarget.getAttribute('data-idx'));
+          courses.splice(i,1);
+          renderCourses();
+        });
+      });
+    }
+
+    addCourseBtn.addEventListener('click', () => {
+      const sel = courseSelect.value;
+      let code = '', title = '', unit = Number(unitInput.value || 0), score = Number(scoreInput.value || 0);
+      if(sel){
+        const parts = sel.split('|');
+        code = parts[0];
+        title = parts[0];
+        if(!unit) unit = Number(parts[2]) || 0;
+      } else {
+        code = prompt('Enter course code (e.g., MTH 111):') || '';
+        title = code;
+      }
+      if(!code || unit <= 0 || isNaN(score) || score < 0 || score > 100){
+        alert('Please provide a valid course code, unit (>0) and score (0–100).');
+        return;
+      }
+      const point = scoreToPoint(score);
+      courses.push({ code, title, unit, score, point });
+      unitInput.value = '';
+      scoreInput.value = '';
+      courseSelect.value = '';
+      renderCourses();
+    });
+
+    calcGPA.addEventListener('click', () => {
+      if(courses.length === 0){ alert('Add at least one course.'); return; }
+      let totalUnits = 0, totalPoints = 0;
+      courses.forEach(c => { totalUnits += Number(c.unit); totalPoints += Number(c.unit) * Number(c.point); });
+      const gpa = totalUnits ? (totalPoints / totalUnits) : 0;
+      gpaResult.textContent = gpa.toFixed(2);
+      gpaResult.dataset.currentUnits = totalUnits;
+      gpaResult.dataset.currentPoints = totalPoints;
+    });
+
+    calcCGPA.addEventListener('click', () => {
+      const prevU = Number(prevUnits.value || 0);
+      const prevP = Number(prevPoints.value || 0);
+      const curU = Number(gpaResult.dataset.currentUnits || 0);
+      const curP = Number(gpaResult.dataset.currentPoints || 0);
+      if(prevU < 0 || prevP < 0){ alert('Previous totals must be non-negative.'); return; }
+      if(curU === 0 && prevU === 0){ alert('No units to compute CGPA.'); return; }
+      const cgpa = (prevP + curP) / (prevU + curU);
+      cgpaResult.textContent = isFinite(cgpa) ? cgpa.toFixed(2) : '—';
+    });
+
+    clearAll.addEventListener('click', () => {
+      if(!confirm('Clear all courses?')) return;
+      courses = [];
+      renderCourses();
+      gpaResult.textContent = '—';
+      cgpaResult.textContent = '—';
+      prevUnits.value = '';
+      prevPoints.value = '';
+      labelInput.value = '';
+    });
+
+    // Persistence functions
+    async function saveCalculation(payload) {
+      const user = firebase.auth().currentUser;
+      if(!user) {
+        // store intent and redirect to signup
+        try{ sessionStorage.setItem('postAuthSave', JSON.stringify(payload)); }catch(e){}
+        alert('You need to sign in to save. Redirecting to signup.');
+        window.location.href = '/signup.html';
+        return;
+      }
+      try {
+        const ref = db.ref(`profiles/${user.uid}/calculations`);
+        const newRef = ref.push();
+        payload.id = newRef.key;
+        payload.createdAt = firebase.database.ServerValue.TIMESTAMP;
+        await newRef.set(payload);
+        alert('Calculation saved.');
+        loadCalculations(); // refresh history
+      } catch (err) {
+        console.error('Save error', err);
+        alert('Failed to save calculation.');
+      }
+    }
+
+    // Save button handler
+    saveCalcBtn.addEventListener('click', async () => {
+      const user = firebase.auth().currentUser;
+      if(!user){
+        // redirect to signup/login
+        try{ sessionStorage.setItem('postAuthSave', JSON.stringify({
+          label: labelInput.value || '',
+          courses, currentUnits: Number(gpaResult.dataset.currentUnits || 0),
+          currentPoints: Number(gpaResult.dataset.currentPoints || 0),
+          gpa: gpaResult.textContent === '—' ? null : Number(gpaResult.textContent),
+          prevUnits: Number(prevUnits.value || 0),
+          prevPoints: Number(prevPoints.value || 0),
+          cgpa: cgpaResult.textContent === '—' ? null : Number(cgpaResult.textContent)
+        })); }catch(e){}
+        alert('Please sign in to save. Redirecting to signup.');
+        window.location.href = '/signup.html';
+        return;
+      }
+      if(courses.length === 0){
+        alert('Add at least one course before saving.');
+        return;
+      }
+      const payload = {
+        label: labelInput.value || '',
+        courses,
+        currentUnits: Number(gpaResult.dataset.currentUnits || 0),
+        currentPoints: Number(gpaResult.dataset.currentPoints || 0),
+        gpa: gpaResult.textContent === '—' ? null : Number(gpaResult.textContent),
+        prevUnits: Number(prevUnits.value || 0),
+        prevPoints: Number(prevPoints.value || 0),
+        cgpa: cgpaResult.textContent === '—' ? null : Number(cgpaResult.textContent)
+      };
+      await saveCalculation(payload);
+    });
+
+    // Load saved calculations for current user
+    async function loadCalculations(){
+      const user = firebase.auth().currentUser;
+      historyEl.innerHTML = '<div class="small muted">Loading…</div>';
+      if(!user){
+        historyEl.innerHTML = '<div class="small muted">Sign in to view saved calculations.</div>';
+        return;
+      }
+      try {
+        const snap = await db.ref(`profiles/${user.uid}/calculations`).orderByChild('createdAt').once('value');
+        const list = [];
+        snap.forEach(child => list.push(child.val()));
+        renderHistory(list);
+      } catch (err) {
+        console.error('Load history error', err);
+        historyEl.innerHTML = '<div class="small muted">Failed to load history.</div>';
+      }
+    }
+
+    function renderHistory(list){
+      historyEl.innerHTML = '';
+      if(!list || list.length === 0){
+        historyEl.innerHTML = '<div class="small muted">No saved calculations yet.</div>';
+        return;
+      }
+      list.sort((a,b)=> (b.createdAt||0) - (a.createdAt||0));
+      list.forEach(item => {
+        const el = document.createElement('div');
+        el.className = 'history-item';
+        const date = item.createdAt ? new Date(item.createdAt).toLocaleString() : '';
+        el.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div style="font-weight:700">${item.label || 'Saved calculation'}</div>
+              <div class="small muted">${date}</div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-weight:800">${item.gpa !== null && item.gpa !== undefined ? Number(item.gpa).toFixed(2) : '—'}</div>
+              <div class="small muted">GPA</div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <button class="btn btn-ghost" data-id="${item.id}" onclick="viewCalculation('${item.id}')">View</button>
+            <button class="btn" data-id="${item.id}" onclick="exportCalculation('${item.id}')">Copy</button>
+            <button class="btn" style="background:#ef4444" data-id="${item.id}" onclick="deleteCalculation('${item.id}')">Delete</button>
+          </div>
+        `;
+        historyEl.appendChild(el);
+      });
+    }
+
+    // View, export, delete helpers
+    async function viewCalculation(id){
+      const user = firebase.auth().currentUser;
+      if(!user) return alert('Sign in to view.');
+      const snap = await db.ref(`profiles/${user.uid}/calculations/${id}`).once('value');
+      const data = snap.val();
+      if(!data) return alert('Not found.');
+      alert(`Label: ${data.label || '—'}\nGPA: ${data.gpa || '—'}\nCGPA: ${data.cgpa || '—'}\nCourses:\n${(data.courses||[]).map(c=>`${c.code} ${c.unit}u ${c.score}% (GP ${c.point})`).join('\n')}`);
+    }
+
+    async function exportCalculation(id){
+      const user = firebase.auth().currentUser;
+      if(!user) return alert('Sign in to export.');
+      const snap = await db.ref(`profiles/${user.uid}/calculations/${id}`).once('value');
+      const data = snap.val();
+      if(!data) return alert('Not found.');
+      await navigator.clipboard.writeText(JSON.stringify(data, null, 2));
+      alert('Calculation copied to clipboard.');
+    }
+
+    async function deleteCalculation(id){
+      if(!confirm('Delete this saved calculation?')) return;
+      const user = firebase.auth().currentUser;
+      if(!user) return alert('Sign in to delete.');
+      await db.ref(`profiles/${user.uid}/calculations/${id}`).remove();
+      alert('Deleted.');
+      loadCalculations();
+    }
+
+    // Export all saved calculations (copy JSON)
+    exportAllBtn.addEventListener('click', async () => {
+      const user = firebase.auth().currentUser;
+      if(!user) return alert('Sign in to export.');
+      const snap = await db.ref(`profiles/${user.uid}/calculations`).once('value');
+      const all = [];
+      snap.forEach(child => all.push(child.val()));
+      if(all.length === 0) return alert('No saved calculations.');
+      await navigator.clipboard.writeText(JSON.stringify(all, null, 2));
+      alert('All calculations copied to clipboard.');
+    });
+
+    openProfileBtn.addEventListener('click', () => {
+      window.location.href = '/profile.html';
+    });
+
+    // Auth state handling
+    auth.onAuthStateChanged(async (user) => {
+      if(user){
+        userStatus.textContent = `Signed in: ${user.email}`;
+        loadCalculations();
+        // If there was a pending save intent after auth, perform it
+        try{
+          const pending = sessionStorage.getItem('postAuthSave');
+          if(pending){
+            const payload = JSON.parse(pending);
+            sessionStorage.removeItem('postAuthSave');
+            await saveCalculation(payload);
+          }
+        }catch(e){}
+      } else {
+        userStatus.textContent = 'Not signed in';
+        historyEl.innerHTML = '<div class="small muted">Sign in to view saved calculations.</div>';
+      }
+    });
+
+    // On page load: check for post-auth redirect (if user returned after signup/login with intended action)
+    window.addEventListener('load', async () => {
+      try{
+        const pending = sessionStorage.getItem('postAuthSave');
+        if(pending && auth.currentUser){
+          const payload = JSON.parse(pending);
+          sessionStorage.removeItem('postAuthSave');
+          await saveCalculation(payload);
+        }
+      }catch(e){}
+    });
+
+    // Expose functions used in history buttons to global scope
+    window.viewCalculation = viewCalculation;
+    window.exportCalculation = exportCalculation;
+    window.deleteCalculation = deleteCalculation;
+
+    // initial render
+    renderCourses();
+  </script>
+</body>
+</html>

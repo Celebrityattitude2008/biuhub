@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>BIU Student Hub — Past Questions (100L Sem 1)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#071028;
+      --card:#071827;
+      --accent:#6d28d9;
+      --accent-2:#06b6d4;
+      --muted:#9aa8bf;
+      --glass: rgba(255,255,255,0.03);
+      --radius:14px;
+      --max-width:1100px;
+    }
+    *{box-sizing:border-box;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
+    html,body{height:100%;margin:0;background:
+      radial-gradient(900px 400px at 10% 10%, rgba(109,40,217,0.06), transparent 8%),
+      linear-gradient(180deg,#041026 0%, #071028 100%);
+      color:#e6eef8;-webkit-font-smoothing:antialiased;}
+    .wrap{max-width:var(--max-width);margin:28px auto;padding:20px;}
+    header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff}
+    h1{margin:0;font-size:20px}
+    .sub{color:var(--muted);font-size:13px}
+    .controls{display:flex;gap:10px;align-items:center}
+    .select, .search {padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:#e6eef8}
+    .btn{padding:10px 12px;border-radius:10px;border:none;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;font-weight:700;cursor:pointer}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
+    .notice{padding:12px;border-radius:10px;background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.02);color:var(--muted)}
+    .tab-container{display:flex;gap:8px;margin:18px 0;flex-wrap:wrap}
+    .tab-btn{padding:10px 14px;border-radius:999px;border:1px solid rgba(255,255,255,0.03);background:transparent;color:var(--muted);cursor:pointer;font-weight:700}
+    .tab-btn.active{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;box-shadow:0 8px 30px rgba(109,40,217,0.12)}
+    .course-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:12px}
+    .course-card{display:flex;justify-content:space-between;align-items:center;padding:14px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));border:1px solid rgba(255,255,255,0.02)}
+    .course-card h3{margin:0;font-size:16px}
+    .course-card p{margin:0;color:var(--muted);font-size:13px}
+    .download-btn{padding:8px 10px;border-radius:10px;border:none;background:linear-gradient(90deg,#06b6d4,#06b6d4);color:#042;cursor:pointer;font-weight:700}
+    .download-btn:hover{transform:translateY(-3px);transition:transform .12s}
+    .empty{color:var(--muted);padding:18px;border-radius:10px;background:rgba(255,255,255,0.01);text-align:center}
+    .upgrade-overlay{
+      position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(2,6,23,0.6);backdrop-filter:blur(4px);z-index:9999;opacity:0;pointer-events:none;transition:opacity .18s;
+    }
+    .upgrade-overlay.show{opacity:1;pointer-events:auto}
+    .upgrade-card{background:linear-gradient(180deg,#071827,#081a2a);padding:20px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);max-width:520px;text-align:center}
+    .upgrade-card h3{margin:0 0 8px}
+    .upgrade-card p{color:var(--muted);margin:0 0 12px}
+    .close-x{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);padding:8px 10px;border-radius:8px;cursor:pointer}
+    @media (max-width:980px){
+      .course-grid{grid-template-columns:repeat(2,1fr)}
+    }
+    @media (max-width:640px){
+      .course-grid{grid-template-columns:1fr}
+      .controls{flex-direction:column;align-items:stretch}
+      header{flex-direction:column;align-items:flex-start;gap:12px}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo">BIU</div>
+        <div>
+          <h1>Past Questions — 100L Semester 1</h1>
+          <div class="sub">Curated past questions for 100L first semester</div>
+        </div>
+      </div>
+
+      <div class="controls" aria-hidden="false">
+        <select id="levelSelect" class="select" aria-label="Level">
+          <option value="100">100L</option>
+          <option value="200">200L</option>
+          <option value="300">300L</option>
+          <option value="400">400L</option>
+        </select>
+
+        <select id="semesterSelect" class="select" aria-label="Semester">
+          <option value="1">Semester 1</option>
+          <option value="2">Semester 2</option>
+        </select>
+
+        <input id="searchInput" class="search" placeholder="Search course or code" />
+        <button id="btnSearch" class="btn ghost">Search</button>
+      </div>
+    </header>
+
+    <div class="notice">Note: This page currently shows 100L first semester content. Selecting other levels/semesters will show an upgrade notice.</div>
+
+    <div class="tab-container" role="tablist" aria-label="Categories">
+      <button class="tab-btn active" id="btn-all" onclick="filterTab('all', this)">All PQs</button>
+      <button class="tab-btn" id="btn-gst" onclick="filterTab('cat-gst', this)">GSTs</button>
+      <button class="tab-btn" id="btn-sci" onclick="filterTab('cat-sci', this)">Sciences/Math</button>
+      <button class="tab-btn" id="btn-dept" onclick="filterTab('cat-dept', this)">Departmental</button>
+    </div>
+
+    <div class="course-grid" id="course-list" aria-live="polite">
+      <!-- Cards (100L Sem 1 sample) -->
+      <div class="course-card cat-gst">
+        <div>
+          <h3>GST 111</h3><p>Communication English</p>
+        </div>
+        <button class="download-btn" onclick="handleDownload('GST 111','https://docs.google.com/document/d/1cICV9V2Wtywaofp_1cA84ItLXu-vve-p/edit')">View PQ</button>
+      </div>
+
+      <div class="course-card cat-gst">
+        <div>
+          <h3>GST 112</h3><p>People and Culture</p>
+        </div>
+        <button class="download-btn" onclick="handleDownload('GST 112','https://drive.google.com/file/d/1o290W5ofDBxyoik0WC-y-VdjyHUqylJN/view')">View PQ</button>
+      </div>
+
+      <div class="course-card cat-gst">
+        <div>
+          <h3>IDS 111</h3><p>Rudiments of Faith</p>
+        </div>
+        <button class="download-btn" onclick="handleDownload('IDS 111','https://docs.google.com/document/d/1dYTcgJQBICb8L5ZNvX4z_nb6H2d7Pd_M/edit')">View PQ</button>
+      </div>
+
+      <div class="course-card cat-sci">
+        <div>
+          <h3>MTH 111</h3><p>General Mathematics</p>
+        </div>
+        <button class="download-btn" onclick="handleDownload('MTH 111','https://docs.google.com/document/d/1IHjwn7HRnlUoypBEOJL2-k_u0ptZ8GEq/edit')">View PQ</button>
+      </div>
+
+      <div class="course-card cat-sci">
+        <div>
+          <h3>MTH 112</h3><p>Elementary Statistics</p>
+        </div>
+        <button class="download-btn" onclick="handleDownload('MTH 112','https://docs.google.com/document/d/1jFZFlzQvHxNbnzY35d19kOoOGLX6NxyF/edit?usp=drivesdk&ouid=111271384522252483913&rtpof=true&sd=true')">View PQ</button>
+      </div>
+
+      <div class="course-card cat-sci">
+        <div>
+          <h3>CSC 113</h3><p>Intro Programming II</p>
+        </div>
+        <button class="download-btn" onclick="handleDownload('CSC 113','https://docs.google.com/document/d/1QJxLjtQTpA1AHVFRgEfwe24QPZPHGti-/edit?usp=drivesdk&ouid=111271384522252483913&rtpof=true&sd=true')">View PQ</button>
+      </div>
+
+      <div class="course-card cat-sci">
+        <div>
+          <h3>CHM 111</h3><p>General Chemistry I</p>
+        </div>
+        <button class="download-btn" onclick="handleDownload('CHM 111','https://drive.google.com/file/d/1w8e61Q8bRlr3mnwR_ELex5n-tTeOsi8k/view')">View PQ</button>
+      </div>
+
+      <div class="course-card cat-dept">
+        <div>
+          <h3>CSC 111</h3><p>Intro to Computer Science</p>
+        </div>
+        <button class="download-btn" onclick="handleDownload('CSC 111','https://docs.google.com/document/d/1tGh6b6NQTMQoF_IpiMb6HY-xQ5HrsPyf/view')">View PQ</button>
+      </div>
+
+      <div class="course-card cat-sci">
+        <div>
+          <h3>CHM 113</h3><p>Organic & Inorganic Basics</p>
+        </div>
+        <button class="download-btn" onclick="handleDownload('CHM 113','https://drive.google.com/file/d/1YQTm7bRCGPls4Q0SaGnGA57cPOCXhPB3/view?usp=drivesdk')">View PQ</button>
+      </div>
+
+      <div class="course-card cat-sci">
+        <div>
+          <h3>ZOO 111</h3><p>Introductory Zoology</p>
+        </div>
+        <button class="download-btn" onclick="handleDownload('ZOO 111','https://drive.google.com/file/d/1d5X3OVPWjmrQhd1ybgulCBHZEqgvvbSp/view?usp=drivesdk')">View PQ</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upgrade overlay (shown when user selects other level/semester) -->
+  <div id="upgradeOverlay" class="upgrade-overlay" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="upgrade-card" role="document">
+      <h3>Hold on — Upgrade in progress</h3>
+      <p>We're upgrading the Past Questions library for other levels and semesters. For now, only 100L Semester 1 is available. We'll notify you when more content is live.</p>
+      <div style="display:flex;gap:8px;justify-content:center;margin-top:12px">
+        <button class="btn" id="notifyMe">Notify me</button>
+        <button class="close-x" id="closeOverlay">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <script>
+    // Firebase config (your project)
+    const firebaseConfig = {
+      apiKey: "AIzaSyBsVbLw4mvFTJhmORUXCUNyGc98Rripj3M",
+      authDomain: "biu-students-hub.firebaseapp.com",
+      projectId: "biu-students-hub",
+      storageBucket: "biu-students-hub.firebasestorage.app",
+      messagingSenderId: "128818531382",
+      appId: "1:128818531382:web:190dc5688d1b9d21321c97",
+      measurementId: "G-ELK8KN5SK7"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
+
+    // Auth guard: if user not signed in, redirect to signup/login before allowing downloads
+    let currentUser = null;
+    auth.onAuthStateChanged(user => {
+      currentUser = user;
+      // no redirect here — we allow browsing, but downloads require sign-in
+    });
+
+    // Tab filtering
+    function filterTab(cat, btn){
+      // update active class
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      if(btn) btn.classList.add('active');
+
+      const cards = document.querySelectorAll('.course-card');
+      cards.forEach(c => {
+        if(cat === 'all') c.style.display = '';
+        else c.style.display = c.classList.contains(cat) ? '' : 'none';
+      });
+    }
+
+    // Search
+    document.getElementById('btnSearch').addEventListener('click', () => {
+      const q = document.getElementById('searchInput').value.trim().toLowerCase();
+      const cards = document.querySelectorAll('.course-card');
+      let found = 0;
+      cards.forEach(c => {
+        const title = c.querySelector('h3').textContent.toLowerCase();
+        const desc = c.querySelector('p').textContent.toLowerCase();
+        const match = !q || title.includes(q) || desc.includes(q);
+        c.style.display = match ? '' : 'none';
+        if(match) found++;
+      });
+      if(found === 0){
+        const list = document.getElementById('course-list');
+        list.innerHTML = '<div class="empty">No matching past questions found.</div>';
+      }
+    });
+
+    // Handle download/view: require signed-in user; otherwise redirect to signup
+    function handleDownload(title, url){
+      if(!currentUser){
+        // store intended action in session and redirect to signup
+        try{ sessionStorage.setItem('postAuthRedirect', location.pathname + '?intended=' + encodeURIComponent(url)); }catch(e){}
+        window.location.href = '/signup.html';
+        return;
+      }
+      // open in new tab
+      window.open(url, '_blank', 'noopener');
+    }
+
+    // Level / semester selection: show upgrade overlay if not 100L sem1
+    const levelSelect = document.getElementById('levelSelect');
+    const semesterSelect = document.getElementById('semesterSelect');
+    const overlay = document.getElementById('upgradeOverlay');
+    const closeOverlay = document.getElementById('closeOverlay');
+    const notifyMe = document.getElementById('notifyMe');
+
+    function checkAvailability(){
+      const level = levelSelect.value;
+      const sem = semesterSelect.value;
+      // only 100 & sem 1 available
+      if(level !== '100' || sem !== '1'){
+        showUpgradeOverlay();
+      } else {
+        // if user returns to 100L sem1, reload page content (or reset)
+        // For now, we simply ensure the course list is visible (no change)
+      }
+    }
+
+    levelSelect.addEventListener('change', checkAvailability);
+    semesterSelect.addEventListener('change', checkAvailability);
+
+    function showUpgradeOverlay(){
+      overlay.classList.add('show');
+      overlay.setAttribute('aria-hidden', 'false');
+    }
+    function hideUpgradeOverlay(){
+      overlay.classList.remove('show');
+      overlay.setAttribute('aria-hidden', 'true');
+      // reset selects back to 100L sem1
+      levelSelect.value = '100';
+      semesterSelect.value = '1';
+    }
+    closeOverlay.addEventListener('click', hideUpgradeOverlay);
+    notifyMe.addEventListener('click', async () => {
+      // If signed in, write a simple notification request to DB; otherwise prompt sign-in
+      if(!currentUser){
+        try{ sessionStorage.setItem('notifyAfterAuth', 'true'); }catch(e){}
+        window.location.href = '/signup.html';
+        return;
+      }
+      const uid = currentUser.uid;
+      const payload = {
+        uid,
+        email: currentUser.email || '',
+        levelRequested: levelSelect.value,
+        semesterRequested: semesterSelect.value,
+        createdAt: firebase.database.ServerValue.TIMESTAMP
+      };
+      try{
+        await db.ref('upgradeRequests').push(payload);
+        alert('Thanks — we recorded your interest. We will notify you when content is available.');
+        hideUpgradeOverlay();
+      }catch(err){
+        console.error(err);
+        alert('Failed to record request. Try again later.');
+      }
+    });
+
+    // On page load: check if user was redirected after signup/login with intended action
+    window.addEventListener('load', () => {
+      try{
+        const intended = sessionStorage.getItem('postAuthRedirect');
+        const notifyAfterAuth = sessionStorage.getItem('notifyAfterAuth');
+        if(intended && auth.currentUser){
+          // open intended link and clear
+          window.open(decodeURIComponent(intended.split('=')[1] || ''), '_blank', 'noopener');
+          sessionStorage.removeItem('postAuthRedirect');
+        }
+        if(notifyAfterAuth && auth.currentUser){
+          // simulate clicking notify
+          notifyMe.click();
+          sessionStorage.removeItem('notifyAfterAuth');
+        }
+      }catch(e){}
+    });
+
+    // Accessibility: allow keyboard tab filtering
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('keydown', (e) => {
+        if(e.key === 'Enter' || e.key === ' ') btn.click();
+      });
+    });
+
+    // initial filter
+    filterTab('all', document.getElementById('btn-all'));
+  </script>
+</body>
+</html>

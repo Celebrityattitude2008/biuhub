@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>BIU Student Hub — Privacy Policy</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#071028; --card:#071827; --accent:#6d28d9; --muted:#9aa8bf; --radius:12px;
+      --max-width:980px;
+    }
+    *{box-sizing:border-box;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
+    html,body{height:100%;margin:0;background:
+      radial-gradient(900px 400px at 10% 10%, rgba(109,40,217,0.06), transparent 8%),
+      linear-gradient(180deg,#041026 0%, #071028 100%);color:#e6eef8;-webkit-font-smoothing:antialiased;}
+    .wrap{max-width:var(--max-width);margin:28px auto;padding:22px;}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:22px;border-radius:var(--radius);border:1px solid rgba(255,255,255,0.03)}
+    h1{margin:0 0 8px;font-size:20px}
+    h2{margin:18px 0 8px;font-size:16px}
+    p{margin:8px 0;color:var(--muted);line-height:1.5}
+    ul{margin:8px 0 8px 18px;color:var(--muted)}
+    li{margin:6px 0}
+    .muted{color:var(--muted)}
+    .note{font-size:13px;color:#9fb6d6;margin-top:8px}
+    a{color:var(--accent);text-decoration:none}
+    .small{font-size:13px;color:var(--muted)}
+    .divider{height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.03),transparent);margin:18px 0;border-radius:2px}
+    footer{margin-top:18px;color:var(--muted);font-size:13px;text-align:center}
+    .contact-card{background:rgba(255,255,255,0.01);padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.02);margin-top:8px}
+    .contact-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+    .label{font-weight:700;color:#e6eef8;margin-right:6px}
+    @media (max-width:720px){.wrap{padding:14px}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card" role="main" aria-labelledby="title">
+      <h1 id="title">Privacy Policy</h1>
+      <p class="small">Last updated: 10 February 2026</p>
+
+      <p>This Privacy Policy explains what information BIU Student Hub collects, how we use it, how we share it, and the choices you have. The policy applies to the web application and related services that use Firebase Realtime Database for data storage and Google Drive for file hosting.</p>
+
+      <h2>Data we collect</h2>
+      <p>We collect the minimum information needed to provide the service and to keep the community safe.</p>
+      <ul>
+        <li><strong>Account information</strong> Email address and authentication metadata when you sign up using Email/Password or Google sign-in.</li>
+        <li><strong>Profile information</strong> Full name, level, bio, social links, and an optional profile picture link stored as a Google Drive share URL.</li>
+        <li><strong>Calculations</strong> CGPA/GPA calculation entries you save. Each entry includes course list, units, grade points, totals, label, and timestamp.</li>
+        <li><strong>Discussions</strong> Posts you create in community discussions including text, optional image link, author UID, author name, and timestamp.</li>
+        <li><strong>Payment proofs</strong> Drive share links you submit as proof of payment and related metadata such as upload time and status.</li>
+        <li><strong>Usage data</strong> Basic telemetry such as page views and actions for debugging and improving the service. This data is aggregated and anonymized where possible.</li>
+      </ul>
+
+      <h2>How we use your data</h2>
+      <ul>
+        <li>Provide and operate the service including account management, profile display, CGPA calculations, and discussion posting.</li>
+        <li>Enable verification workflows where users submit payment proof and admins review and mark verified status.</li>
+        <li>Store and display Google Drive links for profile pictures, proofs, and past questions so files can be viewed without paid storage.</li>
+        <li>Prevent abuse and moderate content by allowing admins to review reports, proofs, and verification requests.</li>
+        <li>Improve the product by analyzing usage patterns and fixing bugs.</li>
+      </ul>
+
+      <h2>Where data is stored</h2>
+      <p>Profile records, discussions, calculations, verification requests, and related metadata are stored in Firebase Realtime Database under the project named <strong>biu-students-hub</strong>. Files such as profile pictures, payment proofs, and past questions are hosted on Google Drive and referenced by share links saved in the database.</p>
+
+      <h2>Google Drive links and visibility</h2>
+      <p>When you paste a Google Drive share link into the app, we store that link exactly as provided. For images to display correctly the file must be shared with the setting Anyone with the link can view. Anyone who has the Drive link can view the file. Do not upload or share sensitive personal documents unless you are comfortable with that visibility level.</p>
+
+      <h2>Sharing and disclosure</h2>
+      <ul>
+        <li>We do not sell your personal data.</li>
+        <li>Admins may access payment proofs and verification requests to perform reviews.</li>
+        <li>We may disclose information if required by law or to protect the rights, property, or safety of the service, users, or others.</li>
+      </ul>
+
+      <h2>Security</h2>
+      <p>We use Firebase Authentication to manage sign-in and Firebase Realtime Database rules to restrict writes and reads. Admin-only actions are protected by authentication checks. While we take reasonable measures to protect data, no system is completely secure. Keep your account credentials private and use a strong password.</p>
+
+      <h2>Retention</h2>
+      <p>We retain profile data, saved calculations, discussions, and verification records until you delete your account or the data is removed by an admin. If you request deletion, we will remove your profile node and associated personal metadata from the database. Copies may remain in backups for a limited period for disaster recovery.</p>
+
+      <h2>Your choices and rights</h2>
+      <ul>
+        <li><strong>Access</strong> You can view and edit your profile and saved calculations from your profile page.</li>
+        <li><strong>Delete</strong> You can delete your profile data from the profile settings. Deleting your account removes your profile node and personal metadata from the database.</li>
+        <li><strong>Proofs</strong> You can remove or replace Drive links you submitted for verification by editing your profile or payment proof entries.</li>
+        <li><strong>Contact</strong> For data requests or questions use the contact details below.</li>
+      </ul>
+
+      <h2>Moderation and community safety</h2>
+      <p>Community discussions are moderated. Users can report posts for review. Admins may remove posts that violate community rules. Verification is optional and used as a trust indicator. Removing verification does not delete a user account unless requested.</p>
+
+      <h2>Third-party services</h2>
+      <p>We rely on third-party services for core functionality. Firebase provides authentication and database services. Google Drive hosts files referenced by the app. These providers have their own privacy policies and terms. For details see Firebase privacy documentation and Google Drive privacy documentation.</p>
+
+      <h2>Changes to this policy</h2>
+      <p>We may update this policy from time to time. When we make changes we will update the Last updated date at the top of this page. Significant changes will be communicated through the app or by email when possible.</p>
+
+      <h2>Contact</h2>
+      <p>If you have questions about this policy or want to request data access or deletion contact the project admin at <strong>admin@biuhub.com</strong> or use the support channel in the app.</p>
+
+      <h2>Creator</h2>
+      <p>This project and the BIU Student Hub web app were created and maintained by a student contributor. If you need to reach the creator directly for feedback, bug reports, or collaboration, use the contact details below.</p>
+
+      <div class="contact-card" role="region" aria-label="Creator contact">
+        <div class="contact-row"><span class="label">Name</span><span>Paul Adamu</span></div>
+        <div class="contact-row"><span class="label">Level / Department</span><span>100L CSC</span></div>
+        <div class="contact-row"><span class="label">Phone</span><span>07041795388</span></div>
+        <div class="contact-row"><span class="label">Email</span><span><a href="mailto:pauladamu600@gmail.com">pauladamu600@gmail.com</a></span></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <p class="note">Quick tips: Do not paste private documents into public Drive folders. Use a Google Form for sensitive uploads if you prefer admin-only access. Keep your account email secure and enable email verification for extra safety.</p>
+
+      <footer>
+        <div>BIU Student Hub</div>
+        <div class="small">This policy covers the web application and related services. For third-party privacy details consult Firebase and Google Drive documentation.</div>
+      </footer>
+    </div>
+  </div>
+</body>
+</html>

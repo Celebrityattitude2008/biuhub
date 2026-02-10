@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>BIU Student Hub — Discussions</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#071028; --card:#071827; --accent:#6d28d9; --accent-2:#06b6d4;
+      --muted:#9aa8bf; --glass: rgba(255,255,255,0.03); --radius:12px;
+      --success:#10b981; --danger:#ef4444;
+    }
+    *{box-sizing:border-box;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
+    html,body{height:100%;margin:0;background:
+      radial-gradient(900px 400px at 10% 10%, rgba(109,40,217,0.06), transparent 8%),
+      linear-gradient(180deg,#041026 0%, #071028 100%);color:#e6eef8;padding:20px;}
+    .wrap{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 360px;gap:20px;}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:18px;border-radius:var(--radius);border:1px solid rgba(255,255,255,0.03);box-shadow:0 12px 40px rgba(2,6,23,0.6)}
+    header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    h1{margin:0;font-size:20px}
+    .small{font-size:13px;color:var(--muted)}
+    .post-form{display:flex;flex-direction:column;gap:8px}
+    textarea{width:100%;min-height:84px;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:#e6eef8}
+    input[type="url"], input[type="text"]{padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:#e6eef8}
+    .row{display:flex;gap:8px;align-items:center}
+    .btn{padding:10px 12px;border-radius:10px;border:none;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;font-weight:700;cursor:pointer}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
+    .discussion-list{display:flex;flex-direction:column;gap:12px;max-height:72vh;overflow:auto;padding-right:6px}
+    .post{display:flex;gap:12px;padding:12px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));border:1px solid rgba(255,255,255,0.02)}
+    .avatar{width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:16px;overflow:hidden;background-size:cover;background-position:center}
+    .meta{display:flex;flex-direction:column;gap:6px}
+    .meta-top{display:flex;gap:8px;align-items:center}
+    .author{font-weight:800}
+    .verified{color:#60a5fa;font-weight:700;font-size:13px;margin-left:6px}
+    .time{color:var(--muted);font-size:13px}
+    .post-body{margin-top:6px;color:#e6eef8}
+    .post-img{max-width:320px;border-radius:8px;margin-top:8px;border:1px solid rgba(255,255,255,0.03)}
+    .controls{display:flex;gap:8px;margin-top:8px}
+    .muted-note{color:var(--muted);font-size:13px;margin-top:8px}
+    .profile-link{color:var(--accent);text-decoration:none;font-weight:700}
+    @media (max-width:980px){.wrap{grid-template-columns:1fr;}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <main class="card" aria-labelledby="discussTitle">
+      <header>
+        <div>
+          <h1 id="discussTitle">Community Discussions</h1>
+          <div class="small">Share tips, ask questions, and help classmates. Verified users show a badge and profile picture.</div>
+        </div>
+        <div>
+          <a href="/profile.html" class="btn btn-ghost" id="goProfile">My Profile</a>
+        </div>
+      </header>
+
+      <section class="post-form" aria-label="Create post">
+        <div id="signedInNotice" class="small muted">Sign in to post. Verified users get a badge.</div>
+        <textarea id="postText" placeholder="Share a quick tip, question, or link (sign in to post)" disabled></textarea>
+        <input id="postImageLink" type="url" placeholder="Optional: paste Drive image link (https://drive.google.com/...)" />
+        <div class="row">
+          <button id="postBtn" class="btn" disabled>Post</button>
+          <button id="signInBtn" class="btn btn-ghost">Sign in</button>
+          <div style="margin-left:auto" class="small muted">Posts are community-moderated</div>
+        </div>
+        <div id="postStatus" class="muted-note"></div>
+      </section>
+
+      <div style="height:12px"></div>
+
+      <section aria-labelledby="recentTitle">
+        <h2 id="recentTitle" style="font-size:15px;margin:0 0 8px">Recent posts</h2>
+        <div id="discussionList" class="discussion-list" aria-live="polite">
+          <div class="small muted">Loading posts…</div>
+        </div>
+      </section>
+    </main>
+
+    <aside class="card" aria-labelledby="sidebarTitle">
+      <h3 id="sidebarTitle" style="margin:0 0 8px">Community</h3>
+      <div class="small muted">Rules: be respectful, no spam, no hate speech. Verified users are trusted contributors.</div>
+
+      <div style="margin-top:12px">
+        <div style="font-weight:800;margin-bottom:8px">Quick actions</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button id="refreshBtn" class="btn btn-ghost">Refresh posts</button>
+          <a id="openPQ" class="btn btn-ghost" href="/pq.html">Open Past Questions</a>
+          <a id="openCGPA" class="btn btn-ghost" href="/cgpa.html">Open CGPA Calculator</a>
+        </div>
+      </div>
+
+      <div style="margin-top:16px">
+        <div style="font-weight:800;margin-bottom:8px">Top contributors</div>
+        <div id="topContrib" class="small muted">Loading…</div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <script>
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyBsVbLw4mvFTJhmORUXCUNyGc98Rripj3M",
+      authDomain: "biu-students-hub.firebaseapp.com",
+      projectId: "biu-students-hub",
+      storageBucket: "biu-students-hub.firebasestorage.app",
+      messagingSenderId: "128818531382",
+      appId: "1:128818531382:web:190dc5688d1b9d21321c97",
+      measurementId: "G-ELK8KN5SK7"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
+
+    // Elements
+    const postText = document.getElementById('postText');
+    const postImageLink = document.getElementById('postImageLink');
+    const postBtn = document.getElementById('postBtn');
+    const signInBtn = document.getElementById('signInBtn');
+    const signedInNotice = document.getElementById('signedInNotice');
+    const postStatus = document.getElementById('postStatus');
+    const discussionList = document.getElementById('discussionList');
+    const refreshBtn = document.getElementById('refreshBtn');
+    const goProfile = document.getElementById('goProfile');
+    const topContrib = document.getElementById('topContrib');
+
+    let currentUser = null;
+
+    // Drive helpers
+    function driveFileIdFromUrl(url){
+      if(!url) return null;
+      const m = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+      if(m && m[1]) return m[1];
+      try { const u = new URL(url); return u.searchParams.get('id'); } catch(e){ return null; }
+    }
+    function driveViewUrl(url){
+      const id = driveFileIdFromUrl(url);
+      return id ? `https://drive.google.com/uc?export=view&id=${id}` : url;
+    }
+
+    // Open profile page for uid
+    function openProfile(uid){
+      window.open(`/profile.html?uid=${uid}`, '_blank');
+    }
+
+    // Render a single post
+    function renderPost(post){
+      const el = document.createElement('div');
+      el.className = 'post';
+      const avatar = document.createElement('div');
+      avatar.className = 'avatar';
+      if(post.authorProfilePicUrl){
+        avatar.style.backgroundImage = `url(${driveViewUrl(post.authorProfilePicUrl)})`;
+        avatar.textContent = '';
+      } else {
+        avatar.textContent = (post.authorName || 'U').split(' ').map(s=>s[0]).slice(0,2).join('').toUpperCase();
+      }
+      avatar.style.cursor = 'pointer';
+      avatar.onclick = () => openProfile(post.authorUid);
+
+      const body = document.createElement('div');
+      body.style.flex = '1';
+      const meta = document.createElement('div');
+      meta.className = 'meta';
+      const top = document.createElement('div');
+      top.className = 'meta-top';
+      const author = document.createElement('div');
+      author.className = 'author';
+      author.textContent = post.authorName || 'Student';
+      author.style.cursor = 'pointer';
+      author.onclick = () => openProfile(post.authorUid);
+
+      if(post.authorVerified){
+        const v = document.createElement('span');
+        v.className = 'verified';
+        v.textContent = '✔ Verified';
+        top.appendChild(author);
+        top.appendChild(v);
+      } else {
+        top.appendChild(author);
+      }
+
+      const time = document.createElement('div');
+      time.className = 'time';
+      time.textContent = new Date(post.createdAt || Date.now()).toLocaleString();
+
+      top.appendChild(time);
+      meta.appendChild(top);
+
+      const content = document.createElement('div');
+      content.className = 'post-body';
+      content.textContent = post.text || '';
+
+      body.appendChild(meta);
+      body.appendChild(content);
+
+      if(post.imageUrl){
+        const img = document.createElement('img');
+        img.className = 'post-img';
+        img.src = driveViewUrl(post.imageUrl);
+        img.alt = 'post image';
+        img.onclick = () => window.open(post.imageUrl, '_blank');
+        body.appendChild(img);
+      }
+
+      // controls: delete if owner
+      const controls = document.createElement('div');
+      controls.className = 'controls';
+      if(currentUser && post.authorUid === currentUser.uid){
+        const del = document.createElement('button');
+        del.className = 'btn btn-ghost';
+        del.textContent = 'Delete';
+        del.onclick = async () => {
+          if(!confirm('Delete this post?')) return;
+          try{
+            await db.ref(`discussions/${post.id}`).remove();
+            loadPosts();
+          }catch(e){ console.error(e); alert('Failed to delete.'); }
+        };
+        controls.appendChild(del);
+      }
+      body.appendChild(controls);
+
+      el.appendChild(avatar);
+      el.appendChild(body);
+      return el;
+    }
+
+    // Load recent posts
+    async function loadPosts(){
+      discussionList.innerHTML = '<div class="small muted">Loading posts…</div>';
+      try{
+        const snap = await db.ref('discussions').orderByChild('createdAt').limitToLast(50).once('value');
+        const arr = [];
+        snap.forEach(child => arr.push({ id: child.key, ...child.val() }));
+        arr.sort((a,b)=> (b.createdAt||0) - (a.createdAt||0));
+        discussionList.innerHTML = '';
+        if(arr.length === 0){
+          discussionList.innerHTML = '<div class="small muted">No posts yet. Be the first to share.</div>';
+          return;
+        }
+        arr.forEach(p => discussionList.appendChild(renderPost(p)));
+        computeTopContributors(arr);
+      }catch(err){
+        console.error('loadPosts', err);
+        discussionList.innerHTML = '<div class="small muted">Failed to load posts.</div>';
+      }
+    }
+
+    // Compute simple top contributors (by post count)
+    function computeTopContributors(posts){
+      const counts = {};
+      posts.forEach(p => {
+        counts[p.authorUid] = (counts[p.authorUid] || 0) + 1;
+      });
+      const entries = Object.entries(counts).sort((a,b)=> b[1]-a[1]).slice(0,5);
+      if(entries.length === 0){ topContrib.textContent = 'No contributors yet.'; return; }
+      topContrib.innerHTML = '';
+      entries.forEach(([uid, cnt]) => {
+        const el = document.createElement('div');
+        el.style.display = 'flex';
+        el.style.justifyContent = 'space-between';
+        el.style.alignItems = 'center';
+        const nameEl = document.createElement('a');
+        nameEl.href = `/profile.html?uid=${uid}`;
+        nameEl.target = '_blank';
+        nameEl.className = 'profile-link';
+        nameEl.textContent = uid;
+        el.appendChild(nameEl);
+        const c = document.createElement('div');
+        c.className = 'small muted';
+        c.textContent = `${cnt} post${cnt>1?'s':''}`;
+        el.appendChild(c);
+        topContrib.appendChild(el);
+      });
+    }
+
+    // Create a post
+    postBtn.addEventListener('click', async () => {
+      const text = postText.value.trim();
+      const imageUrl = postImageLink.value.trim() || null;
+      if(!text && !imageUrl) return alert('Write something or paste an image link.');
+      if(!currentUser) return alert('Sign in to post.');
+      postBtn.disabled = true;
+      postStatus.textContent = 'Posting…';
+      try{
+        // fetch latest profile snapshot for author info
+        const profSnap = await db.ref(`profiles/${currentUser.uid}`).once('value');
+        const prof = profSnap.val() || {};
+        const payload = {
+          authorUid: currentUser.uid,
+          authorName: prof.fullName || currentUser.displayName || currentUser.email || 'Student',
+          authorProfilePicUrl: prof.profilePicUrl || null,
+          authorVerified: !!prof.verified,
+          text,
+          imageUrl,
+          createdAt: firebase.database.ServerValue.TIMESTAMP
+        };
+        const ref = await db.ref('discussions').push();
+        await ref.set(payload);
+        postText.value = '';
+        postImageLink.value = '';
+        postStatus.textContent = 'Posted.';
+        await loadPosts();
+      }catch(err){
+        console.error('post error', err);
+        postStatus.textContent = 'Failed to post.';
+      } finally {
+        postBtn.disabled = false;
+        setTimeout(()=> postStatus.textContent = '', 1800);
+      }
+    });
+
+    // Sign in button
+    signInBtn.addEventListener('click', ()=> {
+      window.location.href = '/login.html';
+    });
+
+    // Refresh
+    refreshBtn.addEventListener('click', loadPosts);
+    goProfile.addEventListener('click', ()=> window.location.href = '/profile.html');
+
+    // Auth state
+    auth.onAuthStateChanged(async user => {
+      currentUser = user;
+      if(user){
+        signedInNotice.textContent = `Signed in: ${user.email}`;
+        postText.disabled = false;
+        postBtn.disabled = false;
+        signInBtn.style.display = 'none';
+        // prefill author info if needed
+        try{
+          const snap = await db.ref(`profiles/${user.uid}`).once('value');
+          const prof = snap.val() || {};
+          // if profile missing, create minimal profile
+          if(!snap.exists()){
+            await db.ref(`profiles/${user.uid}`).set({
+              fullName: user.displayName || '',
+              email: user.email || '',
+              level: '100',
+              createdAt: firebase.database.ServerValue.TIMESTAMP,
+              verified: false,
+              social: {}
+            });
+          }
+        }catch(e){ console.error(e); }
+      } else {
+        signedInNotice.textContent = 'Sign in to post. Verified users get a badge.';
+        postText.disabled = true;
+        postBtn.disabled = true;
+        signInBtn.style.display = '';
+      }
+    });
+
+    // Initial load
+    loadPosts();
+  </script>
+</body>
+</html>
