@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>BIU Student Hub — Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#071028;
+      --accent:#6d28d9;
+      --accent-2:#06b6d4;
+      --muted:#9aa8bf;
+      --glass: rgba(255,255,255,0.03);
+      --radius:16px;
+      --card-max:920px;
+    }
+    *{box-sizing:border-box;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
+    html,body{height:100%;margin:0;background:
+      radial-gradient(900px 400px at 10% 10%, rgba(109,40,217,0.08), transparent 8%),
+      radial-gradient(700px 300px at 90% 90%, rgba(6,182,212,0.04), transparent 6%),
+      linear-gradient(180deg,#041026 0%, #071028 100%);color:#e6eef8;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
+    .wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:28px}
+    .card{
+      width:100%;max-width:var(--card-max);display:grid;grid-template-columns:420px 1fr;gap:22px;padding:22px;border-radius:16px;
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      box-shadow:0 12px 40px rgba(2,6,23,0.7);backdrop-filter:blur(8px);
+      transform:translateY(18px);opacity:0;animation:enter .6s cubic-bezier(.2,.9,.2,1) .06s forwards;border:1px solid rgba(255,255,255,0.03)
+    }
+    @keyframes enter{to{transform:none;opacity:1}}
+    .panel{padding:18px;border-radius:12px;display:flex;flex-direction:column;gap:12px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;transform:rotate(-6deg);box-shadow:0 10px 30px rgba(109,40,217,0.18)}
+    h1{margin:0;font-size:20px}
+    p.lead{margin:0;color:var(--muted)}
+    form{display:flex;flex-direction:column;gap:12px}
+    label{font-size:13px;color:var(--muted);margin-bottom:6px}
+    input,select{padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:#e6eef8;outline:none}
+    input:focus{box-shadow:0 10px 30px rgba(109,40,217,0.12);border-color:rgba(109,40,217,0.6)}
+    .row{display:flex;gap:10px}
+    .btn{padding:12px 14px;border-radius:12px;border:none;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;font-weight:700;cursor:pointer;box-shadow:0 10px 30px rgba(109,40,217,0.18)}
+    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
+    .google{background:#fff;color:#111;border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:10px;justify-content:center;font-weight:700}
+    .small{font-size:13px;color:var(--muted)}
+    .muted{color:var(--muted)}
+    .profilePreview{display:flex;gap:12px;align-items:center}
+    .avatar{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,#111,#222);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
+    .verified{display:inline-flex;align-items:center;gap:8px;color:#60a5fa;font-weight:700}
+    .divider{height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.03),transparent);margin:8px 0;border-radius:2px}
+    #feedback{min-height:22px}
+    @media (max-width:920px){.card{grid-template-columns:1fr;max-width:720px;padding:18px}}
+    @media (max-width:420px){.logo{width:48px;height:48px} .row{flex-direction:column}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card" role="main" aria-labelledby="loginTitle">
+      <div class="panel" aria-hidden="false">
+        <div class="brand">
+          <div class="logo" aria-hidden="true">BIU</div>
+          <div>
+            <div style="font-size:13px;color:var(--muted)">Benson Idahosa University</div>
+            <h1 id="loginTitle">Welcome back</h1>
+          </div>
+        </div>
+        <p class="lead">Sign in to access past questions, leaderboards, and the student community.</p>
+
+        <div class="divider" role="separator"></div>
+
+        <div id="signedPreview" style="display:none">
+          <div class="profilePreview">
+            <div class="avatar" id="previewAvatar">JD</div>
+            <div>
+              <div id="previewName" style="font-weight:700"></div>
+              <div id="previewEmail" class="small muted"></div>
+            </div>
+          </div>
+          <div id="previewVerified" style="margin-top:8px"></div>
+        </div>
+
+        <div style="margin-top:auto" class="small muted">New here? <a href="/signup.html" style="color:var(--accent);text-decoration:none;font-weight:700">Create account</a></div>
+      </div>
+
+      <div class="panel" aria-hidden="false">
+        <form id="loginForm" novalidate>
+          <div>
+            <label for="email">Email</label>
+            <input id="email" type="email" autocomplete="email" placeholder="you@students.biu.edu.ng" required />
+          </div>
+
+          <div>
+            <label for="password">Password</label>
+            <input id="password" type="password" autocomplete="current-password" placeholder="Your password" required />
+          </div>
+
+          <div id="feedback" aria-live="polite"></div>
+
+          <div style="display:flex;gap:10px;align-items:center">
+            <button type="submit" class="btn" id="signInBtn">Sign in</button>
+            <button type="button" class="google" id="googleSignIn" aria-label="Sign in with Google">
+              <svg viewBox="0 0 533.5 544.3" aria-hidden="true" style="width:18px;height:18px"><path fill="#4285f4" d="M533.5 278.4c0-17.4-1.6-34.1-4.6-50.3H272v95.1h147.1c-6.3 34.1-25.1 62.9-53.6 82.2v68.2h86.6c50.6-46.6 81.4-115.3 81.4-195.2z"/><path fill="#34a853" d="M272 544.3c72.6 0 133.6-24.1 178.2-65.4l-86.6-68.2c-24.1 16.2-55 25.8-91.6 25.8-70.4 0-130-47.6-151.3-111.6H32.6v69.9C77.1 486.6 168.6 544.3 272 544.3z"/><path fill="#fbbc04" d="M120.7 325.3c-10.8-32.1-10.8-66.6 0-98.7V156.7H32.6c-39.8 78.9-39.8 171.2 0 250.1l88.1-81.5z"/><path fill="#ea4335" d="M272 107.7c38.9-.6 76.4 14.1 104.9 40.6l78.6-78.6C405.6 24.6 344.6 0 272 0 168.6 0 77.1 57.7 32.6 156.7l88.1 69.9C142 155.3 201.6 107.7 272 107.7z"/></svg>
+              Sign in with Google
+            </button>
+          </div>
+
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+            <button type="button" class="btn ghost" id="resetBtn">Forgot password</button>
+            <div class="small muted">Need help? <span id="helpText" class="small muted">Contact admin</span></div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <script>
+    // Firebase config (your project)
+    const firebaseConfig = {
+      apiKey: "AIzaSyBsVbLw4mvFTJhmORUXCUNyGc98Rripj3M",
+      authDomain: "biu-students-hub.firebaseapp.com",
+      projectId: "biu-students-hub",
+      storageBucket: "biu-students-hub.firebasestorage.app",
+      messagingSenderId: "128818531382",
+      appId: "1:128818531382:web:190dc5688d1b9d21321c97",
+      measurementId: "G-ELK8KN5SK7"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
+
+    // UI elements
+    const loginForm = document.getElementById('loginForm');
+    const signInBtn = document.getElementById('signInBtn');
+    const googleBtn = document.getElementById('googleSignIn');
+    const feedback = document.getElementById('feedback');
+    const resetBtn = document.getElementById('resetBtn');
+    const signedPreview = document.getElementById('signedPreview');
+    const previewAvatar = document.getElementById('previewAvatar');
+    const previewName = document.getElementById('previewName');
+    const previewEmail = document.getElementById('previewEmail');
+    const previewVerified = document.getElementById('previewVerified');
+
+    function showMessage(msg, type='error'){
+      const color = type === 'error' ? '#ef4444' : '#10b981';
+      feedback.innerHTML = '<div style="color:'+color+';font-size:13px">'+msg+'</div>';
+    }
+
+    // Email/password sign in
+    loginForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      feedback.innerHTML = '';
+      signInBtn.disabled = true;
+      signInBtn.textContent = 'Signing in...';
+
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      try{
+        const cred = await auth.signInWithEmailAndPassword(email, password);
+        const user = cred.user;
+
+        if(!user.emailVerified){
+          showMessage('Please verify your email before signing in. Check your inbox.', 'error');
+          try { await user.sendEmailVerification(); } catch {}
+          signInBtn.disabled = false;
+          signInBtn.textContent = 'Sign in';
+          return;
+        }
+
+        // read profile to check verified status
+        const snap = await db.ref('profiles/' + user.uid).once('value');
+        const profile = snap.val() || {};
+        const verified = !!profile.verified;
+
+        // show small preview then redirect
+        previewAvatar.textContent = (user.displayName || '').split(' ').map(s=>s[0]).join('').slice(0,2).toUpperCase() || user.email.charAt(0).toUpperCase();
+        previewName.textContent = user.displayName || profile.fullName || 'Student';
+        previewEmail.textContent = user.email;
+        previewVerified.innerHTML = verified ? '<span class="verified">✔ Verified</span>' : '<span class="small muted">Not verified</span>';
+        signedPreview.style.display = 'block';
+
+        // update lastSeen timestamp
+        await db.ref('profiles/' + user.uid + '/lastSeen').set(firebase.database.ServerValue.TIMESTAMP);
+
+        // redirect
+        setTimeout(()=> window.location.href = '/index.html', 900);
+      }catch(err){
+        console.error(err);
+        showMessage(err.message || 'Sign-in failed.');
+      } finally {
+        signInBtn.disabled = false;
+        signInBtn.textContent = 'Sign in';
+      }
+    });
+
+    // Google sign-in
+    googleBtn.addEventListener('click', async () => {
+      const provider = new firebase.auth.GoogleAuthProvider();
+      provider.setCustomParameters({prompt: 'select_account'});
+      try{
+        const result = await auth.signInWithPopup(provider);
+        const user = result.user;
+
+        // ensure profile exists
+        const ref = db.ref('profiles/' + user.uid);
+        const snap = await ref.once('value');
+        if(!snap.exists()){
+          await ref.set({
+            fullName: user.displayName || '',
+            email: user.email || '',
+            level: '100',
+            createdAt: firebase.database.ServerValue.TIMESTAMP,
+            verified: false,
+            role: 'student',
+            social: { instagram: '', tiktok: '', linkedin: '' },
+            streak: 0,
+            profilePicPath: ''
+          });
+        }
+
+        // redirect
+        window.location.href = '/index.html';
+      }catch(err){
+        console.error(err);
+        showMessage(err.message || 'Google sign-in failed.');
+      }
+    });
+
+    // Password reset
+    resetBtn.addEventListener('click', async () => {
+      const email = document.getElementById('email').value.trim();
+      if(!email){
+        showMessage('Enter your email to receive a reset link.');
+        return;
+      }
+      try{
+        await auth.sendPasswordResetEmail(email);
+        showMessage('Password reset email sent.', 'success');
+      }catch(err){
+        console.error(err);
+        showMessage(err.message || 'Failed to send reset email.');
+      }
+    });
+
+    // Auto redirect if already signed in
+    auth.onAuthStateChanged(async (user) => {
+      if(user){
+        if(user.emailVerified){
+          const snap = await db.ref('profiles/' + user.uid).once('value');
+          const profile = snap.val() || {};
+          previewAvatar.textContent = (user.displayName || '').split(' ').map(s=>s[0]).join('').slice(0,2).toUpperCase() || user.email.charAt(0).toUpperCase();
+          previewName.textContent = user.displayName || profile.fullName || 'Student';
+          previewEmail.textContent = user.email;
+          previewVerified.innerHTML = profile.verified ? '<span class="verified">✔ Verified</span>' : '<span class="small muted">Not verified</span>';
+          signedPreview.style.display = 'block';
+          setTimeout(()=> window.location.href = '/index.html', 700);
+        } else {
+          showMessage('Please verify your email. Check your inbox.', 'error');
+        }
+      }
+    });
+  </script>
+</body>
+</html>
