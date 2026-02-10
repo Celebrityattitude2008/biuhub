@@ -1,0 +1,345 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>BIU Student Hub — Home</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#071028;
+      --card:#071827;
+      --accent:#6d28d9;
+      --accent-2:#06b6d4;
+      --muted:#9aa8bf;
+      --glass: rgba(255,255,255,0.03);
+      --success:#10b981;
+      --danger:#ef4444;
+      --radius:16px;
+      --max-width:1200px;
+      --glass-2: rgba(255,255,255,0.02);
+    }
+    *{box-sizing:border-box;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
+    html,body{height:100%;margin:0;background:
+      radial-gradient(900px 400px at 10% 10%, rgba(109,40,217,0.08), transparent 8%),
+      radial-gradient(700px 300px at 90% 90%, rgba(6,182,212,0.04), transparent 6%),
+      linear-gradient(180deg,#041026 0%, #071028 100%);
+      color:#e6eef8;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;}
+
+    .container{max-width:var(--max-width);margin:0 auto;padding:28px;}
+
+    /* Header */
+    header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 0}
+    .brand{display:flex;align-items:center;gap:12px}
+    .logo{
+      width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));
+      display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:18px;transform:rotate(-6deg);
+      box-shadow:0 10px 30px rgba(109,40,217,0.18);
+    }
+    nav{display:flex;gap:12px;align-items:center}
+    .nav-link{color:var(--muted);text-decoration:none;padding:8px 12px;border-radius:10px;font-weight:600}
+    .nav-link:hover{color:#fff;background:rgba(255,255,255,0.02)}
+    .cta{padding:10px 14px;border-radius:12px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;font-weight:700;border:none;cursor:pointer;box-shadow:0 10px 30px rgba(109,40,217,0.18)}
+    .ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);padding:8px 12px;border-radius:10px}
+
+    /* Hero */
+    .hero{display:grid;grid-template-columns:1fr 420px;gap:28px;align-items:center;padding:36px 0}
+    .hero-left{max-width:720px}
+    .eyebrow{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:linear-gradient(90deg,rgba(255,255,255,0.02),transparent);color:var(--muted);font-weight:700;font-size:13px}
+    h1{font-size:36px;margin:12px 0 8px;line-height:1.02}
+    p.lead{color:var(--muted);margin:0 0 18px;max-width:58ch}
+    .hero-cta{display:flex;gap:12px;align-items:center}
+    .stat-grid{display:flex;gap:12px;margin-top:18px}
+    .stat{background:var(--glass-2);padding:12px 14px;border-radius:12px;color:var(--muted);font-weight:700}
+
+    /* Right card (quick links + discussion preview) */
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      border-radius:16px;padding:18px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 12px 40px rgba(2,6,23,0.6);
+      display:flex;flex-direction:column;gap:12px;min-height:260px;
+      transform:translateY(10px);opacity:0;animation:cardIn .6s ease-out .08s forwards;
+    }
+    @keyframes cardIn{to{transform:none;opacity:1}}
+
+    .card h3{margin:0;font-size:16px}
+    .quick-links{display:flex;flex-direction:column;gap:8px}
+    .quick-links a{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:10px;background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.02);text-decoration:none;color:#e6eef8;font-weight:700}
+
+    /* Sections */
+    section{margin-top:28px}
+    .grid-3{display:grid;grid-template-columns:1fr 420px;gap:28px}
+    .panel{background:linear-gradient(180deg, rgba(255,255,255,0.01), transparent);padding:18px;border-radius:14px;border:1px solid rgba(255,255,255,0.02)}
+    .panel h3{margin:0 0 12px}
+
+    /* Past questions panel (redirect) */
+    .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+    select,input[type="search"]{padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:#e6eef8}
+    .pq-cta{display:flex;gap:8px;align-items:center}
+
+    /* Discussion */
+    .discussion-list{display:flex;flex-direction:column;gap:10px;max-height:320px;overflow:auto;padding-right:6px}
+    .post{padding:12px;border-radius:10px;background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.02)}
+    .post .meta{display:flex;gap:8px;align-items:center;color:var(--muted);font-size:13px;margin-bottom:8px}
+
+    /* Footer */
+    footer{margin-top:36px;padding:18px 0;color:var(--muted);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+
+    /* small screens */
+    @media (max-width:980px){
+      .hero{grid-template-columns:1fr;gap:18px}
+      .grid-3{grid-template-columns:1fr;gap:18px}
+      .card{order:2}
+    }
+    @media (max-width:520px){
+      h1{font-size:28px}
+      .logo{width:48px;height:48px}
+    }
+
+    /* subtle hover */
+    .pq-cta button:hover,.quick-links a:hover,.post:hover{transform:translateY(-4px);transition:transform .12s}
+    .fade-in{animation:fadeUp .5s ease-out both}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true">BIU</div>
+        <div>
+          <div style="font-size:13px;color:var(--muted)">Benson Idahosa University</div>
+          <div style="font-weight:800">Student Hub</div>
+        </div>
+      </div>
+
+      <nav>
+        <a class="nav-link" href="/index.html">Home</a>
+        <a class="nav-link" href="/pq.html">Past Questions</a>
+        <a class="nav-link" href="/profile.html">Profile</a>
+        <a class="nav-link" href="/login.html">Login</a>
+        <button class="cta" id="getStarted">Get Started</button>
+      </nav>
+    </header>
+
+    <!-- HERO -->
+    <main class="hero">
+      <div class="hero-left fade-in">
+        <div class="eyebrow">Student Community • Verified Profiles</div>
+        <h1>Study smarter. Compete fair. Share freely.</h1>
+        <p class="lead">Access past questions, join discussions, climb the streak leaderboard, and get verified to unlock exclusive profile features.</p>
+
+        <div class="hero-cta">
+          <button class="cta" id="ctaSignup">Create account</button>
+          <button class="ghost" id="ctaExplore">Explore past questions</button>
+        </div>
+
+        <div class="stat-grid" aria-hidden="true">
+          <div class="stat">📚 <strong id="statPQ">—</strong> past questions</div>
+          <div class="stat">💬 <strong id="statPosts">—</strong> discussions</div>
+        </div>
+      </div>
+
+      <aside class="card fade-in" aria-labelledby="quickLinksTitle">
+        <h3 id="quickLinksTitle">Quick Links</h3>
+
+        <div class="quick-links" id="quickLinks">
+          <a href="/pq.html">📚 Browse Past Questions <span style="opacity:.7">Open</span></a>
+          <a href="/discussions.html">💬 Community Discussions <span style="opacity:.7">Open</span></a>
+          <a href="/leaderboard.html">🏆 Leaderboard <span style="opacity:.7">Open</span></a>
+          <a href="/profile.html">👤 Your Profile <span style="opacity:.7">Open</span></a>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;margin-top:12px;align-items:center">
+          <a href="/pq.html" class="nav-link">Go to Past Questions</a>
+          <button class="ghost" id="refreshQuick">Refresh</button>
+        </div>
+      </aside>
+    </main>
+
+    <!-- CONTENT GRID -->
+    <section class="grid-3">
+      <!-- Past Questions Panel (redirect) -->
+      <div class="panel fade-in" aria-labelledby="pqTitle">
+        <h3 id="pqTitle">Past Questions</h3>
+        <div class="filters" role="region" aria-label="Filter past questions">
+          <select id="pqLevel" aria-label="Select level">
+            <option value="100">100L</option>
+            <option value="200">200L</option>
+            <option value="300">300L</option>
+            <option value="400">400L</option>
+          </select>
+          <select id="pqSemester" aria-label="Select semester">
+            <option value="1">Semester 1</option>
+            <option value="2">Semester 2</option>
+          </select>
+          <input id="pqSearch" type="search" placeholder="Search by course or year" />
+          <div class="pq-cta">
+            <button class="cta" id="openPQ">Open Past Questions</button>
+            <button class="ghost" id="pqHelp">How to upload</button>
+          </div>
+        </div>
+
+        <div style="color:var(--muted);padding:12px">Click "Open Past Questions" to go to the full past questions page where you can filter by level and semester, and download files.</div>
+      </div>
+
+      <!-- Discussion Panel -->
+      <div class="panel fade-in" aria-labelledby="discussTitle">
+        <h3 id="discussTitle">General Discussion</h3>
+        <div style="display:flex;gap:8px;margin-bottom:12px">
+          <input id="postInput" type="text" placeholder="Share a quick tip or question (sign in to post)" style="flex:1" disabled />
+          <button class="ghost" id="openDiscussion" title="Sign in to post">Sign in</button>
+        </div>
+
+        <div class="discussion-list" id="discussionList">
+          <div style="color:var(--muted);padding:12px">Loading recent posts…</div>
+        </div>
+
+        <div style="display:flex;justify-content:space-between;margin-top:12px">
+          <a href="/discussions.html" class="nav-link">Open full discussion</a>
+          <div class="small muted">Community-moderated</div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div>© <strong>Benson Idahosa University Student Hub</strong> — Built for students</div>
+      <div class="small muted">Made with care • <a href="/privacy.html" class="nav-link">Privacy</a></div>
+    </footer>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+  <script>
+    // Firebase config (your project)
+    const firebaseConfig = {
+      apiKey: "AIzaSyBsVbLw4mvFTJhmORUXCUNyGc98Rripj3M",
+      authDomain: "biu-students-hub.firebaseapp.com",
+      projectId: "biu-students-hub",
+      storageBucket: "biu-students-hub.firebasestorage.app",
+      messagingSenderId: "128818531382",
+      appId: "1:128818531382:web:190dc5688d1b9d21321c97",
+      measurementId: "G-ELK8KN5SK7"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.database();
+
+    // If user is not signed in, redirect to signup (prevents anonymous access)
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        // short delay to allow UI to render briefly, then redirect
+        setTimeout(() => {
+          // avoid redirect loop if already on signup page
+          if (!location.pathname.endsWith('/signup.html') && !location.pathname.endsWith('/login.html')) {
+            window.location.href = '/signup.html';
+          }
+        }, 300);
+      } else {
+        // user is signed in — you can load personalized UI or data here if needed
+      }
+    });
+
+    // UI refs
+    const statPQ = document.getElementById('statPQ');
+    const statPosts = document.getElementById('statPosts');
+    const pqLevel = document.getElementById('pqLevel');
+    const pqSemester = document.getElementById('pqSemester');
+    const pqSearch = document.getElementById('pqSearch');
+    const openPQ = document.getElementById('openPQ');
+    const ctaSignup = document.getElementById('ctaSignup');
+    const ctaExplore = document.getElementById('ctaExplore');
+    const getStarted = document.getElementById('getStarted');
+    const openDiscussion = document.getElementById('openDiscussion');
+    const discussionList = document.getElementById('discussionList');
+    const refreshQuick = document.getElementById('refreshQuick');
+
+    // Redirect to pq.html with query params for level/semester/search
+    openPQ.addEventListener('click', () => {
+      const level = pqLevel.value;
+      const sem = pqSemester.value;
+      const q = encodeURIComponent(pqSearch.value.trim());
+      const url = `/pq.html?level=${level}&sem=${sem}${q ? '&q=' + q : ''}`;
+      window.location.href = url;
+    });
+
+    // Hero CTA actions
+    ctaSignup.addEventListener('click', ()=> window.location.href = '/signup.html');
+    getStarted.addEventListener('click', ()=> window.location.href = '/signup.html');
+    ctaExplore.addEventListener('click', ()=> {
+      window.location.href = '/pq.html';
+    });
+    openDiscussion.addEventListener('click', ()=> window.location.href = '/login.html');
+
+    // Load counts for stats
+    async function loadCounts(){
+      try{
+        const pqSnap = await db.ref('pastQuestions').once('value');
+        let pqCount = 0;
+        pqSnap.forEach(levelSnap => {
+          levelSnap.forEach(semSnap => {
+            pqCount += semSnap.numChildren ? semSnap.numChildren() : 0;
+          });
+        });
+        statPQ.textContent = pqCount || 0;
+      }catch(e){
+        statPQ.textContent = '—';
+      }
+      try{
+        const postsSnap = await db.ref('discussions').limitToLast(50).once('value');
+        statPosts.textContent = postsSnap.numChildren() || 0;
+      }catch(e){
+        statPosts.textContent = '—';
+      }
+    }
+
+    // Discussion preview
+    async function loadDiscussions(){
+      discussionList.innerHTML = '<div style="color:var(--muted);padding:12px">Loading recent posts…</div>';
+      try{
+        const snap = await db.ref('discussions').orderByChild('createdAt').limitToLast(20).once('value');
+        const arr = [];
+        snap.forEach(child => arr.push({ id: child.key, ...child.val() }));
+        arr.sort((a,b)=> (b.createdAt||0) - (a.createdAt||0));
+        discussionList.innerHTML = '';
+        if(arr.length === 0){
+          discussionList.innerHTML = '<div style="color:var(--muted);padding:12px">No posts yet. Be the first to start a discussion.</div>';
+          return;
+        }
+        arr.slice(0,10).forEach(post => {
+          const p = document.createElement('div');
+          p.className = 'post';
+          const meta = document.createElement('div');
+          meta.className = 'meta';
+          meta.textContent = `${post.authorName || 'Student'} • ${new Date(post.createdAt || Date.now()).toLocaleString()}`;
+          const body = document.createElement('div');
+          body.textContent = post.text || '';
+          p.appendChild(meta);
+          p.appendChild(body);
+          discussionList.appendChild(p);
+        });
+      }catch(err){
+        console.error('Discussion load error', err);
+        discussionList.innerHTML = '<div style="color:var(--muted);padding:12px">Failed to load discussions.</div>';
+      }
+    }
+
+    // Initial load (only runs if DB accessible; auth redirect will run first if not signed in)
+    loadCounts();
+    loadDiscussions();
+
+    // Refresh quick links panel (placeholder)
+    refreshQuick.addEventListener('click', () => {
+      loadCounts();
+      loadDiscussions();
+    });
+
+    // Accessibility: keyboard focus for CTA
+    document.getElementById('ctaSignup').addEventListener('keydown', (e)=> {
+      if(e.key === 'Enter') e.target.click();
+    });
+  </script>
+</body>
+</html>
