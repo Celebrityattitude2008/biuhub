@@ -119,18 +119,24 @@ h1{margin:0;font-size:20px}
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
 <script>
-      const firebaseConfig = {
-      apiKey: "AIzaSyBsVbLw4mvFTJhmORUXCUNyGc98Rripj3M",
-      authDomain: "biu-students-hub.firebaseapp.com",
-      projectId: "biu-students-hub",
-      storageBucket: "biu-students-hub.firebasestorage.app",
-      messagingSenderId: "128818531382",
-      appId: "1:128818531382:web:190dc5688d1b9d21321c97",
-      measurementId: "G-ELK8KN5SK7"
-    };
+const firebaseConfig = {
+  apiKey: "AIzaSyBsVbLw4mvFTJhmORUXCUNyGc98Rripj3M",
+  authDomain: "biu-students-hub.firebaseapp.com",
+  projectId: "biu-students-hub",
+  storageBucket: "biu-students-hub.appspot.com",
+  messagingSenderId: "128818531382",
+  appId: "1:128818531382:web:190dc5688d1b9d21321c97",
+  measurementId: "G-ELK8KN5SK7",
+  databaseURL: "https://biu-students-hub-default-rtdb.firebaseio.com"
+};
+
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
 
 const auth = firebase.auth();
 const db = firebase.database();
+const storage = firebase.storage();
 
 let proofs = [];
 let selected = null;
@@ -149,6 +155,7 @@ const rejectBtn = document.getElementById('rejectBtn');
 const markPendingBtn = document.getElementById('markPendingBtn');
 const searchInput = document.getElementById('searchInput');
 const signOutBtn = document.getElementById('signOut');
+const refreshBtn = document.getElementById('refreshBtn');
 
 function lockButtons(state){
   [approveBtn,rejectBtn,markPendingBtn].forEach(btn=>{
@@ -160,7 +167,8 @@ function lockButtons(state){
 function safeInitials(str){
   if(!str) return 'U';
   return str.split(' ')
-    .map(s=>s && s[0] ? s[0] : '')
+    .filter(s => s)
+    .map(s => s[0])
     .join('')
     .substring(0,2)
     .toUpperCase() || 'U';
@@ -235,22 +243,16 @@ function renderList(filter=''){
 
 async function selectProof(p){
   selected=p;
-
   previewMeta.innerHTML='';
   previewMeta.appendChild(createSafeDiv(p.fullName||p.email||p.uid,null,true));
   previewMeta.appendChild(createSafeDiv(`UID: ${p.uid}`,'small'));
-
   selectedStatus.textContent=(p.status||'pending').toUpperCase();
   proofActions.style.display='block';
-
   previewImage.innerHTML='<div class="small">Loading image…</div>';
 
   try{
-    let finalUrl = null;
-
-    if(p.url){
-      finalUrl = p.url;
-    } else if(p.storagePath){
+    let finalUrl = p.url || null;
+    if(!finalUrl && p.storagePath){
       finalUrl = await storage.ref(p.storagePath).getDownloadURL();
     }
 
@@ -259,19 +261,17 @@ async function selectProof(p){
       link.href = finalUrl;
       link.target = "_blank";
       link.rel = "noopener noreferrer";
-
       const img = document.createElement('img');
       img.src = finalUrl;
-
+      img.onerror = () => { previewImage.innerHTML = '<div class="small">Image could not load.</div>'; };
       link.appendChild(img);
       previewImage.innerHTML='';
       previewImage.appendChild(link);
     } else {
       previewImage.innerHTML='<div class="small">No image available.</div>';
     }
-
-  }catch{
-    previewImage.innerHTML='<div class="small">Failed to load image.</div>';
+  }catch(e){
+    previewImage.innerHTML='<div class="small">Error loading image from storage.</div>';
   }
 }
 
@@ -279,17 +279,10 @@ async function approveSelected(){
   if(!selected) return alert('Select a proof first.');
   const user=auth.currentUser;
   if(!user) return alert('Session expired.');
-  if(!selected.uid||!selected.proofId)
-    return alert('Invalid proof structure.');
-
   lockButtons(true);
-
   try{
     await db.ref(`profiles/${selected.uid}/verified`).set(true);
-
-    await db.ref(`paymentProofs/${selected.uid}/${selected.proofId}`)
-      .update({status:'approved',reviewedBy:user.email});
-
+    await db.ref(`paymentProofs/${selected.uid}/${selected.proofId}`).update({status:'approved',reviewedBy:user.email});
     await db.ref(`adminActions`).push({
       action:'approve_verification',
       uid:selected.uid,
@@ -297,11 +290,8 @@ async function approveSelected(){
       admin:user.email,
       at:firebase.database.ServerValue.TIMESTAMP
     });
-
-  }catch(e){
-    alert(e.message);
-  }
-
+    alert('Approved successfully.');
+  }catch(e){ alert(e.message); }
   lockButtons(false);
 }
 
@@ -309,16 +299,11 @@ async function rejectSelected(){
   if(!selected) return alert('Select a proof first.');
   const user=auth.currentUser;
   if(!user) return alert('Session expired.');
-
   lockButtons(true);
-
   try{
-    await db.ref(`paymentProofs/${selected.uid}/${selected.proofId}`)
-      .update({status:'rejected',reviewedBy:user.email});
-  }catch(e){
-    alert(e.message);
-  }
-
+    await db.ref(`paymentProofs/${selected.uid}/${selected.proofId}`).update({status:'rejected',reviewedBy:user.email});
+    alert('Proof rejected.');
+  }catch(e){ alert(e.message); }
   lockButtons(false);
 }
 
@@ -326,30 +311,19 @@ async function markPending(){
   if(!selected) return alert('Select a proof first.');
   const user=auth.currentUser;
   if(!user) return alert('Session expired.');
-
   lockButtons(true);
-
   try{
-    await db.ref(`paymentProofs/${selected.uid}/${selected.proofId}`)
-      .update({status:'pending',reviewedBy:user.email});
-  }catch(e){
-    alert(e.message);
-  }
-
+    await db.ref(`paymentProofs/${selected.uid}/${selected.proofId}`).update({status:'pending',reviewedBy:user.email});
+    alert('Status set to pending.');
+  }catch(e){ alert(e.message); }
   lockButtons(false);
 }
 
 function attachProofListener(){
-
-  if(proofsRef && proofsListener){
-    proofsRef.off('value', proofsListener);
-  }
-
+  if(proofsRef && proofsListener) proofsRef.off('value', proofsListener);
   proofsRef = db.ref('paymentProofs').limitToLast(200);
-
   proofsListener = snap=>{
     proofs=[];
-
     snap.forEach(uidSnap=>{
       uidSnap.forEach(proofSnap=>{
         const d=proofSnap.val()||{};
@@ -365,52 +339,32 @@ function attachProofListener(){
         });
       });
     });
-
     proofs.sort((a,b)=>(b.uploadedAt||0)-(a.uploadedAt||0));
     renderList(searchInput.value.trim());
   };
-
   proofsRef.on('value', proofsListener);
 }
 
-document.getElementById('downloadReport')
-.addEventListener('click',()=>{
+document.getElementById('downloadReport').addEventListener('click',()=>{
   const pending=proofs.filter(p=>p.status==='pending');
-  const text=JSON.stringify(pending,null,2);
-
-  navigator.clipboard.writeText(text)
+  navigator.clipboard.writeText(JSON.stringify(pending,null,2))
     .then(()=>alert('Copied to clipboard.'))
     .catch(()=>alert('Clipboard failed.'));
 });
 
+document.getElementById('openProfiles').onclick = () => { console.log("Current Proofs Data:", proofs); alert("Data logged to console."); };
+refreshBtn.onclick = () => { attachProofListener(); alert("Refreshing..."); };
 approveBtn.onclick=approveSelected;
 rejectBtn.onclick=rejectSelected;
 markPendingBtn.onclick=markPending;
-
-searchInput.addEventListener('input',()=>{
-  renderList(searchInput.value.trim());
-});
-
-signOutBtn.onclick=()=>{
-  auth.signOut().then(()=>{
-    window.location.href='/login.html';
-  });
-};
+searchInput.addEventListener('input',()=>renderList(searchInput.value.trim()));
+signOutBtn.onclick=()=> auth.signOut().then(()=> window.location.href='/login.html');
 
 auth.onAuthStateChanged(user=>{
-  if(!user){
-    window.location.href='/login.html';
-    return;
-  }
-
-  if((user.email||'').toLowerCase()!==ADMIN_EMAIL){
-    window.location.href='/signup.html';
-    return;
-  }
-
+  if(!user){ window.location.href='/login.html'; return; }
+  if((user.email||'').toLowerCase()!==ADMIN_EMAIL){ window.location.href='/signup.html'; return; }
   document.getElementById('authNotice').style.display='none';
   document.getElementById('main').style.display='block';
-
   attachProofListener();
 });
 </script>
