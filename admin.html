@@ -121,13 +121,16 @@ h1{margin:0;font-size:20px}
 <script>
 const firebaseConfig = { /* unchanged */ };
 firebase.initializeApp(firebaseConfig);
+
 const auth = firebase.auth();
 const db = firebase.database();
 const storage = firebase.storage();
 
 let proofs = [];
 let selected = null;
+let proofsRef = null;
 let proofsListener = null;
+
 const ADMIN_EMAIL = 'pauladamu600@gmail.com';
 
 const proofList = document.getElementById('proofList');
@@ -139,201 +142,270 @@ const approveBtn = document.getElementById('approveBtn');
 const rejectBtn = document.getElementById('rejectBtn');
 const markPendingBtn = document.getElementById('markPendingBtn');
 const searchInput = document.getElementById('searchInput');
+const signOutBtn = document.getElementById('signOut');
 
 function lockButtons(state){
-[approveBtn,rejectBtn,markPendingBtn].forEach(btn=>{
-btn.disabled = state;
-btn.style.opacity = state ? 0.6 : 1;
-});
+  [approveBtn,rejectBtn,markPendingBtn].forEach(btn=>{
+    btn.disabled = state;
+    btn.style.opacity = state ? 0.6 : 1;
+  });
 }
 
 function safeInitials(str){
-if(!str) return 'U';
-return str.split(' ')
-.map(s=>s && s[0] ? s[0] : '')
-.join('')
-.substring(0,2)
-.toUpperCase() || 'U';
+  if(!str) return 'U';
+  return str.split(' ')
+    .map(s=>s && s[0] ? s[0] : '')
+    .join('')
+    .substring(0,2)
+    .toUpperCase() || 'U';
+}
+
+function createSafeDiv(text, className=null, bold=false){
+  const div = document.createElement('div');
+  if(className) div.className = className;
+  if(bold) div.style.fontWeight = '700';
+  div.textContent = text || '';
+  return div;
 }
 
 function renderList(filter=''){
-proofList.innerHTML='';
-const filtered = proofs.filter(p=>{
-if(!filter) return true;
-const q=filter.toLowerCase();
-return (p.fullName||'').toLowerCase().includes(q) ||
-(p.email||'').toLowerCase().includes(q) ||
-(p.uid||'').toLowerCase().includes(q);
-});
-if(filtered.length===0){
-proofList.innerHTML='<div class="small" style="padding:12px">No payment proofs found.</div>';
-return;
-}
-filtered.forEach(p=>{
-const el=document.createElement('div');
-el.className='item';
+  proofList.innerHTML='';
+  const filtered = proofs.filter(p=>{
+    if(!filter) return true;
+    const q=filter.toLowerCase();
+    return (p.fullName||'').toLowerCase().includes(q) ||
+           (p.email||'').toLowerCase().includes(q) ||
+           (p.uid||'').toLowerCase().includes(q);
+  });
 
-const meta=document.createElement('div');
-meta.className='meta';
+  if(filtered.length===0){
+    const empty = document.createElement('div');
+    empty.className = 'small';
+    empty.style.padding = '12px';
+    empty.textContent = 'No payment proofs found.';
+    proofList.appendChild(empty);
+    return;
+  }
 
-const av=document.createElement('div');
-av.className='avatar';
-av.textContent=safeInitials(p.fullName||p.email);
+  filtered.forEach(p=>{
+    const el=document.createElement('div');
+    el.className='item';
 
-const info=document.createElement('div');
-info.innerHTML=`<div style="font-weight:700">${p.fullName||p.email||p.uid}</div>
-<div class="small">${p.email||''} • ${p.uid}</div>`;
+    const meta=document.createElement('div');
+    meta.className='meta';
 
-meta.appendChild(av);
-meta.appendChild(info);
+    const av=document.createElement('div');
+    av.className='avatar';
+    av.textContent=safeInitials(p.fullName||p.email);
 
-const right=document.createElement('div');
-right.style.display='flex';
-right.style.gap='8px';
+    const info=document.createElement('div');
+    info.appendChild(createSafeDiv(p.fullName||p.email||p.uid,null,true));
+    info.appendChild(createSafeDiv(`${p.email||''} • ${p.uid}`,'small'));
 
-const status=document.createElement('div');
-status.className='small';
-status.textContent=p.status||'pending';
+    meta.appendChild(av);
+    meta.appendChild(info);
 
-const viewBtn=document.createElement('button');
-viewBtn.className='btn ghost';
-viewBtn.textContent='View';
-viewBtn.onclick=()=>selectProof(p);
+    const right=document.createElement('div');
+    right.style.display='flex';
+    right.style.gap='8px';
 
-right.appendChild(status);
-right.appendChild(viewBtn);
+    const status=document.createElement('div');
+    status.className='small';
+    status.textContent=p.status||'pending';
 
-el.appendChild(meta);
-el.appendChild(right);
-proofList.appendChild(el);
-});
+    const viewBtn=document.createElement('button');
+    viewBtn.className='btn ghost';
+    viewBtn.textContent='View';
+    viewBtn.onclick=()=>selectProof(p);
+
+    right.appendChild(status);
+    right.appendChild(viewBtn);
+
+    el.appendChild(meta);
+    el.appendChild(right);
+    proofList.appendChild(el);
+  });
 }
 
 async function selectProof(p){
-selected=p;
-previewMeta.innerHTML=`<div style="font-weight:700">${p.fullName||p.email||p.uid}</div>
-<div class="small">UID: ${p.uid}</div>`;
-selectedStatus.textContent=(p.status||'pending').toUpperCase();
-proofActions.style.display='block';
+  selected=p;
 
-previewImage.innerHTML='<div class="small">Loading image…</div>';
-try{
-if(p.url){
-previewImage.innerHTML=`<a href="${p.url}" target="_blank"><img src="${p.url}" /></a>`;
-}else if(p.storagePath){
-const url=await storage.ref(p.storagePath).getDownloadURL();
-previewImage.innerHTML=`<a href="${url}" target="_blank"><img src="${url}" /></a>`;
-}else{
-previewImage.innerHTML='<div class="small">No image available.</div>';
-}
-}catch{
-previewImage.innerHTML='<div class="small">Failed to load image.</div>';
-}
+  previewMeta.innerHTML='';
+  previewMeta.appendChild(createSafeDiv(p.fullName||p.email||p.uid,null,true));
+  previewMeta.appendChild(createSafeDiv(`UID: ${p.uid}`,'small'));
+
+  selectedStatus.textContent=(p.status||'pending').toUpperCase();
+  proofActions.style.display='block';
+
+  previewImage.innerHTML='<div class="small">Loading image…</div>';
+
+  try{
+    let finalUrl = null;
+
+    if(p.url){
+      finalUrl = p.url;
+    } else if(p.storagePath){
+      finalUrl = await storage.ref(p.storagePath).getDownloadURL();
+    }
+
+    if(finalUrl){
+      const link = document.createElement('a');
+      link.href = finalUrl;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+
+      const img = document.createElement('img');
+      img.src = finalUrl;
+
+      link.appendChild(img);
+      previewImage.innerHTML='';
+      previewImage.appendChild(link);
+    } else {
+      previewImage.innerHTML='<div class="small">No image available.</div>';
+    }
+
+  }catch{
+    previewImage.innerHTML='<div class="small">Failed to load image.</div>';
+  }
 }
 
 async function approveSelected(){
-if(!selected) return alert('Select a proof first.');
-const user=auth.currentUser;
-if(!user) return alert('Session expired.');
+  if(!selected) return alert('Select a proof first.');
+  const user=auth.currentUser;
+  if(!user) return alert('Session expired.');
+  if(!selected.uid||!selected.proofId)
+    return alert('Invalid proof structure.');
 
-if(!selected.uid||!selected.proofId)
-return alert('Invalid proof structure.');
+  lockButtons(true);
 
-lockButtons(true);
-try{
-await db.ref(`profiles/${selected.uid}/verified`).set(true);
-await db.ref(`paymentProofs/${selected.uid}/${selected.proofId}`)
-.update({status:'approved',reviewedBy:user.email});
-await db.ref(`adminActions`).push({
-action:'approve_verification',
-uid:selected.uid,
-proofId:selected.proofId,
-admin:user.email,
-at:firebase.database.ServerValue.TIMESTAMP
-});
-}catch(e){
-alert(e.message);
-}
-lockButtons(false);
+  try{
+    await db.ref(`profiles/${selected.uid}/verified`).set(true);
+
+    await db.ref(`paymentProofs/${selected.uid}/${selected.proofId}`)
+      .update({status:'approved',reviewedBy:user.email});
+
+    await db.ref(`adminActions`).push({
+      action:'approve_verification',
+      uid:selected.uid,
+      proofId:selected.proofId,
+      admin:user.email,
+      at:firebase.database.ServerValue.TIMESTAMP
+    });
+
+  }catch(e){
+    alert(e.message);
+  }
+
+  lockButtons(false);
 }
 
 async function rejectSelected(){
-if(!selected) return alert('Select a proof first.');
-const user=auth.currentUser;
-if(!user) return alert('Session expired.');
-lockButtons(true);
-try{
-await db.ref(`paymentProofs/${selected.uid}/${selected.proofId}`)
-.update({status:'rejected',reviewedBy:user.email});
-}catch(e){alert(e.message);}
-lockButtons(false);
+  if(!selected) return alert('Select a proof first.');
+  const user=auth.currentUser;
+  if(!user) return alert('Session expired.');
+
+  lockButtons(true);
+
+  try{
+    await db.ref(`paymentProofs/${selected.uid}/${selected.proofId}`)
+      .update({status:'rejected',reviewedBy:user.email});
+  }catch(e){
+    alert(e.message);
+  }
+
+  lockButtons(false);
 }
 
 async function markPending(){
-if(!selected) return alert('Select a proof first.');
-const user=auth.currentUser;
-if(!user) return alert('Session expired.');
-lockButtons(true);
-try{
-await db.ref(`paymentProofs/${selected.uid}/${selected.proofId}`)
-.update({status:'pending',reviewedBy:user.email});
-}catch(e){alert(e.message);}
-lockButtons(false);
+  if(!selected) return alert('Select a proof first.');
+  const user=auth.currentUser;
+  if(!user) return alert('Session expired.');
+
+  lockButtons(true);
+
+  try{
+    await db.ref(`paymentProofs/${selected.uid}/${selected.proofId}`)
+      .update({status:'pending',reviewedBy:user.email});
+  }catch(e){
+    alert(e.message);
+  }
+
+  lockButtons(false);
 }
 
 function attachProofListener(){
-if(proofsListener) db.ref('paymentProofs').off('value',proofsListener);
 
-proofsListener=db.ref('paymentProofs')
-.limitToLast(200)
-.on('value',snap=>{
-proofs=[];
-snap.forEach(uidSnap=>{
-uidSnap.forEach(proofSnap=>{
-const d=proofSnap.val();
-proofs.push({
-uid:uidSnap.key,
-proofId:proofSnap.key,
-fullName:d.fullName||d.name||'',
-email:d.email||'',
-uploadedAt:d.uploadedAt||0,
-status:d.status||'pending',
-storagePath:d.storagePath||'',
-url:d.url||''
-});
-});
-});
-proofs.sort((a,b)=>(b.uploadedAt||0)-(a.uploadedAt||0));
-renderList(searchInput.value.trim());
-});
+  if(proofsRef && proofsListener){
+    proofsRef.off('value', proofsListener);
+  }
+
+  proofsRef = db.ref('paymentProofs').limitToLast(200);
+
+  proofsListener = snap=>{
+    proofs=[];
+
+    snap.forEach(uidSnap=>{
+      uidSnap.forEach(proofSnap=>{
+        const d=proofSnap.val()||{};
+        proofs.push({
+          uid:uidSnap.key,
+          proofId:proofSnap.key,
+          fullName:d.fullName||d.name||'',
+          email:d.email||'',
+          uploadedAt:d.uploadedAt||0,
+          status:d.status||'pending',
+          storagePath:d.storagePath||'',
+          url:d.url||''
+        });
+      });
+    });
+
+    proofs.sort((a,b)=>(b.uploadedAt||0)-(a.uploadedAt||0));
+    renderList(searchInput.value.trim());
+  };
+
+  proofsRef.on('value', proofsListener);
 }
 
 document.getElementById('downloadReport')
 .addEventListener('click',()=>{
-const pending=proofs.filter(p=>p.status==='pending');
-const text=JSON.stringify(pending,null,2);
-navigator.clipboard.writeText(text)
-.then(()=>alert('Copied to clipboard.'))
-.catch(()=>alert('Clipboard failed.'));
+  const pending=proofs.filter(p=>p.status==='pending');
+  const text=JSON.stringify(pending,null,2);
+
+  navigator.clipboard.writeText(text)
+    .then(()=>alert('Copied to clipboard.'))
+    .catch(()=>alert('Clipboard failed.'));
 });
 
 approveBtn.onclick=approveSelected;
 rejectBtn.onclick=rejectSelected;
 markPendingBtn.onclick=markPending;
-searchInput.addEventListener('input',()=>renderList(searchInput.value.trim()));
+
+searchInput.addEventListener('input',()=>{
+  renderList(searchInput.value.trim());
+});
+
+signOutBtn.onclick=()=>{
+  auth.signOut().then(()=>{
+    window.location.href='/login.html';
+  });
+};
 
 auth.onAuthStateChanged(user=>{
-if(!user){
-window.location.href='/login.html';
-return;
-}
-if((user.email||'').toLowerCase()!==ADMIN_EMAIL){
-window.location.href='/index.html';
-return;
-}
-document.getElementById('authNotice').style.display='none';
-document.getElementById('main').style.display='block';
-attachProofListener();
+  if(!user){
+    window.location.href='/login.html';
+    return;
+  }
+
+  if((user.email||'').toLowerCase()!==ADMIN_EMAIL){
+    window.location.href='/signup.html';
+    return;
+  }
+
+  document.getElementById('authNotice').style.display='none';
+  document.getElementById('main').style.display='block';
+
+  attachProofListener();
 });
 </script>
 </body>
