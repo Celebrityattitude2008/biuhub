@@ -119,12 +119,18 @@ h1{margin:0;font-size:20px}
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
 <script>
-const firebaseConfig = { /* unchanged */ };
-firebase.initializeApp(firebaseConfig);
+      const firebaseConfig = {
+      apiKey: "AIzaSyBsVbLw4mvFTJhmORUXCUNyGc98Rripj3M",
+      authDomain: "biu-students-hub.firebaseapp.com",
+      projectId: "biu-students-hub",
+      storageBucket: "biu-students-hub.firebasestorage.app",
+      messagingSenderId: "128818531382",
+      appId: "1:128818531382:web:190dc5688d1b9d21321c97",
+      measurementId: "G-ELK8KN5SK7"
+    };
 
 const auth = firebase.auth();
 const db = firebase.database();
-const storage = firebase.storage();
 
 let proofs = [];
 let selected = null;
