@@ -33,7 +33,7 @@ h1{margin:0;font-size:20px}
 .item{display:flex;justify-content:space-between;align-items:center;padding:12px;border-radius:10px;background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.02)}
 .meta{display:flex;gap:12px;align-items:center}
 .avatar{width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff}
-.btn{padding:10px 12px;border-radius:10px;border:none;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;font-weight:700;cursor:pointer}
+.btn{padding:10px 12px;border-radius:10px;border:none;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;font-weight:700;cursor:pointer;font-size: 12px;}
 .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
 .btn.danger{background:linear-gradient(90deg,#ef4444,#f97316)}
 .small{font-size:13px;color:var(--muted)}
@@ -42,6 +42,9 @@ h1{margin:0;font-size:20px}
 .controls{display:flex;gap:8px;flex-wrap:wrap}
 .search{width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:#e6eef8;margin-bottom:12px}
 .notice{padding:10px;border-radius:10px;background:rgba(255,255,255,0.01);color:var(--muted);font-size:13px}
+.badge { padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 800; text-transform: uppercase; margin-left: 4px;}
+.badge.verify { background: #10b981; color: white; }
+.badge.ban { background: #ef4444; color: white; }
 @media (max-width:980px){.grid{grid-template-columns:1fr;}}
 </style>
 </head>
@@ -63,53 +66,48 @@ h1{margin:0;font-size:20px}
 <div id="authNotice" class="card notice">Checking admin access…</div>
 
 <div id="main" style="display:none">
-<div class="card">
-<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px">
-<div>
-<div style="font-weight:800">Payment Proofs</div>
-<div class="small">Review incoming verification payments and approve or reject.</div>
-</div>
-<div style="display:flex;gap:8px;align-items:center">
-<input id="searchInput" class="search" placeholder="Search by student name or uid" style="width:320px" />
-<button id="refreshBtn" class="btn ghost">Refresh</button>
-</div>
-</div>
+    <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px">
+            <div>
+                <div style="font-weight:800">Payment Proofs</div>
+                <div class="small">Review incoming verification payments.</div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center">
+                <input id="searchInput" class="search" placeholder="Search proofs..." style="width:280px; margin:0" />
+                <button id="refreshBtn" class="btn ghost">Refresh</button>
+            </div>
+        </div>
 
-<div class="grid">
-<div>
-<div class="list" id="proofList"></div>
-</div>
+        <div class="grid">
+            <div><div class="list" id="proofList"></div></div>
+            <aside>
+                <div class="preview card">
+                    <div style="display:flex;justify-content:space-between;align-items:center">
+                        <div style="font-weight:700">Selected proof</div>
+                        <div id="selectedStatus" class="small"></div>
+                    </div>
+                    <div id="previewMeta" style="margin-top:8px" class="small">Select a proof to view</div>
+                    <div id="previewImage" style="margin-top:12px"></div>
+                    <div id="proofActions" style="margin-top:12px;display:none">
+                        <div class="controls">
+                            <button id="approveBtn" class="btn">Approve</button>
+                            <button id="rejectBtn" class="btn danger">Reject</button>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
 
-<aside>
-<div class="preview card">
-<div style="display:flex;justify-content:space-between;align-items:center">
-<div style="font-weight:700">Selected proof</div>
-<div id="selectedStatus" class="small"></div>
-</div>
-<div id="previewMeta" style="margin-top:8px" class="small">Select a proof to view details</div>
-<div id="previewImage" style="margin-top:12px"></div>
+    <div style="height:24px"></div>
 
-<div id="proofActions" style="margin-top:12px;display:none">
-<div class="controls">
-<button id="approveBtn" class="btn">Approve & Verify</button>
-<button id="rejectBtn" class="btn danger">Reject</button>
-<button id="markPendingBtn" class="btn ghost">Mark Pending</button>
-</div>
-</div>
-</div>
-
-<div style="height:12px"></div>
-
-<div class="card">
-<div style="font-weight:700;margin-bottom:8px">Admin tools</div>
-<div style="display:flex;flex-direction:column;gap:8px">
-<button id="openProfiles" class="btn ghost">Open Profiles in Console</button>
-<button id="downloadReport" class="btn ghost">Export pending list (copy)</button>
-</div>
-</div>
-</aside>
-</div>
-</div>
+    <div class="card">
+        <div style="margin-bottom:12px">
+            <div style="font-weight:800">User Management</div>
+            <div class="small">Quickly verify or ban users directly.</div>
+        </div>
+        <div class="list" id="userList" style="max-height:40vh"></div>
+    </div>
 </div>
 </div>
 
@@ -120,253 +118,165 @@ h1{margin:0;font-size:20px}
 
 <script>
 const firebaseConfig = {
-  apiKey: "AIzaSyBsVbLw4mvFTJhmORUXCUNyGc98Rripj3M",
-  authDomain: "biu-students-hub.firebaseapp.com",
-  projectId: "biu-students-hub",
-  storageBucket: "biu-students-hub.appspot.com",
-  messagingSenderId: "128818531382",
-  appId: "1:128818531382:web:190dc5688d1b9d21321c97",
-  measurementId: "G-ELK8KN5SK7",
-  databaseURL: "https://biu-students-hub-default-rtdb.firebaseio.com"
+  apiKey: "AIzaSyBsVbLw4mvFTJhmORUXCUNyGc98Rripj3M",
+  authDomain: "biu-students-hub.firebaseapp.com",
+  projectId: "biu-students-hub",
+  storageBucket: "biu-students-hub.appspot.com",
+  messagingSenderId: "128818531382",
+  appId: "1:128818531382:web:190dc5688d1b9d21321c97",
+  measurementId: "G-ELK8KN5SK7",
+  databaseURL: "https://biu-students-hub-default-rtdb.firebaseio.com"
 };
 
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
-
-const auth = firebase.auth();
-const db = firebase.database();
-const storage = firebase.storage();
-
-let proofs = [];
-let selected = null;
-let proofsRef = null;
-let proofsListener = null;
+if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth(), db = firebase.database(), storage = firebase.storage();
 
 const ADMIN_EMAIL = 'pauladamu600@gmail.com';
+let proofs = [], users = [], selected = null;
 
-const proofList = document.getElementById('proofList');
-const previewMeta = document.getElementById('previewMeta');
-const previewImage = document.getElementById('previewImage');
-const proofActions = document.getElementById('proofActions');
-const selectedStatus = document.getElementById('selectedStatus');
-const approveBtn = document.getElementById('approveBtn');
-const rejectBtn = document.getElementById('rejectBtn');
-const markPendingBtn = document.getElementById('markPendingBtn');
-const searchInput = document.getElementById('searchInput');
-const signOutBtn = document.getElementById('signOut');
-const refreshBtn = document.getElementById('refreshBtn');
+const proofList = document.getElementById('proofList'), 
+      userList = document.getElementById('userList'),
+      previewImage = document.getElementById('previewImage'),
+      proofActions = document.getElementById('proofActions'),
+      searchInput = document.getElementById('searchInput');
 
-function lockButtons(state){
-  [approveBtn,rejectBtn,markPendingBtn].forEach(btn=>{
-    btn.disabled = state;
-    btn.style.opacity = state ? 0.6 : 1;
-  });
-}
-
+// --- UTILS ---
 function safeInitials(str){
-  if(!str) return 'U';
-  return str.split(' ')
-    .filter(s => s)
-    .map(s => s[0])
-    .join('')
-    .substring(0,2)
-    .toUpperCase() || 'U';
+    if(!str) return 'U';
+    return str.split(' ').filter(s=>s).map(s=>s[0]).join('').substring(0,2).toUpperCase();
 }
 
-function createSafeDiv(text, className=null, bold=false){
-  const div = document.createElement('div');
-  if(className) div.className = className;
-  if(bold) div.style.fontWeight = '700';
-  div.textContent = text || '';
-  return div;
+// --- USER ACTIONS ---
+async function toggleVerify(uid, currentStatus) {
+    if(!confirm(`Change verification for this user?`)) return;
+    await db.ref(`profiles/${uid}/verified`).set(!currentStatus);
 }
 
-function renderList(filter=''){
-  proofList.innerHTML='';
-  const filtered = proofs.filter(p=>{
-    if(!filter) return true;
-    const q=filter.toLowerCase();
-    return (p.fullName||'').toLowerCase().includes(q) ||
-           (p.email||'').toLowerCase().includes(q) ||
-           (p.uid||'').toLowerCase().includes(q);
-  });
-
-  if(filtered.length===0){
-    const empty = document.createElement('div');
-    empty.className = 'small';
-    empty.style.padding = '12px';
-    empty.textContent = 'No payment proofs found.';
-    proofList.appendChild(empty);
-    return;
-  }
-
-  filtered.forEach(p=>{
-    const el=document.createElement('div');
-    el.className='item';
-
-    const meta=document.createElement('div');
-    meta.className='meta';
-
-    const av=document.createElement('div');
-    av.className='avatar';
-    av.textContent=safeInitials(p.fullName||p.email);
-
-    const info=document.createElement('div');
-    info.appendChild(createSafeDiv(p.fullName||p.email||p.uid,null,true));
-    info.appendChild(createSafeDiv(`${p.email||''} • ${p.uid}`,'small'));
-
-    meta.appendChild(av);
-    meta.appendChild(info);
-
-    const right=document.createElement('div');
-    right.style.display='flex';
-    right.style.gap='8px';
-
-    const status=document.createElement('div');
-    status.className='small';
-    status.textContent=p.status||'pending';
-
-    const viewBtn=document.createElement('button');
-    viewBtn.className='btn ghost';
-    viewBtn.textContent='View';
-    viewBtn.onclick=()=>selectProof(p);
-
-    right.appendChild(status);
-    right.appendChild(viewBtn);
-
-    el.appendChild(meta);
-    el.appendChild(right);
-    proofList.appendChild(el);
-  });
+async function toggleBan(uid, currentStatus) {
+    const action = currentStatus ? 'Unban' : 'Ban';
+    if(!confirm(`Are you sure you want to ${action} this user?`)) return;
+    await db.ref(`profiles/${uid}/banned`).set(!currentStatus);
 }
 
-async function selectProof(p){
-  selected=p;
-  previewMeta.innerHTML='';
-  previewMeta.appendChild(createSafeDiv(p.fullName||p.email||p.uid,null,true));
-  previewMeta.appendChild(createSafeDiv(`UID: ${p.uid}`,'small'));
-  selectedStatus.textContent=(p.status||'pending').toUpperCase();
-  proofActions.style.display='block';
-  previewImage.innerHTML='<div class="small">Loading image…</div>';
-
-  try{
-    let finalUrl = p.url || null;
-    if(!finalUrl && p.storagePath){
-      finalUrl = await storage.ref(p.storagePath).getDownloadURL();
-    }
-
-    if(finalUrl){
-      const link = document.createElement('a');
-      link.href = finalUrl;
-      link.target = "_blank";
-      link.rel = "noopener noreferrer";
-      const img = document.createElement('img');
-      img.src = finalUrl;
-      img.onerror = () => { previewImage.innerHTML = '<div class="small">Image could not load.</div>'; };
-      link.appendChild(img);
-      previewImage.innerHTML='';
-      previewImage.appendChild(link);
-    } else {
-      previewImage.innerHTML='<div class="small">No image available.</div>';
-    }
-  }catch(e){
-    previewImage.innerHTML='<div class="small">Error loading image from storage.</div>';
-  }
-}
-
-async function approveSelected(){
-  if(!selected) return alert('Select a proof first.');
-  const user=auth.currentUser;
-  if(!user) return alert('Session expired.');
-  lockButtons(true);
-  try{
-    await db.ref(`profiles/${selected.uid}/verified`).set(true);
-    await db.ref(`paymentProofs/${selected.uid}/${selected.proofId}`).update({status:'approved',reviewedBy:user.email});
-    await db.ref(`adminActions`).push({
-      action:'approve_verification',
-      uid:selected.uid,
-      proofId:selected.proofId,
-      admin:user.email,
-      at:firebase.database.ServerValue.TIMESTAMP
+// --- RENDERERS ---
+function renderUsers() {
+    userList.innerHTML = '';
+    users.forEach(u => {
+        const item = document.createElement('div');
+        item.className = 'item';
+        item.innerHTML = `
+            <div class="meta">
+                <div class="avatar">${safeInitials(u.fullName || u.email)}</div>
+                <div>
+                    <div style="font-weight:700; display:flex; align-items:center">
+                        ${u.fullName || 'User'} 
+                        ${u.verified ? '<span class="badge verify">Verified</span>' : ''}
+                        ${u.banned ? '<span class="badge ban">Banned</span>' : ''}
+                    </div>
+                    <div class="small">${u.email}</div>
+                </div>
+            </div>
+            <div class="controls">
+                <button class="btn ghost" onclick="toggleVerify('${u.uid}', ${!!u.verified})">
+                    ${u.verified ? 'Unverify' : 'Verify'}
+                </button>
+                <button class="btn ${u.banned ? '' : 'danger'}" onclick="toggleBan('${u.uid}', ${!!u.banned})">
+                    ${u.banned ? 'Unban' : 'Ban'}
+                </button>
+            </div>
+        `;
+        userList.appendChild(item);
     });
-    alert('Approved successfully.');
-  }catch(e){ alert(e.message); }
-  lockButtons(false);
 }
 
-async function rejectSelected(){
-  if(!selected) return alert('Select a proof first.');
-  const user=auth.currentUser;
-  if(!user) return alert('Session expired.');
-  lockButtons(true);
-  try{
-    await db.ref(`paymentProofs/${selected.uid}/${selected.proofId}`).update({status:'rejected',reviewedBy:user.email});
-    alert('Proof rejected.');
-  }catch(e){ alert(e.message); }
-  lockButtons(false);
+function renderProofs(filter='') {
+    proofList.innerHTML = '';
+    const filtered = proofs.filter(p => 
+        (p.fullName||'').toLowerCase().includes(filter.toLowerCase()) || 
+        (p.uid||'').toLowerCase().includes(filter.toLowerCase())
+    );
+    filtered.forEach(p => {
+        const item = document.createElement('div');
+        item.className = 'item';
+        item.innerHTML = `
+            <div class="meta">
+                <div class="avatar">${safeInitials(p.fullName)}</div>
+                <div><div style="font-weight:700">${p.fullName}</div><div class="small">${p.status}</div></div>
+            </div>
+            <button class="btn ghost" onclick="selectProof('${p.proofId}', '${p.uid}')">View</button>
+        `;
+        proofList.appendChild(item);
+    });
 }
 
-async function markPending(){
-  if(!selected) return alert('Select a proof first.');
-  const user=auth.currentUser;
-  if(!user) return alert('Session expired.');
-  lockButtons(true);
-  try{
-    await db.ref(`paymentProofs/${selected.uid}/${selected.proofId}`).update({status:'pending',reviewedBy:user.email});
-    alert('Status set to pending.');
-  }catch(e){ alert(e.message); }
-  lockButtons(false);
+async function selectProof(proofId, uid) {
+    selected = proofs.find(p => p.proofId === proofId && p.uid === uid);
+    document.getElementById('selectedStatus').textContent = selected.status.toUpperCase();
+    document.getElementById('previewMeta').textContent = `${selected.fullName} (${selected.uid})`;
+    proofActions.style.display = 'block';
+    previewImage.innerHTML = '<div class="small">Loading...</div>';
+    
+    try {
+        const url = selected.url || await storage.ref(selected.storagePath).getDownloadURL();
+        previewImage.innerHTML = `<a href="${url}" target="_blank"><img src="${url}" style="width:100%; border-radius:8px"></a>`;
+    } catch(e) { previewImage.innerHTML = 'Error loading image'; }
 }
 
-function attachProofListener(){
-  if(proofsRef && proofsListener) proofsRef.off('value', proofsListener);
-  proofsRef = db.ref('paymentProofs').limitToLast(200);
-  proofsListener = snap=>{
-    proofs=[];
-    snap.forEach(uidSnap=>{
-      uidSnap.forEach(proofSnap=>{
-        const d=proofSnap.val()||{};
-        proofs.push({
-          uid:uidSnap.key,
-          proofId:proofSnap.key,
-          fullName:d.fullName||d.name||'',
-          email:d.email||'',
-          uploadedAt:d.uploadedAt||0,
-          status:d.status||'pending',
-          storagePath:d.storagePath||'',
-          url:d.url||''
+// --- DATA LISTENERS ---
+function initData() {
+    // Listen for Proofs
+    db.ref('paymentProofs').on('value', snap => {
+        proofs = [];
+        snap.forEach(uSnap => {
+            uSnap.forEach(pSnap => {
+                const d = pSnap.val();
+                proofs.push({ uid: uSnap.key, proofId: pSnap.key, ...d });
+            });
         });
-      });
+        renderProofs(searchInput.value);
     });
-    proofs.sort((a,b)=>(b.uploadedAt||0)-(a.uploadedAt||0));
-    renderList(searchInput.value.trim());
-  };
-  proofsRef.on('value', proofsListener);
+
+    // Listen for Users
+    db.ref('profiles').on('value', snap => {
+        users = [];
+        snap.forEach(uSnap => {
+            users.push({ uid: uSnap.key, ...uSnap.val() });
+        });
+        renderUsers();
+    });
+
+    db.ref('profiles').on('value', snap => {
+    console.log("Data received:", snap.val()); // This should show in your F12 console
+    // ... rest of the code
+});
 }
 
-document.getElementById('downloadReport').addEventListener('click',()=>{
-  const pending=proofs.filter(p=>p.status==='pending');
-  navigator.clipboard.writeText(JSON.stringify(pending,null,2))
-    .then(()=>alert('Copied to clipboard.'))
-    .catch(()=>alert('Clipboard failed.'));
+// --- AUTH ---
+auth.onAuthStateChanged(user => {
+    if(!user || user.email !== ADMIN_EMAIL) {
+        window.location.href = '/login.html';
+    } else {
+        document.getElementById('authNotice').style.display = 'none';
+        document.getElementById('main').style.display = 'block';
+        initData();
+    }
 });
 
-document.getElementById('openProfiles').onclick = () => { console.log("Current Proofs Data:", proofs); alert("Data logged to console."); };
-refreshBtn.onclick = () => { attachProofListener(); alert("Refreshing..."); };
-approveBtn.onclick=approveSelected;
-rejectBtn.onclick=rejectSelected;
-markPendingBtn.onclick=markPending;
-searchInput.addEventListener('input',()=>renderList(searchInput.value.trim()));
-signOutBtn.onclick=()=> auth.signOut().then(()=> window.location.href='/login.html');
+document.getElementById('approveBtn').onclick = async () => {
+    if(!selected) return;
+    await db.ref(`profiles/${selected.uid}/verified`).set(true);
+    await db.ref(`paymentProofs/${selected.uid}/${selected.proofId}/status`).set('approved');
+    alert('Approved!');
+};
 
-auth.onAuthStateChanged(user=>{
-  if(!user){ window.location.href='/login.html'; return; }
-  if((user.email||'').toLowerCase()!==ADMIN_EMAIL){ window.location.href='/signup.html'; return; }
-  document.getElementById('authNotice').style.display='none';
-  document.getElementById('main').style.display='block';
-  attachProofListener();
-});
+document.getElementById('rejectBtn').onclick = async () => {
+    if(!selected) return;
+    await db.ref(`paymentProofs/${selected.uid}/${selected.proofId}/status`).set('rejected');
+    alert('Rejected!');
+};
+
+document.getElementById('signOut').onclick = () => auth.signOut();
+searchInput.oninput = (e) => renderProofs(e.target.value);
 </script>
 </body>
 </html>
