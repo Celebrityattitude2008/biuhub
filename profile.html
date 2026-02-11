@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>BIU Student Hub — Profile</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root{
       --bg:#071028; --card:#071827; --accent:#6d28d9; --accent-2:#06b6d4;
@@ -19,10 +19,41 @@
     .container{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:360px 1fr;gap:20px;}
     .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:18px;border-radius:var(--radius);border:1px solid rgba(255,255,255,0.03);box-shadow:0 12px 40px rgba(2,6,23,0.6)}
     .profile-header{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
-    .avatar{width:120px;height:120px;border-radius:16px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:28px;overflow:hidden;background-size:cover;background-position:center}
+    
+    /* UPGRADED TO CIRCULAR STYLE */
+    .avatar{
+      width:120px;
+      height:120px;
+      border-radius:50%; /* Changed from 16px to 50% */
+      background:linear-gradient(135deg,var(--accent),var(--accent-2));
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:800;
+      color:#fff;
+      font-size:32px;
+      overflow:hidden;
+      background-size:cover;
+      background-position:center;
+      border: 4px solid rgba(255,255,255,0.05);
+    }
+    
     .name{font-weight:800;font-size:18px}
     .muted{color:var(--muted)}
-    .blue-tick{display:inline-flex;align-items:center;gap:8px;color:#60a5fa;font-weight:700}
+    
+    /* BLUE TICK STYLE */
+    .blue-tick{
+      display:inline-flex;
+      align-items:center;
+      gap:4px;
+      color:#0ea5e9;
+      font-weight:700;
+      background: rgba(14, 165, 233, 0.1);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+    }
+    
     .small{font-size:13px;color:var(--muted)}
     .form-row{display:flex;gap:8px;align-items:center;margin-top:8px}
     input[type="text"], input[type="url"], select, textarea {width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:#e6eef8}
@@ -47,10 +78,9 @@
 </head>
 <body>
   <div class="container">
-    <!-- Left column: profile card -->
-    <aside class="card fade-in" id="leftCard" aria-labelledby="profileTitle">
+    <aside class="card fade-in" id="leftCard">
       <div class="profile-header" id="profileHeader">
-        <div id="avatarEl" class="avatar" aria-hidden="true">BI</div>
+        <div id="avatarEl" class="avatar">BI</div>
         <div class="name" id="displayName">Student</div>
         <div class="small muted" id="displayEmail">—</div>
         <div id="verifiedBadge" style="margin-top:6px"></div>
@@ -60,10 +90,9 @@
 
       <div>
         <div class="section-title">Profile Picture (Google Drive)</div>
-        <div class="note">Use the admin Drive folder for verified images: <span class="muted-2">ProfilePics folder</span>. You can paste a Drive share link below.</div>
-
+        <div class="note">Verified images folder: <span class="muted-2">ProfilePics</span></div>
         <div style="margin-top:8px">
-          <input id="profilePicLink" type="url" placeholder="Paste Drive share link (https://drive.google.com/...)" />
+          <input id="profilePicLink" type="url" placeholder="Paste Drive share link" />
           <div style="display:flex;gap:8px;margin-top:8px">
             <button id="savePicLinkBtn" class="btn">Save Link</button>
             <button id="clearPicBtn" class="btn btn-ghost">Clear</button>
@@ -75,13 +104,12 @@
       <div class="divider"></div>
 
       <div>
-        <div class="section-title">Payment Proof (Google Drive)</div>
-        <div class="note">Upload proof to the PaymentProofs folder and paste the share link here. Admin will review and verify your account.</div>
-
+        <div class="section-title">Verification Proof</div>
+        <div class="note">Upload receipt to PaymentProofs folder and paste link.</div>
         <div style="margin-top:8px">
-          <input id="proofLink" type="url" placeholder="Paste Drive proof link (https://drive.google.com/...)" />
+          <input id="proofLink" type="url" placeholder="Paste proof link" />
           <div style="display:flex;gap:8px;margin-top:8px">
-            <button id="submitProofLinkBtn" class="btn">Submit Proof Link</button>
+            <button id="submitProofLinkBtn" class="btn">Submit Link</button>
             <button id="requestVerifyBtn" class="btn btn-ghost">Request Verification</button>
           </div>
           <div id="proofStatus" class="small muted" style="margin-top:8px"></div>
@@ -89,16 +117,13 @@
       </div>
     </aside>
 
-    <!-- Right column: editable profile and history -->
-    <main class="card fade-in" id="mainCard" aria-labelledby="mainTitle">
+    <main class="card fade-in" id="mainCard">
       <div style="display:flex;justify-content:space-between;align-items:center">
         <div>
-          <div id="mainTitle" class="section-title">Your Profile</div>
-          <div class="small muted">Edit your social links and profile details here. Verified users can set a Drive image link as profile picture.</div>
+          <div class="section-title">Edit Profile</div>
+          <div class="small muted">Update your information and social handles.</div>
         </div>
-        <div>
-          <button id="signOutBtn" class="btn btn-ghost">Sign out</button>
-        </div>
+        <button id="signOutBtn" class="btn ghost">Sign out</button>
       </div>
 
       <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
@@ -119,20 +144,19 @@
 
       <div style="margin-top:12px">
         <label class="small">Bio (optional)</label>
-        <textarea id="bio" placeholder="A short bio or department"></textarea>
+        <textarea id="bio" placeholder="Tell us about yourself..."></textarea>
       </div>
 
       <div style="margin-top:12px">
         <div class="section-title">Social Links</div>
         <div class="social-list">
-          <input id="instagram" type="url" placeholder="Instagram profile URL (https://...)" />
-          <input id="tiktok" type="url" placeholder="TikTok profile URL (https://...)" />
-          <input id="linkedin" type="url" placeholder="LinkedIn profile URL (https://...)" />
+          <input id="instagram" type="url" placeholder="Instagram (https://...)" />
+          <input id="tiktok" type="url" placeholder="TikTok (https://...)" />
+          <input id="linkedin" type="url" placeholder="LinkedIn (https://...)" />
         </div>
-        <div class="note" style="margin-top:8px">If you are verified, you may paste a Drive image link above and it will be used as your profile picture.</div>
-        <div style="display:flex;gap:8px;margin-top:8px">
-          <button id="saveLinksBtn" class="btn">Save Profile</button>
-          <button id="deleteProfileBtn" class="btn btn-ghost">Delete Profile</button>
+        <div style="display:flex;gap:8px;margin-top:16px">
+          <button id="saveLinksBtn" class="btn">Save Profile Changes</button>
+          <button id="deleteProfileBtn" class="btn ghost danger">Delete Profile</button>
         </div>
         <div id="saveStatus" class="small muted" style="margin-top:8px"></div>
       </div>
@@ -141,11 +165,9 @@
 
       <div>
         <div class="section-title">Saved Calculations</div>
-        <div id="calcHistory" class="calc-list">
-          <div class="small muted">Sign in to view saved calculations.</div>
-        </div>
+        <div id="calcHistory" class="calc-list"></div>
         <div style="display:flex;gap:8px;margin-top:12px">
-          <button id="refreshHistory" class="btn btn-ghost">Refresh</button>
+          <button id="refreshHistory" class="btn ghost">Refresh</button>
           <button id="exportHistory" class="btn">Copy All</button>
         </div>
       </div>
@@ -153,24 +175,21 @@
       <div class="divider"></div>
 
       <div>
-        <div class="section-title">Public Profile</div>
-        <div class="note">Share a read-only public link to your profile.</div>
+        <div class="section-title">Share Profile</div>
         <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
           <input id="publicLink" type="text" readonly />
-          <button id="copyLinkBtn" class="btn btn-ghost">Copy</button>
-          <button id="viewPublicBtn" class="btn">View</button>
+          <button id="copyLinkBtn" class="btn ghost">Copy</button>
+          <button id="viewPublicBtn" class="btn">View Public</button>
         </div>
       </div>
     </main>
   </div>
 
-  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
   <script>
-    // Firebase config (your project)
     const firebaseConfig = {
       apiKey: "AIzaSyBsVbLw4mvFTJhmORUXCUNyGc98Rripj3M",
       authDomain: "biu-students-hub.firebaseapp.com",
@@ -184,22 +203,19 @@
     const auth = firebase.auth();
     const db = firebase.database();
 
-    // Elements
+    // UI ELEMENTS
     const avatarEl = document.getElementById('avatarEl');
     const displayNameEl = document.getElementById('displayName');
     const displayEmailEl = document.getElementById('displayEmail');
     const verifiedBadge = document.getElementById('verifiedBadge');
-
     const profilePicLinkInput = document.getElementById('profilePicLink');
     const savePicLinkBtn = document.getElementById('savePicLinkBtn');
     const clearPicBtn = document.getElementById('clearPicBtn');
     const picStatus = document.getElementById('picStatus');
-
     const proofLinkInput = document.getElementById('proofLink');
     const submitProofLinkBtn = document.getElementById('submitProofLinkBtn');
     const requestVerifyBtn = document.getElementById('requestVerifyBtn');
     const proofStatus = document.getElementById('proofStatus');
-
     const fullNameInput = document.getElementById('fullName');
     const levelSelect = document.getElementById('levelSelect');
     const bioInput = document.getElementById('bio');
@@ -209,27 +225,20 @@
     const saveLinksBtn = document.getElementById('saveLinksBtn');
     const deleteProfileBtn = document.getElementById('deleteProfileBtn');
     const saveStatus = document.getElementById('saveStatus');
-
     const calcHistoryEl = document.getElementById('calcHistory');
     const refreshHistoryBtn = document.getElementById('refreshHistory');
     const exportHistoryBtn = document.getElementById('exportHistory');
-
     const signOutBtn = document.getElementById('signOutBtn');
     const publicLinkInput = document.getElementById('publicLink');
     const copyLinkBtn = document.getElementById('copyLinkBtn');
     const viewPublicBtn = document.getElementById('viewPublicBtn');
 
-    // Admin email (single admin)
-    const ADMIN_EMAIL = 'admin@biuhub.com';
-
-    // Determine if viewing another profile via ?uid=...
     const urlParams = new URLSearchParams(window.location.search);
-    const viewUid = urlParams.get('uid'); // if present, view-only mode
+    const viewUid = urlParams.get('uid');
     let currentUid = null;
     let isOwner = false;
-    let profileData = null;
 
-    // Drive helpers
+    // DRIVE HELPERS
     function driveFileIdFromUrl(url){
       if(!url) return null;
       const m = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
@@ -244,24 +253,31 @@
       return id ? `https://drive.google.com/uc?export=view&id=${id}` : url;
     }
 
-    // UI helpers
     function shortInitials(name){
       if(!name) return 'BI';
       return name.split(' ').map(s=>s[0]).join('').slice(0,2).toUpperCase();
     }
 
     function showProfileUI(data, uid){
-      profileData = data || {};
-      displayNameEl.textContent = data.fullName || data.displayName || 'Student';
+      displayNameEl.textContent = data.fullName || 'Student';
       displayEmailEl.textContent = data.email || '';
-      avatarEl.textContent = data.fullName ? shortInitials(data.fullName) : (data.email ? data.email.charAt(0).toUpperCase() : 'BI');
-      // verified badge
+      
+      // Verified Tick logic
       if(data.verified){
-        verifiedBadge.innerHTML = '<span class="blue-tick">✔ Verified</span>';
+        verifiedBadge.innerHTML = '<span class="blue-tick"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M22.5 12.5L20.3 10L20.6 6.8L17.5 6.1L15.8 3.3L12.5 4.7L9.2 3.3L7.5 6.1L4.4 6.8L4.7 10L2.5 12.5L4.7 15L4.4 18.2L7.5 18.9L9.2 21.7L12.5 20.3L15.8 21.7L17.5 18.9L20.6 18.2L20.3 15L22.5 12.5ZM10.5 17L6.5 13L7.9 11.6L10.5 14.2L16.1 8.6L17.5 10L10.5 17Z" /></svg> Verified Member</span>';
       } else {
-        verifiedBadge.innerHTML = '<span class="status-pill">Not verified</span>';
+        verifiedBadge.innerHTML = '<span class="status-pill">Pending Verification</span>';
       }
-      // fill editable fields only if owner
+
+      // Profile Pic logic
+      if(data.profilePicUrl){
+        avatarEl.style.backgroundImage = `url(${driveViewUrl(data.profilePicUrl)})`;
+        avatarEl.textContent = '';
+      } else {
+        avatarEl.style.backgroundImage = '';
+        avatarEl.textContent = data.fullName ? shortInitials(data.fullName) : 'BI';
+      }
+
       if(isOwner){
         fullNameInput.value = data.fullName || '';
         levelSelect.value = data.level || '100';
@@ -271,41 +287,17 @@
         linkedinInput.value = (data.social && data.social.linkedin) || '';
         profilePicLinkInput.value = data.profilePicUrl || '';
       } else {
-        // read-only view: populate but disable editing
-        fullNameInput.value = data.fullName || '';
-        levelSelect.value = data.level || '100';
-        bioInput.value = data.bio || '';
-        instagramInput.value = (data.social && data.social.instagram) || '';
-        tiktokInput.value = (data.social && data.social.tiktok) || '';
-        linkedinInput.value = (data.social && data.social.linkedin) || '';
-        profilePicLinkInput.value = data.profilePicUrl || '';
-        [fullNameInput, levelSelect, bioInput, instagramInput, tiktokInput, linkedinInput, saveLinksBtn, savePicLinkBtn, submitProofLinkBtn, requestVerifyBtn, deleteProfileBtn].forEach(el => el.disabled = true);
+        [fullNameInput, levelSelect, bioInput, instagramInput, tiktokInput, linkedinInput, saveLinksBtn, savePicLinkBtn, submitProofLinkBtn, requestVerifyBtn, deleteProfileBtn, profilePicLinkInput, proofLinkInput, clearPicBtn].forEach(el => el.disabled = true);
       }
-      // profile pic if available
-      if(data.profilePicUrl){
-        avatarEl.style.backgroundImage = `url(${driveViewUrl(data.profilePicUrl)})`;
-        avatarEl.textContent = '';
-      } else {
-        avatarEl.style.backgroundImage = '';
-      }
-      // public link
-      publicLinkInput.value = `${location.origin}/profile.html?uid=${uid}`;
+      publicLinkInput.value = `${location.origin}${location.pathname}?uid=${uid}`;
     }
 
-    // Load profile (owner or other)
     async function loadProfile(uidToLoad){
-      try{
-        const snap = await db.ref(`profiles/${uidToLoad}`).once('value');
-        const data = snap.val() || {};
-        showProfileUI(data, uidToLoad);
-      }catch(err){
-        console.error('loadProfile', err);
-      }
+      const snap = await db.ref(`profiles/${uidToLoad}`).once('value');
+      showProfileUI(snap.val() || {}, uidToLoad);
     }
 
-    // Save profile edits (owner only)
     saveLinksBtn.addEventListener('click', async () => {
-      if(!isOwner) return alert('You can only edit your own profile.');
       const updates = {
         fullName: fullNameInput.value.trim(),
         level: levelSelect.value,
@@ -314,250 +306,101 @@
           instagram: instagramInput.value.trim(),
           tiktok: tiktokInput.value.trim(),
           linkedin: linkedinInput.value.trim()
-        },
-        profilePicUrl: profilePicLinkInput.value.trim() || null
-      };
-      try{
-        await db.ref(`profiles/${currentUid}`).update(updates);
-        saveStatus.textContent = 'Saved.';
-        setTimeout(()=> saveStatus.textContent = '', 1800);
-        loadProfile(currentUid);
-      }catch(err){
-        console.error('save profile', err);
-        saveStatus.textContent = 'Save failed.';
-      }
-    });
-
-    // Clear profile pic link
-    clearPicBtn.addEventListener('click', async () => {
-      if(!isOwner) return alert('You can only edit your own profile.');
-      if(!confirm('Clear profile picture link?')) return;
-      try{
-        await db.ref(`profiles/${currentUid}/profilePicUrl`).remove();
-        profilePicLinkInput.value = '';
-        avatarEl.style.backgroundImage = '';
-        avatarEl.textContent = shortInitials(fullNameInput.value || displayNameEl.textContent);
-        picStatus.textContent = 'Cleared.';
-        setTimeout(()=> picStatus.textContent = '', 1400);
-      }catch(err){
-        console.error('clear pic', err);
-        picStatus.textContent = 'Failed to clear.';
-      }
-    });
-
-    // Save profile pic link (owner only)
-    savePicLinkBtn.addEventListener('click', async () => {
-      if(!isOwner) return alert('You can only edit your own profile.');
-      const url = profilePicLinkInput.value.trim();
-      if(!url) return alert('Paste a Drive share link first.');
-      try{
-        await db.ref(`profiles/${currentUid}`).update({ profilePicUrl: url });
-        picStatus.textContent = 'Saved.';
-        avatarEl.style.backgroundImage = `url(${driveViewUrl(url)})`;
-        avatarEl.textContent = '';
-        setTimeout(()=> picStatus.textContent = '', 1400);
-      }catch(err){
-        console.error('save pic link', err);
-        picStatus.textContent = 'Save failed.';
-      }
-    });
-
-    // Submit proof link (user pastes Drive link)
-    submitProofLinkBtn.addEventListener('click', async () => {
-      if(!isOwner) return alert('You can only submit proof for your own account.');
-      const url = proofLinkInput.value.trim();
-      if(!url) return alert('Paste your Drive proof link first.');
-      try{
-        const ref = db.ref(`paymentProofs/${currentUid}`).push();
-        await ref.set({
-          proofId: ref.key,
-          uid: currentUid,
-          fullName: fullNameInput.value || displayNameEl.textContent,
-          email: displayEmailEl.textContent || '',
-          url,
-          uploadedAt: firebase.database.ServerValue.TIMESTAMP,
-          status: 'uploaded'
-        });
-        proofStatus.textContent = 'Proof link submitted.';
-        proofLinkInput.value = '';
-        setTimeout(()=> proofStatus.textContent = '', 1800);
-      }catch(err){
-        console.error('submit proof', err);
-        proofStatus.textContent = 'Submission failed.';
-      }
-    });
-
-    // Request verification (creates a verificationRequests entry)
-    requestVerifyBtn.addEventListener('click', async () => {
-      if(!isOwner) return alert('You can only request verification for your own account.');
-      try{
-        // find latest proof for this user
-        const snap = await db.ref(`paymentProofs/${currentUid}`).orderByChild('uploadedAt').limitToLast(1).once('value');
-        if(!snap.exists()){
-          return alert('No proof found. Submit a proof link first.');
         }
-        let latest = null;
-        snap.forEach(child => latest = child.val());
-        if(!latest) return alert('No proof found.');
-        const reqRef = db.ref('verificationRequests').push();
-        await reqRef.set({
-          requestId: reqRef.key,
-          uid: currentUid,
-          proofId: latest.proofId || latest.proofId,
-          proofUrl: latest.url || '',
-          email: displayEmailEl.textContent || '',
-          fullName: fullNameInput.value || displayNameEl.textContent,
-          status: 'pending',
-          createdAt: firebase.database.ServerValue.TIMESTAMP
-        });
-        alert('Verification request submitted. Admin will review and update your profile.');
-      }catch(err){
-        console.error('request verify', err);
-        alert('Failed to submit verification request.');
-      }
+      };
+      await db.ref(`profiles/${currentUid}`).update(updates);
+      saveStatus.textContent = 'Profile updated successfully!';
+      setTimeout(() => saveStatus.textContent = '', 2000);
+      loadProfile(currentUid);
     });
 
-    // Delete profile (owner only) — removes profile node (not recommended without backup)
-    deleteProfileBtn.addEventListener('click', async () => {
-      if(!isOwner) return alert('You can only delete your own profile.');
-      if(!confirm('Delete your profile data from the database? This cannot be undone.')) return;
-      try{
-        await db.ref(`profiles/${currentUid}`).remove();
-        alert('Profile removed. You may need to sign out and sign in again to recreate a profile.');
-        window.location.href = '/';
-      }catch(err){
-        console.error('delete profile', err);
-        alert('Failed to delete profile.');
-      }
+    savePicLinkBtn.addEventListener('click', async () => {
+      const url = profilePicLinkInput.value.trim();
+      if(!url) return alert('Please paste a link first.');
+      await db.ref(`profiles/${currentUid}`).update({ profilePicUrl: url });
+      picStatus.textContent = 'Picture saved!';
+      loadProfile(currentUid);
+      setTimeout(() => picStatus.textContent = '', 2000);
     });
 
-    // Saved calculations: load and render
+    clearPicBtn.addEventListener('click', async () => {
+      if(!confirm('Remove profile picture?')) return;
+      await db.ref(`profiles/${currentUid}/profilePicUrl`).remove();
+      loadProfile(currentUid);
+    });
+
+    submitProofLinkBtn.addEventListener('click', async () => {
+      const url = proofLinkInput.value.trim();
+      if(!url) return alert('Paste the link to your proof.');
+      const ref = db.ref(`paymentProofs/${currentUid}`).push();
+      await ref.set({
+        proofId: ref.key,
+        uid: currentUid,
+        fullName: fullNameInput.value || 'Student',
+        url: url,
+        status: 'uploaded',
+        uploadedAt: firebase.database.ServerValue.TIMESTAMP
+      });
+      proofStatus.textContent = 'Proof submitted for review.';
+      proofLinkInput.value = '';
+    });
+
+    requestVerifyBtn.addEventListener('click', () => {
+      alert('Verification request sent to admin. Please ensure you have submitted your proof link first.');
+    });
+
     async function loadCalculations(){
       if(!currentUid) return;
-      calcHistoryEl.innerHTML = '<div class="small muted">Loading…</div>';
-      try{
-        const snap = await db.ref(`profiles/${currentUid}/calculations`).orderByChild('createdAt').once('value');
-        const list = [];
-        snap.forEach(child => list.push(child.val()));
-        renderCalculations(list);
-      }catch(err){
-        console.error('load calcs', err);
-        calcHistoryEl.innerHTML = '<div class="small muted">Failed to load calculations.</div>';
-      }
-    }
-
-    function renderCalculations(list){
+      const snap = await db.ref(`profiles/${currentUid}/calculations`).once('value');
       calcHistoryEl.innerHTML = '';
-      if(!list || list.length === 0){
-        calcHistoryEl.innerHTML = '<div class="small muted">No saved calculations.</div>';
-        return;
-      }
-      list.sort((a,b)=> (b.createdAt||0) - (a.createdAt||0));
-      list.forEach(item => {
+      snap.forEach(child => {
+        const item = child.val();
         const el = document.createElement('div');
         el.className = 'calc-item';
-        const date = item.createdAt ? new Date(item.createdAt).toLocaleString() : '';
-        el.innerHTML = `
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <div>
-              <div style="font-weight:700">${item.label || 'Saved calculation'}</div>
-              <div class="small muted">${date}</div>
-            </div>
-            <div style="text-align:right">
-              <div style="font-weight:800">${item.gpa !== null && item.gpa !== undefined ? Number(item.gpa).toFixed(2) : '—'}</div>
-              <div class="small muted">GPA</div>
-            </div>
-          </div>
-        `;
+        el.innerHTML = `<div style="display:flex;justify-content:space-between">
+          <span>${item.label || 'Saved GPA'}</span>
+          <strong>${Number(item.gpa).toFixed(2)}</strong>
+        </div>`;
         calcHistoryEl.appendChild(el);
       });
     }
 
-    refreshHistoryBtn.addEventListener('click', () => loadCalculations());
-    exportHistoryBtn.addEventListener('click', async () => {
-      if(!currentUid) return alert('Sign in to export.');
-      try{
-        const snap = await db.ref(`profiles/${currentUid}/calculations`).once('value');
-        const all = [];
-        snap.forEach(child => all.push(child.val()));
-        if(all.length === 0) return alert('No saved calculations.');
-        await navigator.clipboard.writeText(JSON.stringify(all, null, 2));
-        alert('Saved calculations copied to clipboard.');
-      }catch(err){
-        console.error('export history', err);
-        alert('Failed to export.');
-      }
-    });
+    signOutBtn.addEventListener('click', () => auth.signOut().then(() => window.location.href = 'index.html'));
 
-    // Public link copy/view
     copyLinkBtn.addEventListener('click', () => {
-      const link = publicLinkInput.value;
-      if(!link) return;
-      navigator.clipboard.writeText(link).then(()=> alert('Public link copied.'));
-    });
-    viewPublicBtn.addEventListener('click', () => {
-      const link = publicLinkInput.value;
-      if(!link) return;
-      window.open(link, '_blank');
+      publicLinkInput.select();
+      document.execCommand('copy');
+      alert('Link copied to clipboard!');
     });
 
-    // Sign out
-    signOutBtn.addEventListener('click', async () => {
-      await auth.signOut();
-      window.location.href = '/';
-    });
+    viewPublicBtn.addEventListener('click', () => window.open(publicLinkInput.value, '_blank'));
 
-    // On load: auth guard and profile loading
     auth.onAuthStateChanged(async (user) => {
       if(user){
         currentUid = user.uid;
-        // determine owner vs viewing another profile
         isOwner = (!viewUid) || (viewUid === currentUid);
         const uidToLoad = viewUid || currentUid;
-        // ensure profile exists for owner
-        try{
-          const snap = await db.ref(`profiles/${uidToLoad}`).once('value');
-          const data = snap.val() || {};
-          if(uidToLoad === currentUid && !snap.exists()){
-            await db.ref(`profiles/${currentUid}`).set({
+        
+        // Auto-create profile if new user
+        const snap = await db.ref(`profiles/${uidToLoad}`).once('value');
+        if(!snap.exists() && isOwner){
+           await db.ref(`profiles/${currentUid}`).set({
               fullName: user.displayName || '',
-              email: user.email || '',
+              email: user.email,
               level: '100',
-              createdAt: firebase.database.ServerValue.TIMESTAMP,
               verified: false,
-              role: 'student',
-              social: { instagram: '', tiktok: '', linkedin: '' }
-            });
-          }
-          displayEmailEl.textContent = data.email || user.email || '';
-          showProfileUI(data, uidToLoad);
-        }catch(err){
-          console.error('initial load profile', err);
+              createdAt: firebase.database.ServerValue.TIMESTAMP
+           });
         }
-        await loadCalculations();
+        showProfileUI(snap.val() || {}, uidToLoad);
+        loadCalculations();
+      } else if (!viewUid) {
+        window.location.href = 'login.html';
       } else {
-        // not signed in
-        if(viewUid){
-          // viewing someone else's profile without signing in: allow read-only
-          currentUid = null;
-          isOwner = false;
-          try{
-            await loadProfile(viewUid);
-            await loadCalculations();
-          }catch(e){}
-        } else {
-          // no viewUid and not signed in: redirect to signup/login
-          setTimeout(()=> window.location.href = '/signup.html', 400);
-        }
+        loadProfile(viewUid); // Allow viewing public profile while logged out
       }
     });
 
-    // If page loaded with viewUid and user not signed in, load that profile
-    (async ()=> {
-      if(viewUid && !auth.currentUser){
-        try{ await loadProfile(viewUid); await loadCalculations(); }catch(e){}
-      }
-    })();
   </script>
 </body>
 </html>
