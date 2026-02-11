@@ -20,11 +20,11 @@
     .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:18px;border-radius:var(--radius);border:1px solid rgba(255,255,255,0.03);box-shadow:0 12px 40px rgba(2,6,23,0.6)}
     .profile-header{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
     
-    /* UPGRADED TO CIRCULAR STYLE */
     .avatar{
+      position: relative;
       width:120px;
       height:120px;
-      border-radius:50%; /* Changed from 16px to 50% */
+      border-radius:50%; 
       background:linear-gradient(135deg,var(--accent),var(--accent-2));
       display:flex;
       align-items:center;
@@ -37,11 +37,23 @@
       background-position:center;
       border: 4px solid rgba(255,255,255,0.05);
     }
+
+    /* SPINNER STYLE */
+    .spinner {
+      display: none;
+      width: 30px;
+      height: 30px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+      position: absolute;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
     
     .name{font-weight:800;font-size:18px}
     .muted{color:var(--muted)}
     
-    /* BLUE TICK STYLE */
     .blue-tick{
       display:inline-flex;
       align-items:center;
@@ -80,7 +92,10 @@
   <div class="container">
     <aside class="card fade-in" id="leftCard">
       <div class="profile-header" id="profileHeader">
-        <div id="avatarEl" class="avatar">BI</div>
+        <div id="avatarEl" class="avatar">
+          <div id="avatarSpinner" class="spinner"></div>
+          <span id="initials">BI</span>
+        </div>
         <div class="name" id="displayName">Student</div>
         <div class="small muted" id="displayEmail">—</div>
         <div id="verifiedBadge" style="margin-top:6px"></div>
@@ -205,6 +220,8 @@
 
     // UI ELEMENTS
     const avatarEl = document.getElementById('avatarEl');
+    const avatarSpinner = document.getElementById('avatarSpinner');
+    const initialsEl = document.getElementById('initials');
     const displayNameEl = document.getElementById('displayName');
     const displayEmailEl = document.getElementById('displayEmail');
     const verifiedBadge = document.getElementById('verifiedBadge');
@@ -238,19 +255,13 @@
     let currentUid = null;
     let isOwner = false;
 
-    // DRIVE HELPERS
-    function driveFileIdFromUrl(url){
-      if(!url) return null;
-      const m = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-      if(m && m[1]) return m[1];
-      try {
-        const u = new URL(url);
-        return u.searchParams.get('id');
-      } catch(e) { return null; }
-    }
+    // IMPROVED DRIVE HELPER
     function driveViewUrl(url){
-      const id = driveFileIdFromUrl(url);
-      return id ? `https://drive.google.com/uc?export=view&id=${id}` : url;
+      if(!url) return null;
+      const match = url.match(/(?:\/d\/|id=)([a-zA-Z0-9_-]+)/);
+      const id = match ? match[1] : null;
+      // Using thumbnail sz=w500 is more reliable for direct embeds
+      return id ? `https://drive.google.com/thumbnail?sz=w500&id=${id}` : url;
     }
 
     function shortInitials(name){
@@ -262,20 +273,33 @@
       displayNameEl.textContent = data.fullName || 'Student';
       displayEmailEl.textContent = data.email || '';
       
-      // Verified Tick logic
       if(data.verified){
         verifiedBadge.innerHTML = '<span class="blue-tick"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M22.5 12.5L20.3 10L20.6 6.8L17.5 6.1L15.8 3.3L12.5 4.7L9.2 3.3L7.5 6.1L4.4 6.8L4.7 10L2.5 12.5L4.7 15L4.4 18.2L7.5 18.9L9.2 21.7L12.5 20.3L15.8 21.7L17.5 18.9L20.6 18.2L20.3 15L22.5 12.5ZM10.5 17L6.5 13L7.9 11.6L10.5 14.2L16.1 8.6L17.5 10L10.5 17Z" /></svg> Verified Member</span>';
       } else {
         verifiedBadge.innerHTML = '<span class="status-pill">Pending Verification</span>';
       }
 
-      // Profile Pic logic
+      // Profile Pic with Spinner Logic
       if(data.profilePicUrl){
-        avatarEl.style.backgroundImage = `url(${driveViewUrl(data.profilePicUrl)})`;
-        avatarEl.textContent = '';
+        const directLink = driveViewUrl(data.profilePicUrl);
+        avatarSpinner.style.display = 'block';
+        initialsEl.textContent = '';
+        
+        const img = new Image();
+        img.src = directLink;
+        img.onload = () => {
+          avatarEl.style.backgroundImage = `url('${directLink}')`;
+          avatarSpinner.style.display = 'none';
+        };
+        img.onerror = () => {
+          avatarSpinner.style.display = 'none';
+          avatarEl.style.backgroundImage = '';
+          initialsEl.textContent = data.fullName ? shortInitials(data.fullName) : 'BI';
+        };
       } else {
         avatarEl.style.backgroundImage = '';
-        avatarEl.textContent = data.fullName ? shortInitials(data.fullName) : 'BI';
+        initialsEl.textContent = data.fullName ? shortInitials(data.fullName) : 'BI';
+        avatarSpinner.style.display = 'none';
       }
 
       if(isOwner){
@@ -381,7 +405,6 @@
         isOwner = (!viewUid) || (viewUid === currentUid);
         const uidToLoad = viewUid || currentUid;
         
-        // Auto-create profile if new user
         const snap = await db.ref(`profiles/${uidToLoad}`).once('value');
         if(!snap.exists() && isOwner){
            await db.ref(`profiles/${currentUid}`).set({
@@ -395,9 +418,9 @@
         showProfileUI(snap.val() || {}, uidToLoad);
         loadCalculations();
       } else if (!viewUid) {
-        window.location.href = 'login.html';
+        window.location.href = 'signup.html';
       } else {
-        loadProfile(viewUid); // Allow viewing public profile while logged out
+        loadProfile(viewUid);
       }
     });
 
