@@ -18,17 +18,25 @@
     * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
     body { margin: 0; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
+    /* Broadcast Banner */
+    #broadcastBanner {
+      display: none; background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      color: white; padding: 10px 20px; text-align: center; font-size: 13px; font-weight: 600;
+      animation: slideDown 0.5s ease;
+    }
+    @keyframes slideDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }
+
     /* Header */
     header {
       padding: 15px 20px; background: var(--card); border-bottom: 1px solid var(--glass);
       display: flex; align-items: center; gap: 15px;
     }
     .back-btn { color: var(--muted); text-decoration: none; font-size: 20px; }
-    .status-dot { width: 10px; height: 10px; background: #10b981; border-radius: 50%; box-shadow: 0 0 10px #10b981; }
+    .status-dot { width: 10px; height: 10px; background: #94a3b8; border-radius: 50%; transition: 0.3s; }
 
     /* Chat Area */
     #chatWindow { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; scroll-behavior: smooth; }
-    .msg { max-width: 85%; padding: 12px 16px; border-radius: 18px; line-height: 1.5; font-size: 14px; position: relative; animation: fadeIn 0.3s ease; }
+    .msg { max-width: 85%; padding: 12px 16px; border-radius: 18px; line-height: 1.5; font-size: 14px; animation: fadeIn 0.3s ease; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     
     .bot { background: var(--card); align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid var(--glass); }
@@ -37,7 +45,7 @@
     /* Quick Actions */
     #quickActions {
       padding: 10px 20px; display: flex; gap: 8px; overflow-x: auto; 
-      white-space: nowrap; scrollbar-width: none; background: rgba(7, 16, 40, 0.8);
+      white-space: nowrap; scrollbar-width: none; background: rgba(7, 16, 40, 0.4);
     }
     #quickActions::-webkit-scrollbar { display: none; }
     .action-chip {
@@ -47,41 +55,43 @@
     .action-chip:hover { background: var(--accent); color: white; }
 
     /* Input Area */
-    .input-area { padding: 15px 20px; background: var(--card); border-top: 1px solid var(--glass); display: flex; gap: 10px; align-items: center; }
+    .input-area { padding: 15px 20px; background: var(--card); border-top: 1px solid var(--glass); display: flex; gap: 10px; }
     input { flex: 1; background: rgba(0,0,0,0.2); border: 1px solid var(--glass); border-radius: 12px; padding: 12px 15px; color: white; outline: none; }
-    .send-btn { background: var(--accent); border: none; width: 45px; height: 45px; border-radius: 12px; color: white; cursor: pointer; font-size: 18px; }
+    .send-btn { background: var(--accent); border: none; width: 45px; height: 45px; border-radius: 12px; color: white; cursor: pointer; }
     
     .typing { font-size: 12px; color: var(--muted); padding: 5px 20px; display: none; }
   </style>
 </head>
 <body>
 
+<div id="broadcastBanner"><span id="broadcastText"></span></div>
+
 <header>
   <a href="index.html" class="back-btn">←</a>
   <div>
     <div style="font-weight: 700; display: flex; align-items: center; gap: 8px;">
-      Study Assistant <div class="status-dot"></div>
+      Study Assistant <div id="statusDot" class="status-dot"></div>
     </div>
-    <div style="font-size: 12px; color: var(--muted);">Hybrid Knowledge Brain</div>
+    <div id="statusText" style="font-size: 12px; color: var(--muted);">Connecting...</div>
   </div>
 </header>
 
 <div id="chatWindow">
-  <div class="msg bot">Hello! I'm your BIU Assistant. Ask me a question or use the quick buttons below.</div>
+  <div class="msg bot">Hello! I'm your BIU Assistant. Ask me about CGPA, Library, Hostels, or school fees!</div>
 </div>
 
 <div id="typingIndicator" class="typing">Assistant is thinking...</div>
 
-<div id="quickActions">
-  </div>
+<div id="quickActions"></div>
 
 <form class="input-area" id="chatForm">
-  <input type="text" id="userInput" placeholder="Type or click a suggestion..." autocomplete="off">
+  <input type="text" id="userInput" placeholder="Ask me anything..." autocomplete="off">
   <button type="submit" class="send-btn">➔</button>
 </form>
 
+<script src="brain.js"></script>
+
 <script>
-  // 1. Initialize Firebase
   const firebaseConfig = {
     apiKey: "AIzaSyBsVbLw4mvFTJhmORUXCUNyGc98Rripj3M",
     authDomain: "biu-students-hub.firebaseapp.com",
@@ -89,6 +99,7 @@
     databaseURL: "https://biu-students-hub-default-rtdb.firebaseio.com",
     appId: "1:128818531382:web:190dc5688d1b9d21321c97"
   };
+
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
 
@@ -97,10 +108,37 @@
   const userInput = document.getElementById('userInput');
   const typingIndicator = document.getElementById('typingIndicator');
   const quickActions = document.getElementById('quickActions');
+  const statusDot = document.getElementById('statusDot');
+  const statusText = document.getElementById('statusText');
 
-  // 2. Load Quick Buttons from Firebase
+  // 1. Connection Monitoring
+  db.ref(".info/connected").on("value", (snap) => {
+    if (snap.val() === true) {
+      statusDot.style.background = "#10b981";
+      statusDot.style.boxShadow = "0 0 10px #10b981";
+      statusText.innerText = "Online Knowledge Brain";
+    } else {
+      statusDot.style.background = "#ef4444";
+      statusDot.style.boxShadow = "0 0 10px #ef4444";
+      statusText.innerText = "Offline (Reconnecting...)";
+    }
+  });
+
+  // 2. Load Broadcasts
+  db.ref('broadcast').on('value', snap => {
+    const data = snap.val();
+    const banner = document.getElementById('broadcastBanner');
+    if (data && data.message) {
+      document.getElementById('broadcastText').innerText = "📢 " + data.message;
+      banner.style.display = 'block';
+    } else {
+      banner.style.display = 'none';
+    }
+  });
+
+  // 3. Load Quick Buttons
   async function loadSuggestions() {
-    db.ref('bot_brain').limitToFirst(6).on('value', snap => {
+    db.ref('bot_brain').limitToFirst(8).on('value', snap => {
       const data = snap.val();
       if (!data) return;
       quickActions.innerHTML = '';
@@ -117,36 +155,52 @@
     });
   }
 
-  // 3. Logic: Fuzzy Search + Fallback
-  async function getResponse(query) {
-    const input = query.toLowerCase().trim();
-    
-    try {
+  // 4. Fuzzy Search Logic
+async function getResponse(query) {
+  const input = query.toLowerCase().trim();
+  
+  try {
+      // 1. Fetch Cloud Brain (Firebase)
       const snap = await db.ref('bot_brain').once('value');
-      const brain = snap.val();
+      const cloudBrain = snap.val() || {};
 
-      if (brain) {
-        const searchList = Object.keys(brain).map(k => ({ key: k, ans: brain[k] }));
-        
-        const fuse = new Fuse(searchList, { 
-            keys: ['key'], 
-            threshold: 0.4 // Tolerance for typos
-        });
+      // 2. Merge Cloud Brain with Local brain.js 
+      // Cloud brain wins if there is a conflict
+      const fullBrainData = { ...localBrain, ...cloudBrain };
 
-        const result = fuse.search(input);
-        if (result.length > 0) return result[0].item.ans;
+      // 3. Prepare for Fuzzy Search
+      const searchList = Object.keys(fullBrainData).map(k => ({ 
+          key: k, 
+          ans: fullBrainData[k] 
+      }));
+      
+      const fuse = new Fuse(searchList, { 
+          keys: ['key'], 
+          threshold: 0.4 
+      });
+
+      const result = fuse.search(input);
+      
+      if (result.length > 0) {
+          return result[0].item.ans;
       }
 
-      // Log if bot doesn't know the answer
+      // 4. Log if still unknown
       db.ref('unanswered_questions').push({ query: query, time: Date.now() });
-      return "I'm still learning about that! I've sent your question to my dev team so I can answer it next time.";
+      return "I'm still learning! I've logged this for the admin to answer soon.";
 
-    } catch (e) {
-      return "My cloud brain is temporarily offline. Please check your connection!";
-    }
+  } catch (e) {
+      // 5. Emergency Fallback: If Firebase is totally offline, use Local Brain only
+      console.warn("Firebase offline, using local brain fallback.");
+      const localList = Object.keys(localBrain).map(k => ({ key: k, ans: localBrain[k] }));
+      const localFuse = new Fuse(localList, { keys: ['key'], threshold: 0.4 });
+      const localResult = localFuse.search(input);
+      
+      return localResult.length > 0 ? localResult[0].item.ans : "I'm offline and couldn't find an answer in my local memory.";
   }
+}
 
-  // 4. UI Events
+  // 5. Chat UI Logic
   chatForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const query = userInput.value.trim();
@@ -155,6 +209,7 @@
     appendMessage('user', query);
     userInput.value = '';
     typingIndicator.style.display = 'block';
+    chatWindow.scrollTop = chatWindow.scrollHeight;
 
     const reply = await getResponse(query);
     
