@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Subscriptions — BIU Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#071028; --accent:#6d28d9; --accent-2:#06b6d4; --muted:#9aa8bf; 
+      --glass: rgba(255,255,255,0.05); --danger:#ef4444; --success:#10b981;
+    }
+    *{box-sizing:border-box;font-family:Inter,sans-serif;}
+    body{margin:0; background:var(--bg); color:#e6eef8; min-height:100vh; padding-bottom: 100px;}
+    .container{max-width:500px; margin:0 auto; padding:20px;}
+    
+    header{display:flex; justify-content:space-between; align-items:center; padding:20px 0;}
+    .back-btn{color:var(--muted); text-decoration:none; font-size:14px;}
+
+    .total-card{
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      padding:30px; border-radius:24px; text-align:center; margin-bottom:25px;
+      box-shadow: 0 20px 40px rgba(109,40,217,0.2);
+    }
+    .total-card h2{margin:0; font-size:32px; font-weight:800;}
+
+    .sub-list{display:flex; flex-direction:column; gap:12px;}
+    .sub-item{
+      background: var(--glass); padding:16px; border-radius:16px;
+      display:flex; justify-content:space-between; align-items:center;
+      border: 1px solid rgba(255,255,255,0.05);
+      animation: fadeIn 0.4s ease;
+      transition: all 0.3s ease;
+    }
+    
+    /* Reminder Highlight */
+    .sub-item.urgent {
+      border: 1px solid var(--danger);
+      background: rgba(239, 68, 68, 0.1);
+    }
+
+    .status-badge {
+      font-size: 10px; text-transform: uppercase; padding: 2px 6px;
+      border-radius: 4px; margin-left: 8px; font-weight: 800; background: var(--danger); color: white;
+    }
+
+    @keyframes fadeIn { from{opacity:0; transform: translateY(10px);} to{opacity:1; transform:0;} }
+
+    .sub-name{font-weight:700; font-size:16px; display: flex; align-items: center;}
+    .sub-date{font-size:12px; color:var(--muted); margin-top:2px;}
+    .sub-price{font-weight:800; color:var(--accent-2);}
+
+    .renew-btn {
+      background: var(--success); color: white; border: none; border-radius: 6px;
+      padding: 5px 12px; font-size: 11px; font-weight: 700; cursor: pointer; margin-right: 8px;
+    }
+
+    /* FAB & Modal */
+    .fab{
+      position:fixed; bottom:30px; right:30px; width:60px; height:60px;
+      background:var(--accent); border-radius:50%; display:flex;
+      align-items:center; justify-content:center; font-size:24px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.3); border:none; color:white; cursor:pointer; z-index: 100;
+    }
+
+    .modal{
+      position:fixed; top:0; left:0; width:100%; height:100%;
+      background: rgba(0,0,0,0.8); display:none; align-items:center; justify-content:center; z-index: 1000;
+      backdrop-filter: blur(5px);
+    }
+    .modal-content{
+      background: #0b1a3d; padding:25px; border-radius:24px; width:90%; max-width:400px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    input{
+      width:100%; padding:12px; margin:10px 0; border-radius:12px;
+      border:1px solid rgba(255,255,255,0.1); background:rgba(0,0,0,0.2); color:white;
+    }
+    .save-btn{
+      width:100%; padding:14px; border-radius:12px; background:var(--accent);
+      color:white; border:none; font-weight:700; margin-top:10px; cursor:pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <a href="/index.html" class="back-btn">← Home</a>
+    <div style="font-weight:700; color:var(--accent-2)">SubScout</div>
+  </header>
+
+  <div class="total-card">
+    <p style="margin:0; opacity:0.8; font-size:14px;">Total Monthly Spend</p>
+    <h2 id="totalDisplay">₦0</h2>
+  </div>
+
+  <div class="sub-list" id="subContainer">
+    <p style="text-align:center; color:var(--muted)">Loading your subscriptions...</p>
+  </div>
+
+  <button class="fab" onclick="toggleModal(true)">+</button>
+</div>
+
+<div class="modal" id="subModal">
+  <div class="modal-content">
+    <h3 style="margin-top:0">Add Subscription</h3>
+    <input type="text" id="subName" placeholder="Service Name (e.g. Netflix)">
+    <input type="number" id="subPrice" placeholder="Price (₦)">
+    <input type="date" id="subDate">
+    <button class="save-btn" id="saveBtn">Save Subscription</button>
+    <button class="back-btn" style="width:100%; margin-top:15px; background:none; border:none; cursor:pointer;" onclick="toggleModal(false)">Cancel</button>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBsVbLw4mvFTJhmORUXCUNyGc98Rripj3M",
+    authDomain: "biu-students-hub.firebaseapp.com",
+    projectId: "biu-students-hub",
+    databaseURL: "https://biu-students-hub-default-rtdb.firebaseio.com",
+    appId: "1:128818531382:web:190dc5688d1b9d21321c97"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.database();
+
+  let currentUser = null;
+
+  auth.onAuthStateChanged(user => {
+    if (user) {
+      currentUser = user;
+      loadUserSubscriptions();
+    } else {
+      window.location.href = '/signup.html';
+    }
+  });
+
+  // Helper: Check for 48-hour window
+  function getRenewalStatus(dateString) {
+    const target = new Date(dateString);
+    const now = new Date();
+    const diffTime = target - now;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    if (diffDays <= 2) return "urgent"; 
+    return "safe";
+  }
+
+  function loadUserSubscriptions() {
+    const subRef = db.ref('user_subscriptions/' + currentUser.uid);
+    subRef.on('value', (snapshot) => {
+      const container = document.getElementById('subContainer');
+      const totalDisplay = document.getElementById('totalDisplay');
+      container.innerHTML = '';
+      let total = 0;
+
+      if (!snapshot.exists()) {
+        container.innerHTML = '<p style="text-align:center; color:var(--muted)">No subscriptions added yet.</p>';
+        totalDisplay.innerText = "₦0";
+        return;
+      }
+
+      snapshot.forEach(child => {
+        const data = child.val();
+        const id = child.key;
+        total += parseInt(data.price);
+        
+        const isUrgent = getRenewalStatus(data.date) === "urgent";
+        
+        container.innerHTML += `
+          <div class="sub-item ${isUrgent ? 'urgent' : ''}">
+            <div>
+              <div class="sub-name">
+                ${data.name} ${isUrgent ? '<span class="status-badge">Due</span>' : ''}
+              </div>
+              <div class="sub-date">Renew: ${data.date}</div>
+            </div>
+            <div style="text-align: right">
+              <div class="sub-price">₦${parseInt(data.price).toLocaleString()}</div>
+              <div style="margin-top:8px">
+                <button class="renew-btn" onclick="renewSub('${id}', '${data.date}')">Paid</button>
+                <button onclick="deleteSub('${id}')" style="background:none; border:none; color:var(--muted); font-size:11px; cursor:pointer;">Remove</button>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      totalDisplay.innerText = "₦" + total.toLocaleString();
+    });
+  }
+
+  // Action: Renew for next month
+  async function renewSub(id, currentDate) {
+    const d = new Date(currentDate);
+    d.setMonth(d.getMonth() + 1);
+    const nextDate = d.toISOString().split('T')[0];
+    
+    try {
+      await db.ref('user_subscriptions/' + currentUser.uid + '/' + id).update({ date: nextDate });
+    } catch (e) { alert(e.message); }
+  }
+
+  // Action: Delete sub
+  async function deleteSub(id) {
+    if(confirm("Remove this subscription?")) {
+      await db.ref('user_subscriptions/' + currentUser.uid + '/' + id).remove();
+    }
+  }
+
+  document.getElementById('saveBtn').addEventListener('click', async () => {
+    const name = document.getElementById('subName').value;
+    const price = document.getElementById('subPrice').value;
+    const date = document.getElementById('subDate').value;
+
+    if (!name || !price || !date) return alert("Fill all fields");
+
+    try {
+      await db.ref('user_subscriptions/' + currentUser.uid).push({ name, price, date });
+      toggleModal(false);
+      document.getElementById('subName').value = '';
+      document.getElementById('subPrice').value = '';
+    } catch (e) { alert(e.message); }
+  });
+
+  function toggleModal(show) {
+    document.getElementById('subModal').style.display = show ? 'flex' : 'none';
+  }
+</script>
+</body>
+</html>
