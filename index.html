@@ -76,6 +76,11 @@
       <div class="eyebrow">🚀 BIU DIGITAL CAMPUS</div>
       <h1>Study smarter, track better, and grow.</h1>
       <p style="color:var(--muted); line-height:1.6; font-size: 18px;">The all-in-one archive for past questions and student utility tools.</p>
+
+      <div id="broadcastBanner" style="display:none; background: linear-gradient(90deg, var(--accent), var(--accent-2)); color: white; padding: 12px 20px; text-align: center; font-size: 14px; font-weight: 700; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+        <span id="broadcastText"></span>
+        <span style="margin-left: 15px; opacity: 0.7; cursor: pointer;" onclick="this.parentElement.style.display='none'">✕</span>
+      </div>
       
       <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
          <div style="background:var(--glass); padding:10px 20px; border-radius:12px">
@@ -191,6 +196,26 @@
         }
       } catch(e) { console.log("CGPA not yet set"); }
     }
+
+    // --- Receive Global Broadcast ---
+const banner = document.getElementById('broadcastBanner');
+const bannerText = document.getElementById('broadcastText');
+
+db.ref('broadcast').on('value', (snap) => {
+    const data = snap.val();
+    if (data && data.message) {
+        bannerText.innerText = "📢 " + data.message;
+        banner.style.display = 'block';
+        
+        // Optional: Auto-hide if the message is older than 24 hours
+        const oneDay = 24 * 60 * 60 * 1000;
+        if (Date.now() - data.timestamp > oneDay) {
+            banner.style.display = 'none';
+        }
+    } else {
+        banner.style.display = 'none';
+    }
+});
 
     async function loadDiscussions(){
       const list = document.getElementById('discussionList');

@@ -1,114 +1,133 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>BIU Student Hub — Admin</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-<style>
-:root{
---bg:#071028;
---card:#071827;
---accent:#6d28d9;
---accent-2:#06b6d4;
---muted:#9aa8bf;
---glass: rgba(255,255,255,0.03);
---radius:14px;
---max-width:1100px;
-}
-*{box-sizing:border-box;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
-html,body{height:100%;margin:0;background:
-radial-gradient(900px 400px at 10% 10%, rgba(109,40,217,0.06), transparent 8%),
-linear-gradient(180deg,#041026 0%, #071028 100%);
-color:#e6eef8;-webkit-font-smoothing:antialiased;}
-.wrap{max-width:var(--max-width);margin:28px auto;padding:20px;}
-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px}
-.brand{display:flex;align-items:center;gap:12px}
-.logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff}
-h1{margin:0;font-size:20px}
-.sub{color:var(--muted);font-size:13px}
-.card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 12px 40px rgba(2,6,23,0.6)}
-.grid{display:grid;grid-template-columns:1fr 360px;gap:18px;margin-top:18px}
-.list{display:flex;flex-direction:column;gap:12px;max-height:64vh;overflow:auto;padding-right:6px}
-.item{display:flex;justify-content:space-between;align-items:center;padding:12px;border-radius:10px;background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.02)}
-.meta{display:flex;gap:12px;align-items:center}
-.avatar{width:44px;height:44px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff}
-.btn{padding:10px 12px;border-radius:10px;border:none;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;font-weight:700;cursor:pointer;font-size: 12px;}
-.btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted)}
-.btn.danger{background:linear-gradient(90deg,#ef4444,#f97316)}
-.small{font-size:13px;color:var(--muted)}
-.preview{display:flex;flex-direction:column;gap:12px}
-.preview img{max-width:100%;border-radius:10px;border:1px solid rgba(255,255,255,0.04)}
-.controls{display:flex;gap:8px;flex-wrap:wrap}
-.search{width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:#e6eef8;margin-bottom:12px}
-.notice{padding:10px;border-radius:10px;background:rgba(255,255,255,0.01);color:var(--muted);font-size:13px}
-.badge { padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 800; text-transform: uppercase; margin-left: 4px;}
-.badge.verify { background: #10b981; color: white; }
-.badge.ban { background: #ef4444; color: white; }
-@media (max-width:980px){.grid{grid-template-columns:1fr;}}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>BIU Student Hub — Command Center</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #071028; --card: #0b1a3d; --accent: #6d28d9; --accent-2: #06b6d4;
+      --muted: #9aa8bf; --glass: rgba(255,255,255,0.03); --radius: 14px;
+    }
+    * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
+    body { 
+      margin: 0; background: var(--bg); color: #e6eef8; 
+      background-attachment: fixed; min-height: 100vh;
+    }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 30px 20px; }
+    
+    header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 30px; }
+    .brand { display: flex; align-items: center; gap: 15px; }
+    .logo { 
+      width: 50px; height: 50px; border-radius: 12px; 
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: flex; align-items: center; justify-content: center; font-weight: 800;
+    }
+
+    .card { 
+      background: var(--card); border-radius: var(--radius); 
+      border: 1px solid var(--glass); padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    .grid { display: grid; grid-template-columns: 1fr 350px; gap: 20px; margin-top: 20px; }
+    .list { display: flex; flex-direction: column; gap: 10px; max-height: 500px; overflow-y: auto; padding-right: 5px; }
+    
+    .item { 
+      display: flex; justify-content: space-between; align-items: center; padding: 15px; 
+      background: rgba(255,255,255,0.02); border-radius: 10px; border: 1px solid transparent;
+      transition: 0.2s;
+    }
+    .item:hover { border-color: var(--accent-2); background: rgba(255,255,255,0.04); }
+
+    .avatar { 
+      width: 40px; height: 40px; border-radius: 8px; background: var(--accent);
+      display: flex; align-items: center; justify-content: center; font-weight: 700;
+    }
+
+    .btn { 
+      padding: 10px 18px; border-radius: 8px; border: none; font-weight: 700; 
+      cursor: pointer; transition: 0.2s; font-size: 13px;
+    }
+    .btn-primary { background: var(--accent); color: white; }
+    .btn-ghost { background: transparent; border: 1px solid var(--glass); color: var(--muted); }
+    .btn-danger { background: #ef4444; color: white; }
+
+    .badge { padding: 3px 8px; border-radius: 5px; font-size: 10px; font-weight: 800; text-transform: uppercase; margin-left: 5px; }
+    .badge-verify { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+    .badge-ban { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+
+    .preview-box img { width: 100%; border-radius: 10px; margin-top: 15px; border: 1px solid var(--glass); }
+    input.search { 
+      background: rgba(0,0,0,0.2); border: 1px solid var(--glass); color: white; 
+      padding: 10px 15px; border-radius: 10px; width: 100%; outline: none;
+    }
+
+    /* Scrollbar */
+    .list::-webkit-scrollbar { width: 5px; }
+    .list::-webkit-scrollbar-thumb { background: var(--glass); border-radius: 10px; }
+
+    @media (max-width: 900px) { .grid { grid-template-columns: 1fr; } }
+  </style>
 </head>
 <body>
+
 <div class="wrap">
-<header>
-<div class="brand">
-<div class="logo">BIU</div>
-<div>
-<h1>Admin Dashboard</h1>
-<div class="sub">Restricted access — pauladamu600@gmail.com only</div>
-</div>
-</div>
-<div>
-<button id="signOut" class="btn ghost">Sign out</button>
-</div>
-</header>
+  <header>
+    <div class="brand">
+      <div class="logo">HUB</div>
+      <div>
+        <h1 style="margin:0; font-size:22px;">Admin Center</h1>
+        <div style="font-size:12px; color:var(--muted)">pauladamu600@gmail.com</div>
+      </div>
+    </div>
+    <button id="signOut" class="btn btn-ghost">Sign Out</button>
+  </header>
 
-<div id="authNotice" class="card notice">Checking admin access…</div>
+  <div id="authNotice" class="card" style="text-align:center;">Verifying Admin Credentials...</div>
 
-<div id="main" style="display:none">
+  <div id="mainContent" style="display:none">
     <div class="card">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:12px">
-            <div>
-                <div style="font-weight:800">Payment Proofs</div>
-                <div class="small">Review incoming verification payments.</div>
-            </div>
-            <div style="display:flex;gap:8px;align-items:center">
-                <input id="searchInput" class="search" placeholder="Search proofs..." style="width:280px; margin:0" />
-                <button id="refreshBtn" class="btn ghost">Refresh</button>
-            </div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <div>
+          <h2 style="margin:0; font-size:18px;">Verification Proofs</h2>
+          <p style="margin:0; font-size:12px; color:var(--muted)">Pending student payments</p>
         </div>
+        <input type="text" id="searchInput" class="search" placeholder="Search by name..." style="max-width:250px;">
+      </div>
 
-        <div class="grid">
-            <div><div class="list" id="proofList"></div></div>
-            <aside>
-                <div class="preview card">
-                    <div style="display:flex;justify-content:space-between;align-items:center">
-                        <div style="font-weight:700">Selected proof</div>
-                        <div id="selectedStatus" class="small"></div>
-                    </div>
-                    <div id="previewMeta" style="margin-top:8px" class="small">Select a proof to view</div>
-                    <div id="previewImage" style="margin-top:12px"></div>
-                    <div id="proofActions" style="margin-top:12px;display:none">
-                        <div class="controls">
-                            <button id="approveBtn" class="btn">Approve</button>
-                            <button id="rejectBtn" class="btn danger">Reject</button>
-                        </div>
-                    </div>
-                </div>
-            </aside>
+      <div class="card" style="margin-bottom: 30px; border: 1px solid var(--accent-2);">
+        <div style="margin-bottom: 12px;">
+            <div style="font-weight: 800; color: var(--accent-2);">Global Broadcast</div>
+            <div class="small">This message will appear on every student's home page instantly.</div>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <input id="broadcastInput" class="search" placeholder="Type announcement (e.g. Exam results are out!)" />
+            <button id="sendBroadcast" class="btn btn-primary">Send</button>
+            <button id="clearBroadcast" class="btn btn-ghost" style="color:#ef4444">Clear</button>
         </div>
     </div>
 
-    <div style="height:24px"></div>
+      <div class="grid">
+        <div class="list" id="proofList"></div>
+        <aside>
+          <div class="card" id="previewArea" style="background: rgba(0,0,0,0.2);">
+            <div style="font-weight:700; border-bottom:1px solid var(--glass); padding-bottom:10px;">Preview</div>
+            <div id="previewContent">
+              <p style="color:var(--muted); font-size:13px; margin-top:15px;">Select a proof to review details.</p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+
+    <div style="height:30px"></div>
 
     <div class="card">
-        <div style="margin-bottom:12px">
-            <div style="font-weight:800">User Management</div>
-            <div class="small">Quickly verify or ban users directly.</div>
-        </div>
-        <div class="list" id="userList" style="max-height:40vh"></div>
+      <h2 style="margin:0 0 15px; font-size:18px;">User Directory</h2>
+      <div class="list" id="userList" style="max-height:400px;"></div>
     </div>
-</div>
+  </div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -117,166 +136,163 @@ h1{margin:0;font-size:20px}
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
 
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyBsVbLw4mvFTJhmORUXCUNyGc98Rripj3M",
-  authDomain: "biu-students-hub.firebaseapp.com",
-  projectId: "biu-students-hub",
-  storageBucket: "biu-students-hub.appspot.com",
-  messagingSenderId: "128818531382",
-  appId: "1:128818531382:web:190dc5688d1b9d21321c97",
-  measurementId: "G-ELK8KN5SK7",
-  databaseURL: "https://biu-students-hub-default-rtdb.firebaseio.com"
-};
+  const firebaseConfig = {
+    apiKey: "AIzaSyBsVbLw4mvFTJhmORUXCUNyGc98Rripj3M",
+    authDomain: "biu-students-hub.firebaseapp.com",
+    projectId: "biu-students-hub",
+    storageBucket: "biu-students-hub.appspot.com",
+    databaseURL: "https://biu-students-hub-default-rtdb.firebaseio.com"
+  };
 
-if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth(), db = firebase.database(), storage = firebase.storage();
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth(), db = firebase.database(), storage = firebase.storage();
 
-const ADMIN_EMAIL = 'pauladamu600@gmail.com';
-let proofs = [], users = [], selected = null;
+  const ADMIN_EMAIL = 'pauladamu600@gmail.com';
+  let allProofs = [], allUsers = [], selectedProof = null;
 
-const proofList = document.getElementById('proofList'), 
-      userList = document.getElementById('userList'),
-      previewImage = document.getElementById('previewImage'),
-      proofActions = document.getElementById('proofActions'),
-      searchInput = document.getElementById('searchInput');
-
-// --- UTILS ---
-function safeInitials(str){
-    if(!str) return 'U';
-    return str.split(' ').filter(s=>s).map(s=>s[0]).join('').substring(0,2).toUpperCase();
-}
-
-// --- USER ACTIONS ---
-async function toggleVerify(uid, currentStatus) {
-    if(!confirm(`Change verification for this user?`)) return;
-    await db.ref(`profiles/${uid}/verified`).set(!currentStatus);
-}
-
-async function toggleBan(uid, currentStatus) {
-    const action = currentStatus ? 'Unban' : 'Ban';
-    if(!confirm(`Are you sure you want to ${action} this user?`)) return;
-    await db.ref(`profiles/${uid}/banned`).set(!currentStatus);
-}
-
-// --- RENDERERS ---
-function renderUsers() {
-    userList.innerHTML = '';
-    users.forEach(u => {
-        const item = document.createElement('div');
-        item.className = 'item';
-        item.innerHTML = `
-            <div class="meta">
-                <div class="avatar">${safeInitials(u.fullName || u.email)}</div>
-                <div>
-                    <div style="font-weight:700; display:flex; align-items:center">
-                        ${u.fullName || 'User'} 
-                        ${u.verified ? '<span class="badge verify">Verified</span>' : ''}
-                        ${u.banned ? '<span class="badge ban">Banned</span>' : ''}
-                    </div>
-                    <div class="small">${u.email}</div>
-                </div>
-            </div>
-            <div class="controls">
-                <button class="btn ghost" onclick="toggleVerify('${u.uid}', ${!!u.verified})">
-                    ${u.verified ? 'Unverify' : 'Verify'}
-                </button>
-                <button class="btn ${u.banned ? '' : 'danger'}" onclick="toggleBan('${u.uid}', ${!!u.banned})">
-                    ${u.banned ? 'Unban' : 'Ban'}
-                </button>
-            </div>
-        `;
-        userList.appendChild(item);
-    });
-}
-
-function renderProofs(filter='') {
-    proofList.innerHTML = '';
-    const filtered = proofs.filter(p => 
-        (p.fullName||'').toLowerCase().includes(filter.toLowerCase()) || 
-        (p.uid||'').toLowerCase().includes(filter.toLowerCase())
-    );
-    filtered.forEach(p => {
-        const item = document.createElement('div');
-        item.className = 'item';
-        item.innerHTML = `
-            <div class="meta">
-                <div class="avatar">${safeInitials(p.fullName)}</div>
-                <div><div style="font-weight:700">${p.fullName}</div><div class="small">${p.status}</div></div>
-            </div>
-            <button class="btn ghost" onclick="selectProof('${p.proofId}', '${p.uid}')">View</button>
-        `;
-        proofList.appendChild(item);
-    });
-}
-
-async function selectProof(proofId, uid) {
-    selected = proofs.find(p => p.proofId === proofId && p.uid === uid);
-    document.getElementById('selectedStatus').textContent = selected.status.toUpperCase();
-    document.getElementById('previewMeta').textContent = `${selected.fullName} (${selected.uid})`;
-    proofActions.style.display = 'block';
-    previewImage.innerHTML = '<div class="small">Loading...</div>';
-    
-    try {
-        const url = selected.url || await storage.ref(selected.storagePath).getDownloadURL();
-        previewImage.innerHTML = `<a href="${url}" target="_blank"><img src="${url}" style="width:100%; border-radius:8px"></a>`;
-    } catch(e) { previewImage.innerHTML = 'Error loading image'; }
-}
-
-// --- DATA LISTENERS ---
-function initData() {
-    // Listen for Proofs
-    db.ref('paymentProofs').on('value', snap => {
-        proofs = [];
-        snap.forEach(uSnap => {
-            uSnap.forEach(pSnap => {
-                const d = pSnap.val();
-                proofs.push({ uid: uSnap.key, proofId: pSnap.key, ...d });
-            });
-        });
-        renderProofs(searchInput.value);
-    });
-
-    // Listen for Users
-    db.ref('profiles').on('value', snap => {
-        users = [];
-        snap.forEach(uSnap => {
-            users.push({ uid: uSnap.key, ...uSnap.val() });
-        });
-        renderUsers();
-    });
-
-    db.ref('profiles').on('value', snap => {
-    console.log("Data received:", snap.val()); // This should show in your F12 console
-    // ... rest of the code
-});
-}
-
-// --- AUTH ---
-auth.onAuthStateChanged(user => {
-    if(!user || user.email !== ADMIN_EMAIL) {
-        window.location.href = '/login.html';
+  // --- Auth Check ---
+  auth.onAuthStateChanged(user => {
+    if (user && user.email === ADMIN_EMAIL) {
+      document.getElementById('authNotice').style.display = 'none';
+      document.getElementById('mainContent').style.display = 'block';
+      loadData();
     } else {
-        document.getElementById('authNotice').style.display = 'none';
-        document.getElementById('main').style.display = 'block';
-        initData();
+      window.location.href = '/login.html';
     }
-});
+  });
 
-document.getElementById('approveBtn').onclick = async () => {
-    if(!selected) return;
-    await db.ref(`profiles/${selected.uid}/verified`).set(true);
-    await db.ref(`paymentProofs/${selected.uid}/${selected.proofId}/status`).set('approved');
-    alert('Approved!');
+  // --- Data Loading ---
+  function loadData() {
+    // 1. Listen for Proofs
+    db.ref('paymentProofs').on('value', snap => {
+      allProofs = [];
+      snap.forEach(userNode => {
+        userNode.forEach(proofNode => {
+          allProofs.push({ uid: userNode.key, proofId: proofNode.key, ...proofNode.val() });
+        });
+      });
+      renderProofs();
+    });
+
+    // 2. Listen for Users
+    db.ref('profiles').on('value', snap => {
+      allUsers = [];
+      snap.forEach(u => allUsers.push({ uid: u.key, ...u.val() }));
+      renderUsers();
+    });
+  }
+
+  // --- Global Broadcast Logic ---
+const bInput = document.getElementById('broadcastInput');
+
+document.getElementById('sendBroadcast').onclick = async () => {
+    const msg = bInput.value.trim();
+    if (!msg) return alert("Please enter a message!");
+
+    await db.ref('broadcast').set({
+        message: msg,
+        timestamp: Date.now(),
+        admin: ADMIN_EMAIL
+    });
+    
+    alert("Broadcast sent successfully!");
+    bInput.value = '';
 };
 
-document.getElementById('rejectBtn').onclick = async () => {
-    if(!selected) return;
-    await db.ref(`paymentProofs/${selected.uid}/${selected.proofId}/status`).set('rejected');
-    alert('Rejected!');
+document.getElementById('clearBroadcast').onclick = async () => {
+    if(confirm("Remove broadcast from all student screens?")) {
+        await db.ref('broadcast').remove();
+    }
 };
 
-document.getElementById('signOut').onclick = () => auth.signOut();
-searchInput.oninput = (e) => renderProofs(e.target.value);
+  // --- Render Functions ---
+  function renderProofs(filter = '') {
+    const list = document.getElementById('proofList');
+    list.innerHTML = '';
+    const filtered = allProofs.filter(p => (p.fullName || '').toLowerCase().includes(filter.toLowerCase()));
+
+    filtered.forEach(p => {
+      const div = document.createElement('div');
+      div.className = 'item';
+      div.innerHTML = `
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div class="avatar">${(p.fullName || 'U').charAt(0)}</div>
+          <div>
+            <div style="font-weight:700">${p.fullName}</div>
+            <div style="font-size:11px; color:var(--muted)">Status: ${p.status}</div>
+          </div>
+        </div>
+        <button class="btn btn-ghost" onclick="viewProof('${p.uid}', '${p.proofId}')">Review</button>
+      `;
+      list.appendChild(div);
+    });
+  }
+
+  async function viewProof(uid, proofId) {
+    selectedProof = allProofs.find(p => p.uid === uid && p.proofId === proofId);
+    const container = document.getElementById('previewContent');
+    container.innerHTML = `<p style="font-size:12px;">Fetching image...</p>`;
+
+    try {
+      const url = selectedProof.url || await storage.ref(selectedProof.storagePath).getDownloadURL();
+      container.innerHTML = `
+        <div class="preview-box">
+          <p style="font-size:13px; margin:10px 0 5px;"><b>User:</b> ${selectedProof.fullName}</p>
+          <a href="${url}" target="_blank"><img src="${url}"></a>
+          <div style="display:flex; gap:10px; margin-top:15px;">
+            <button class="btn btn-primary" onclick="updateStatus('approved')">Approve</button>
+            <button class="btn btn-danger" onclick="updateStatus('rejected')">Reject</button>
+          </div>
+        </div>
+      `;
+    } catch (e) { container.innerHTML = `<p style="color:#ef4444">Error loading proof.</p>`; }
+  }
+
+  function renderUsers() {
+    const list = document.getElementById('userList');
+    list.innerHTML = '';
+    allUsers.forEach(u => {
+      const div = document.createElement('div');
+      div.className = 'item';
+      div.innerHTML = `
+        <div style="display:flex; align-items:center; gap:12px;">
+          <div class="avatar" style="background: ${u.banned ? '#ef4444' : ''}">${(u.fullName || 'U').charAt(0)}</div>
+          <div>
+            <div style="font-weight:700">
+              ${u.fullName || 'Unnamed'} 
+              ${u.verified ? '<span class="badge badge-verify">Verified</span>' : ''}
+              ${u.banned ? '<span class="badge badge-ban">Banned</span>' : ''}
+            </div>
+            <div style="font-size:11px; color:var(--muted)">${u.email}</div>
+          </div>
+        </div>
+        <div style="display:flex; gap:5px;">
+          <button class="btn btn-ghost" onclick="toggleField('${u.uid}', 'verified', ${!u.verified})">${u.verified ? 'Unverify' : 'Verify'}</button>
+          <button class="btn btn-danger" style="background:${u.banned ? '#10b981' : ''}" onclick="toggleField('${u.uid}', 'banned', ${!u.banned})">${u.banned ? 'Unban' : 'Ban'}</button>
+        </div>
+      `;
+      list.appendChild(div);
+    });
+  }
+
+  // --- Database Actions ---
+  async function updateStatus(status) {
+    if (!selectedProof) return;
+    if (status === 'approved') await db.ref(`profiles/${selectedProof.uid}/verified`).set(true);
+    await db.ref(`paymentProofs/${selectedProof.uid}/${selectedProof.proofId}/status`).set(status);
+    alert(`Proof marked as ${status}`);
+    document.getElementById('previewContent').innerHTML = `<p style="color:var(--muted)">Action completed.</p>`;
+  }
+
+  async function toggleField(uid, field, val) {
+    if (confirm(`Confirm ${field} change?`)) {
+      await db.ref(`profiles/${uid}/${field}`).set(val);
+    }
+  }
+
+  document.getElementById('signOut').onclick = () => auth.signOut();
+  document.getElementById('searchInput').oninput = (e) => renderProofs(e.target.value);
 </script>
+
 </body>
 </html>
