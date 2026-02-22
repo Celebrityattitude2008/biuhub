@@ -42,8 +42,10 @@
     .panel h3{margin:0 0 16px; font-size: 18px; display: flex; align-items: center; gap: 8px;}
 
     select{width: 100%; padding:12px;border-radius:10px;border:1px solid rgba(255,255,255,0.08);background:rgba(0,0,0,0.2);color:#fff; margin-bottom: 10px;}
-    .cta{width: 100%; padding:14px;border-radius:12px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;font-weight:700;border:none;cursor:pointer;}
-    .ghost{padding:12px; border-radius:12px; background:transparent; border:1px solid rgba(255,255,255,0.1); color:var(--muted); cursor:pointer; width:100%;}
+    .cta{width: 100%; padding:14px;border-radius:12px;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;font-weight:700;border:none;cursor:pointer; transition: opacity 0.2s;}
+    .cta:hover {opacity: 0.9;}
+    .ghost{padding:12px; border-radius:12px; background:transparent; border:1px solid rgba(255,255,255,0.1); color:var(--muted); cursor:pointer; width:100%; transition: background 0.2s;}
+    .ghost:hover {background: rgba(255,255,255,0.05);}
 
     @media (max-width:480px){
       .brand div:last-child{display:none;}
@@ -77,29 +79,48 @@
       <h1>Study smarter, track better, and grow.</h1>
       <p style="color:var(--muted); line-height:1.6; font-size: 18px;">The all-in-one archive for past questions and student utility tools.</p>
 
-      <div id="broadcastBanner" style="display:none; background: linear-gradient(90deg, var(--accent), var(--accent-2)); color: white; padding: 12px 20px; text-align: center; font-size: 14px; font-weight: 700; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+      <div id="broadcastBanner" style="display:none; background: linear-gradient(90deg, var(--accent), var(--accent-2)); color: white; padding: 12px 20px; text-align: center; font-size: 14px; font-weight: 700; position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 15px rgba(0,0,0,0.3); border-radius: 8px; margin-top: 15px;">
         <span id="broadcastText"></span>
         <span style="margin-left: 15px; opacity: 0.7; cursor: pointer;" onclick="this.parentElement.style.display='none'">✕</span>
       </div>
       
       <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
          <div style="background:var(--glass); padding:10px 20px; border-radius:12px">
-            <span id="statPQ" style="font-weight:800; color:var(--accent-2)">...</span> <small>Materials</small>
+            <span id="statPQ" style="font-weight:800; color:var(--accent-2)">...</span> <small>Materials Logged</small>
           </div>
       </div>
     </main>
 
     <section class="grid-3">
-      <div class="panel fade-in">
-        <h3>📚 Library Access</h3>
-        <div>
-          <select id="pqLevel">
-            <option value="100">100 Level</option>
-            <option value="200">200 Level</option>
-            <option value="300">300 Level</option>
-            <option value="400">400 Level</option>
-          </select>
-          <button class="cta" id="openPQ">Search Questions</button>
+      
+      <div class="panel fade-in" style="grid-column: 1 / -1; border: 1px solid var(--accent); background: rgba(109, 40, 217, 0.05);">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 20px;">
+          <div style="background: var(--accent); padding: 8px; border-radius: 10px; font-size: 18px;">📚</div>
+          <h3 style="margin:0">Biu Archive Explorer</h3>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+          <div>
+            <label style="font-size: 11px; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; display: block;">Select Level</label>
+            <select id="archiveLevel">
+              <option value="100">100 Level</option>
+              <option value="200">200 Level</option>
+              <option value="300">300 Level</option>
+              <option value="400">400 Level</option>
+            </select>
+          </div>
+
+          <div>
+            <label style="font-size: 11px; color: var(--muted); text-transform: uppercase; margin-bottom: 8px; display: block;">Material Type</label>
+            <select id="archiveType">
+              <option value="pq">Past Questions</option>
+              <option value="notes">Lecture Notes</option>
+            </select>
+          </div>
+
+          <div style="display: flex; align-items: flex-end;">
+            <button class="cta" onclick="openArchive()" style="height: 48px;">Search Archive</button>
+          </div>
         </div>
       </div>
 
@@ -119,12 +140,6 @@
         <h3>💳 Budget Tracker</h3>
         <p style="font-size:13px; color:var(--muted); margin-bottom:20px">Manage your subscriptions and shared accounts in one place.</p>
         <button class="ghost" onclick="window.location.href='/subscriptions.html'">Open Tracker</button>
-      </div>
-
-      <div class="panel fade-in">
-        <h3>🤖 Study AI</h3>
-        <p style="font-size:13px; color:var(--muted); margin-bottom:20px">Ask questions, summarize notes, or get study tips from our AI assistant.</p>
-        <button class="cta" onclick="window.location.href='/chatbot.html'">Chat with AI</button>
       </div>
 
       <div class="panel fade-in">
@@ -175,9 +190,17 @@
       }
     });
 
-    document.getElementById('openPQ').addEventListener('click', () => {
-      window.location.href = `/pq.html?level=${document.getElementById('pqLevel').value}`;
-    });
+    // --- Archive Explorer Logic ---
+    function openArchive() {
+      const level = document.getElementById('archiveLevel').value;
+      const type = document.getElementById('archiveType').value;
+      
+      if (type === 'pq') {
+        window.location.href = `/pq.html?level=${level}`;
+      } else if (type === 'notes') {
+        window.location.href = `/note.html?level=${level}`;
+      }
+    }
 
     async function loadCounts(){
       try {
@@ -198,24 +221,24 @@
     }
 
     // --- Receive Global Broadcast ---
-const banner = document.getElementById('broadcastBanner');
-const bannerText = document.getElementById('broadcastText');
+    const banner = document.getElementById('broadcastBanner');
+    const bannerText = document.getElementById('broadcastText');
 
-db.ref('broadcast').on('value', (snap) => {
-    const data = snap.val();
-    if (data && data.message) {
-        bannerText.innerText = "📢 " + data.message;
-        banner.style.display = 'block';
-        
-        // Optional: Auto-hide if the message is older than 24 hours
-        const oneDay = 24 * 60 * 60 * 1000;
-        if (Date.now() - data.timestamp > oneDay) {
-            banner.style.display = 'none';
-        }
-    } else {
-        banner.style.display = 'none';
-    }
-});
+    db.ref('broadcast').on('value', (snap) => {
+      const data = snap.val();
+      if (data && data.message) {
+          bannerText.innerText = "📢 " + data.message;
+          banner.style.display = 'block';
+          
+          // Optional: Auto-hide if the message is older than 24 hours
+          const oneDay = 24 * 60 * 60 * 1000;
+          if (Date.now() - data.timestamp > oneDay) {
+              banner.style.display = 'none';
+          }
+      } else {
+          banner.style.display = 'none';
+      }
+    });
 
     async function loadDiscussions(){
       const list = document.getElementById('discussionList');

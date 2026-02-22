@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archive Note | Biu Archive</title>
+    <style>
+        :root {
+            --primary-blue: #4285F4;
+            --success-green: #34a853;
+            --text-dark: #333;
+            --bg-light: #f8f9fa;
+        }
+
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            line-height: 1.6; 
+            color: var(--text-dark); 
+            max-width: 900px; 
+            margin: 0 auto; 
+            padding: 2rem; 
+            background: var(--bg-light); 
+        }
+
+        .back-link { display: inline-block; margin-bottom: 1.5rem; text-decoration: none; color: #666; font-weight: 500; }
+        .back-link:hover { color: var(--primary-blue); }
+
+        .card { 
+            background: white; 
+            padding: 2.5rem; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08); 
+            margin-bottom: 2rem; 
+        }
+
+        h1, h2, h3 { color: #111; margin-top: 0; }
+        
+        /* How-To Section */
+        .how-to-step { display: flex; gap: 15px; margin-bottom: 1.2rem; align-items: flex-start; }
+        .step-num { 
+            background: var(--success-green); color: white; border-radius: 50%; 
+            width: 28px; height: 28px; display: flex; align-items: center; 
+            justify-content: center; flex-shrink: 0; font-weight: bold; font-size: 0.9rem;
+        }
+
+        /* Form Styling */
+        .form-group { margin-bottom: 1.2rem; }
+        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.9rem; }
+        input, textarea { 
+            width: 100%; padding: 12px; border: 1.5px solid #ddd; 
+            border-radius: 6px; box-sizing: border-box; font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        input:focus { border-color: var(--primary-blue); outline: none; }
+
+        .btn { 
+            background: var(--primary-blue); color: white; border: none; 
+            padding: 12px 24px; border-radius: 6px; cursor: pointer; 
+            font-weight: bold; width: 100%; font-size: 1rem;
+        }
+        .btn:disabled { background: #ccc; cursor: not-allowed; }
+
+        /* Comments area */
+        .comment-item { border-bottom: 1px solid #eee; padding: 1rem 0; }
+        .comment-meta { font-size: 0.8rem; color: #888; margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+
+    <a href="index.html" class="back-link">← Return to Archive Index</a>
+
+    <article class="card">
+        <div style="font-size: 0.8rem; color: var(--primary-blue); font-weight: bold; letter-spacing: 1px; margin-bottom: 10px;">PRESERVING KNOWLEDGE</div>
+        <h1>Course Resource Details</h1>
+        <p>This page allows you to view archived materials and contribute your own study resources to the community database.</p>
+    </article>
+
+    <section class="card" style="border-left: 6px solid var(--success-green);">
+        <h3>How to Contribute to Biu Archive</h3>
+        <div class="how-to-step">
+            <div class="step-num">1</div>
+            <div><strong>Upload to Drive:</strong> Upload your file to your Google Drive.</div>
+        </div>
+        <div class="how-to-step">
+            <div class="step-num">2</div>
+            <div><strong>Set Permissions:</strong> Right-click file > Share > Change "Restricted" to <strong>"Anyone with the link"</strong>.</div>
+        </div>
+        <div class="how-to-step">
+            <div class="step-num">3</div>
+            <div><strong>Paste Link:</strong> Copy the link and paste it into the submission form below.</div>
+        </div>
+    </section>
+
+    <section class="card">
+        <h3>Submit New Resource</h3>
+        <form id="upload-form">
+            <div class="form-group">
+                <label>Course Title</label>
+                <input type="text" id="courseTitle" name="courseTitle" placeholder="e.g. MTH 101: General Mathematics" required>
+            </div>
+            <div class="form-group">
+                <label>Google Drive Link</label>
+                <input type="url" id="driveLink" name="driveLink" placeholder="https://drive.google.com/..." required>
+            </div>
+            <button type="submit" id="submit-btn" class="btn">Add to Archive</button>
+        </form>
+    </section>
+
+    <section class="card">
+        <h3>Discussion & Feedback</h3>
+        <div id="comment-list">
+            <p style="color: #999; font-style: italic;">No discussions started yet.</p>
+        </div>
+        <hr style="margin: 2rem 0; border: 0; border-top: 1px solid #eee;">
+        <form id="comment-form">
+            <textarea id="commentInput" placeholder="Ask a question or leave a note about this resource..." rows="3" required></textarea>
+            <button type="submit" class="btn" style="background: #333; margin-top: 10px; width: auto;">Post Comment</button>
+        </form>
+    </section>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBsVbLw4mvFTJhmORUXCUNyGc98Rripj3M",
+            authDomain: "biu-students-hub.firebaseapp.com",
+            projectId: "biu-students-hub",
+            storageBucket: "biu-students-hub.appspot.com",
+            databaseURL: "https://biu-students-hub-default-rtdb.firebaseio.com"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // Form elements
+        const uploadForm = document.getElementById('upload-form');
+        const submitBtn = document.getElementById('submit-btn');
+
+        // Handling Resource Upload
+        uploadForm.addEventListener('submit', e => {
+            e.preventDefault();
+            
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Submitting to Archive...";
+
+            const resourceData = {
+                courseTitle: document.getElementById('courseTitle').value,
+                driveLink: document.getElementById('driveLink').value,
+                timestamp: Date.now(),
+                status: 'pending'
+            };
+
+            // Push to Firebase pendingResources node
+            db.ref('pendingResources').push(resourceData)
+                .then(() => {
+                    alert("Success! Your resource has been submitted for Admin review.");
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = "Add to Archive";
+                    uploadForm.reset();
+                })
+                .catch(error => {
+                    console.error("Firebase Error:", error);
+                    alert("Submission failed. Please check your connection.");
+                    submitBtn.disabled = false;
+                    submitBtn.innerText = "Add to Archive";
+                });
+        });
+
+        // Simple Comment logic (Optional: Can also be saved to Firebase)
+        document.getElementById('comment-form').onsubmit = (e) => {
+            e.preventDefault();
+            alert("Comment system is being updated! Your message will be visible soon.");
+            e.target.reset();
+        };
+    </script>
+</body>
+</html>

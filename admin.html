@@ -9,6 +9,7 @@
     :root {
       --bg: #071028; --card: #0b1a3d; --accent: #6d28d9; --accent-2: #06b6d4;
       --muted: #9aa8bf; --glass: rgba(255,255,255,0.03); --radius: 14px;
+      --success: #10b981; --warning: #f59e0b; --danger: #ef4444;
     }
     * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
     body { 
@@ -28,6 +29,7 @@
     .card { 
       background: var(--card); border-radius: var(--radius); 
       border: 1px solid var(--glass); padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      margin-bottom: 20px;
     }
 
     .grid { display: grid; grid-template-columns: 1fr 350px; gap: 20px; margin-top: 20px; }
@@ -50,8 +52,9 @@
       cursor: pointer; transition: 0.2s; font-size: 13px;
     }
     .btn-primary { background: var(--accent); color: white; }
+    .btn-success { background: var(--success); color: white; }
     .btn-ghost { background: transparent; border: 1px solid var(--glass); color: var(--muted); }
-    .btn-danger { background: #ef4444; color: white; }
+    .btn-danger { background: var(--danger); color: white; }
 
     .badge { padding: 3px 8px; border-radius: 5px; font-size: 10px; font-weight: 800; text-transform: uppercase; margin-left: 5px; }
     .badge-verify { background: rgba(16, 185, 129, 0.2); color: #10b981; }
@@ -87,26 +90,37 @@
   <div id="authNotice" class="card" style="text-align:center;">Verifying Admin Credentials...</div>
 
   <div id="mainContent" style="display:none">
+    
+    <div class="card" style="border: 1px solid var(--accent-2);">
+        <div style="margin-bottom: 12px;">
+            <div style="font-weight: 800; color: var(--accent-2);">Global Broadcast</div>
+            <div style="font-size:12px; color:var(--muted)">Appears on every student's home page instantly.</div>
+        </div>
+        <div style="display: flex; gap: 10px;">
+            <input id="broadcastInput" class="search" placeholder="Type announcement..." />
+            <button id="sendBroadcast" class="btn btn-primary">Send</button>
+            <button id="clearBroadcast" class="btn btn-ghost" style="color:var(--danger)">Clear</button>
+        </div>
+    </div>
+
+    <div class="card" style="border: 1px solid var(--warning);">
+      <div style="margin-bottom: 12px;">
+          <div style="font-weight: 800; color: var(--warning);">Archive Moderation</div>
+          <div style="font-size:12px; color:var(--muted)">Pending uploads for biuarchive.site</div>
+      </div>
+      <div id="archiveModerationList" class="list" style="max-height: 250px;">
+          <p style="font-size: 12px; color: var(--muted);">Checking for new submissions...</p>
+      </div>
+    </div>
+
     <div class="card">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
         <div>
           <h2 style="margin:0; font-size:18px;">Verification Proofs</h2>
           <p style="margin:0; font-size:12px; color:var(--muted)">Pending student payments</p>
         </div>
-        <input type="text" id="searchInput" class="search" placeholder="Search by name..." style="max-width:250px;">
+        <input type="text" id="searchInput" class="search" placeholder="Search proofs..." style="max-width:250px;">
       </div>
-
-      <div class="card" style="margin-bottom: 30px; border: 1px solid var(--accent-2);">
-        <div style="margin-bottom: 12px;">
-            <div style="font-weight: 800; color: var(--accent-2);">Global Broadcast</div>
-            <div class="small">This message will appear on every student's home page instantly.</div>
-        </div>
-        <div style="display: flex; gap: 10px;">
-            <input id="broadcastInput" class="search" placeholder="Type announcement (e.g. Exam results are out!)" />
-            <button id="sendBroadcast" class="btn btn-primary">Send</button>
-            <button id="clearBroadcast" class="btn btn-ghost" style="color:#ef4444">Clear</button>
-        </div>
-    </div>
 
       <div class="grid">
         <div class="list" id="proofList"></div>
@@ -114,14 +128,12 @@
           <div class="card" id="previewArea" style="background: rgba(0,0,0,0.2);">
             <div style="font-weight:700; border-bottom:1px solid var(--glass); padding-bottom:10px;">Preview</div>
             <div id="previewContent">
-              <p style="color:var(--muted); font-size:13px; margin-top:15px;">Select a proof to review details.</p>
+              <p style="color:var(--muted); font-size:13px; margin-top:15px;">Select a proof to review.</p>
             </div>
           </div>
         </aside>
       </div>
     </div>
-
-    <div style="height:30px"></div>
 
     <div class="card">
       <h2 style="margin:0 0 15px; font-size:18px;">User Directory</h2>
@@ -156,6 +168,7 @@
       document.getElementById('authNotice').style.display = 'none';
       document.getElementById('mainContent').style.display = 'block';
       loadData();
+      loadArchiveSubmissions();
     } else {
       window.location.href = '/login.html';
     }
@@ -163,7 +176,6 @@
 
   // --- Data Loading ---
   function loadData() {
-    // 1. Listen for Proofs
     db.ref('paymentProofs').on('value', snap => {
       allProofs = [];
       snap.forEach(userNode => {
@@ -174,7 +186,6 @@
       renderProofs();
     });
 
-    // 2. Listen for Users
     db.ref('profiles').on('value', snap => {
       allUsers = [];
       snap.forEach(u => allUsers.push({ uid: u.key, ...u.val() }));
@@ -182,30 +193,59 @@
     });
   }
 
-  // --- Global Broadcast Logic ---
-const bInput = document.getElementById('broadcastInput');
+  // --- Archive Submission Moderation ---
+  function loadArchiveSubmissions() {
+    const modList = document.getElementById('archiveModerationList');
+    db.ref('pendingResources').on('value', snap => {
+      modList.innerHTML = '';
+      if (!snap.exists()) {
+        modList.innerHTML = '<p style="font-size: 12px; color: var(--muted);">No pending resources.</p>';
+        return;
+      }
 
-document.getElementById('sendBroadcast').onclick = async () => {
-    const msg = bInput.value.trim();
-    if (!msg) return alert("Please enter a message!");
-
-    await db.ref('broadcast').set({
-        message: msg,
-        timestamp: Date.now(),
-        admin: ADMIN_EMAIL
+      snap.forEach(child => {
+        const res = child.val();
+        const div = document.createElement('div');
+        div.className = 'item';
+        div.innerHTML = `
+          <div style="flex: 1;">
+            <div style="font-weight:700">${res.courseTitle}</div>
+            <a href="${res.driveLink}" target="_blank" style="font-size:11px; color:var(--accent-2); text-decoration:none;">Open Link ↗</a>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-success" onclick="handleResource('${child.key}', 'accept')">Accept</button>
+            <button class="btn btn-danger" onclick="handleResource('${child.key}', 'reject')">Reject</button>
+          </div>
+        `;
+        modList.appendChild(div);
+      });
     });
-    
-    alert("Broadcast sent successfully!");
-    bInput.value = '';
-};
+  }
 
-document.getElementById('clearBroadcast').onclick = async () => {
-    if(confirm("Remove broadcast from all student screens?")) {
-        await db.ref('broadcast').remove();
+  async function handleResource(id, action) {
+    const ref = db.ref(`pendingResources/${id}`);
+    const snapshot = await ref.once('value');
+    const data = snapshot.val();
+
+    if (action === 'accept') {
+      await db.ref('liveResources').push(data);
+      alert("Resource published to Biu Archive!");
     }
-};
+    await ref.remove();
+  }
 
-  // --- Render Functions ---
+  // --- Broadcast ---
+  const bInput = document.getElementById('broadcastInput');
+  document.getElementById('sendBroadcast').onclick = async () => {
+    const msg = bInput.value.trim();
+    if (!msg) return alert("Enter message!");
+    await db.ref('broadcast').set({ message: msg, timestamp: Date.now() });
+    alert("Broadcast Live!");
+    bInput.value = '';
+  };
+  document.getElementById('clearBroadcast').onclick = () => db.ref('broadcast').remove();
+
+  // --- Render Verification Proofs ---
   function renderProofs(filter = '') {
     const list = document.getElementById('proofList');
     list.innerHTML = '';
@@ -219,7 +259,7 @@ document.getElementById('clearBroadcast').onclick = async () => {
           <div class="avatar">${(p.fullName || 'U').charAt(0)}</div>
           <div>
             <div style="font-weight:700">${p.fullName}</div>
-            <div style="font-size:11px; color:var(--muted)">Status: ${p.status}</div>
+            <div style="font-size:11px; color:var(--muted)">${p.status}</div>
           </div>
         </div>
         <button class="btn btn-ghost" onclick="viewProof('${p.uid}', '${p.proofId}')">Review</button>
@@ -231,23 +271,24 @@ document.getElementById('clearBroadcast').onclick = async () => {
   async function viewProof(uid, proofId) {
     selectedProof = allProofs.find(p => p.uid === uid && p.proofId === proofId);
     const container = document.getElementById('previewContent');
-    container.innerHTML = `<p style="font-size:12px;">Fetching image...</p>`;
+    container.innerHTML = `<p style="font-size:12px;">Loading...</p>`;
 
     try {
       const url = selectedProof.url || await storage.ref(selectedProof.storagePath).getDownloadURL();
       container.innerHTML = `
         <div class="preview-box">
-          <p style="font-size:13px; margin:10px 0 5px;"><b>User:</b> ${selectedProof.fullName}</p>
+          <p style="font-size:13px;"><b>Name:</b> ${selectedProof.fullName}</p>
           <a href="${url}" target="_blank"><img src="${url}"></a>
           <div style="display:flex; gap:10px; margin-top:15px;">
-            <button class="btn btn-primary" onclick="updateStatus('approved')">Approve</button>
+            <button class="btn btn-success" onclick="updateStatus('approved')">Approve</button>
             <button class="btn btn-danger" onclick="updateStatus('rejected')">Reject</button>
           </div>
         </div>
       `;
-    } catch (e) { container.innerHTML = `<p style="color:#ef4444">Error loading proof.</p>`; }
+    } catch (e) { container.innerHTML = `<p style="color:var(--danger)">Error loading image.</p>`; }
   }
 
+  // --- Render Users ---
   function renderUsers() {
     const list = document.getElementById('userList');
     list.innerHTML = '';
@@ -256,10 +297,9 @@ document.getElementById('clearBroadcast').onclick = async () => {
       div.className = 'item';
       div.innerHTML = `
         <div style="display:flex; align-items:center; gap:12px;">
-          <div class="avatar" style="background: ${u.banned ? '#ef4444' : ''}">${(u.fullName || 'U').charAt(0)}</div>
+          <div class="avatar" style="background:${u.banned ? 'var(--danger)' : ''}">${(u.fullName || 'U').charAt(0)}</div>
           <div>
-            <div style="font-weight:700">
-              ${u.fullName || 'Unnamed'} 
+            <div style="font-weight:700">${u.fullName || 'Unnamed'} 
               ${u.verified ? '<span class="badge badge-verify">Verified</span>' : ''}
               ${u.banned ? '<span class="badge badge-ban">Banned</span>' : ''}
             </div>
@@ -268,26 +308,23 @@ document.getElementById('clearBroadcast').onclick = async () => {
         </div>
         <div style="display:flex; gap:5px;">
           <button class="btn btn-ghost" onclick="toggleField('${u.uid}', 'verified', ${!u.verified})">${u.verified ? 'Unverify' : 'Verify'}</button>
-          <button class="btn btn-danger" style="background:${u.banned ? '#10b981' : ''}" onclick="toggleField('${u.uid}', 'banned', ${!u.banned})">${u.banned ? 'Unban' : 'Ban'}</button>
+          <button class="btn btn-danger" style="background:${u.banned ? 'var(--success)' : ''}" onclick="toggleField('${u.uid}', 'banned', ${!u.banned})">${u.banned ? 'Unban' : 'Ban'}</button>
         </div>
       `;
       list.appendChild(div);
     });
   }
 
-  // --- Database Actions ---
   async function updateStatus(status) {
     if (!selectedProof) return;
     if (status === 'approved') await db.ref(`profiles/${selectedProof.uid}/verified`).set(true);
     await db.ref(`paymentProofs/${selectedProof.uid}/${selectedProof.proofId}/status`).set(status);
-    alert(`Proof marked as ${status}`);
-    document.getElementById('previewContent').innerHTML = `<p style="color:var(--muted)">Action completed.</p>`;
+    alert(`Status: ${status}`);
+    document.getElementById('previewContent').innerHTML = `<p style="color:var(--muted)">Selection cleared.</p>`;
   }
 
   async function toggleField(uid, field, val) {
-    if (confirm(`Confirm ${field} change?`)) {
-      await db.ref(`profiles/${uid}/${field}`).set(val);
-    }
+    if (confirm(`Change ${field}?`)) await db.ref(`profiles/${uid}/${field}`).set(val);
   }
 
   document.getElementById('signOut').onclick = () => auth.signOut();
