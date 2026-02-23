@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SkillSwap — BIU Hub</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #030712;
+      --glass: rgba(255, 255, 255, 0.03);
+      --accent: #8b5cf6;
+      --accent-2: #ec4899;
+      --border: rgba(255, 255, 255, 0.08);
+      --radius: 20px;
+      --success: #10b981;
+      --whatsapp: #25d366;
+      --danger: #ef4444;
+    }
+
+    body {
+      margin: 0; background-color: var(--bg); color: #f9fafb; font-family: 'Inter', sans-serif;
+      background-image: radial-gradient(circle at 50% -20%, #1e1b4b, transparent);
+      min-height: 100vh;
+    }
+
+    .wrap { max-width: 1000px; margin: 0 auto; padding: 20px; }
+    header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding: 20px 0; }
+    
+    .btn-main {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: white; border: none; padding: 12px 24px; border-radius: 12px;
+      font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px;
+    }
+
+    /* Filter Bar Styles */
+    .filter-bar { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 20px; margin-bottom: 20px; -ms-overflow-style: none; scrollbar-width: none; }
+    .filter-bar::-webkit-scrollbar { display: none; }
+    .filter-chip {
+      padding: 8px 18px; border-radius: 99px; background: var(--glass); border: 1px solid var(--border);
+      color: #94a3b8; cursor: pointer; white-space: nowrap; font-size: 13px; font-weight: 600; transition: 0.2s;
+    }
+    .filter-chip.active { background: var(--accent); color: white; border-color: var(--accent); }
+
+    .modal {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+      backdrop-filter: blur(12px); z-index: 100; align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-content {
+      background: #0f172a; border: 1px solid var(--border); padding: 30px;
+      border-radius: var(--radius); width: 100%; max-width: 500px;
+    }
+
+    input, textarea, select {
+      width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+      padding: 12px; border-radius: 10px; color: white; margin-bottom: 15px; outline: none; font-size: 14px;
+    }
+    select option { background: #0f172a; }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+    
+    .project-card {
+      background: var(--glass); border: 1px solid var(--border); padding: 24px;
+      border-radius: var(--radius); position: relative; transition: 0.3s;
+      display: flex; flex-direction: column;
+    }
+    .project-card:hover { border-color: var(--accent); transform: translateY(-5px); }
+    
+    .course-badge {
+      font-size: 10px; background: rgba(139, 92, 246, 0.2); color: #c4b5fd;
+      padding: 4px 10px; border-radius: 99px; font-weight: 700; text-transform: uppercase;
+    }
+    
+    .cat-badge { font-size: 10px; color: var(--accent-2); font-weight: 800; text-transform: uppercase; margin-bottom: 5px; display: block; }
+    
+    .partner-count {
+      display: flex; align-items: center; gap: 10px; font-size: 13px; color: #94a3b8; margin: 15px 0;
+    }
+    .progress-bar { height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; flex: 1; }
+    .progress-fill { height: 100%; background: var(--accent); transition: width 0.5s ease; }
+
+    .btn-connect {
+      width: 100%; padding: 12px; border-radius: 12px; font-weight: 700; cursor: pointer;
+      border: none; display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-active { background: white; color: black; }
+    .btn-full { background: rgba(255,255,255,0.05); color: #64748b; cursor: not-allowed; border: 1px solid var(--border); }
+    .btn-delete { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); margin-top: 10px; }
+    
+    .full-tag { color: var(--success); font-weight: 800; font-size: 12px; display: flex; align-items: center; gap: 4px; }
+    .section-label { font-size: 12px; font-weight: 800; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; display: block; }
+    
+    .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+    .contact-btn { padding: 12px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 13px; }
+  </style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1 style="margin:0; font-size:32px; font-weight:800; background: linear-gradient(to right, #fff, #94a3b8); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">SkillSwap</h1>
+      <p style="color:#94a3b8; margin:5px 0 0;">Find partners. Build projects.</p>
+    </div>
+    <button class="btn-main" onclick="openModal('postModal')">
+      <span class="material-symbols-rounded">add_circle</span> Post Project
+    </button>
+  </header>
+
+  <div id="myProjectsContainer" style="display:none; margin-bottom:50px;">
+    <span class="section-label">Your Active Posts</span>
+    <div class="grid" id="myProjectsGrid"></div>
+    <hr style="border:0; border-top:1px solid var(--border); margin-top:40px;">
+  </div>
+
+  <span class="section-label">Explore Projects</span>
+  
+  <div class="filter-bar" id="filterBar">
+    <div class="filter-chip active" onclick="setFilter('All')">All</div>
+    <div class="filter-chip" onclick="setFilter('Coding')">Coding</div>
+    <div class="filter-chip" onclick="setFilter('Design')">Design</div>
+    <div class="filter-chip" onclick="setFilter('Study')">Study Group</div>
+    <div class="filter-chip" onclick="setFilter('Arts')">Arts/Music</div>
+    <div class="filter-chip" onclick="setFilter('Sports')">Sports</div>
+  </div>
+
+  <div class="grid" id="projectGrid"></div>
+</div>
+
+<div id="postModal" class="modal">
+  <div class="modal-content">
+    <div style="display:flex; justify-content:space-between; margin-bottom:20px;">
+      <h2 style="margin:0">New Partnership</h2>
+      <button onclick="closeModal('postModal')" style="background:none; border:none; color:white; cursor:pointer;"><span class="material-symbols-rounded">close</span></button>
+    </div>
+    <input type="text" id="pTitle" placeholder="Project Name">
+    <div style="display:flex; gap:10px;">
+        <input type="text" id="pCourse" placeholder="Course (CSC 111)">
+        <select id="pCategory">
+            <option value="Coding">Coding</option>
+            <option value="Design">Design</option>
+            <option value="Study">Study Group</option>
+            <option value="Arts">Arts/Music</option>
+            <option value="Sports">Sports</option>
+            <option value="Other">Other</option>
+        </select>
+    </div>
+    <input type="text" id="pWhatsApp" placeholder="WhatsApp Number (234...)">
+    <textarea id="pDesc" rows="4" placeholder="Description & skills needed..."></textarea>
+    <label style="font-size:13px; color:#94a3b8; display:block; margin-bottom:8px;">Total Partners Needed</label>
+    <input type="number" id="pCount" value="2" min="1" max="20">
+    <button class="btn-main" style="width:100%" id="submitBtn">Launch Project</button>
+  </div>
+</div>
+
+<div id="contactModal" class="modal">
+  <div class="modal-content" style="max-width: 400px; text-align: center;">
+    <h2 id="contactTitle" style="margin-top:0">Joined!</h2>
+    <p style="color: #94a3b8; font-size: 14px;">Reach out to the creator now:</p>
+    <div class="contact-grid">
+      <button id="waAction" class="contact-btn" style="background: var(--whatsapp); color: white;">WhatsApp</button>
+      <button id="mailAction" class="contact-btn" style="background: #fff; color: #000;">Email</button>
+    </div>
+    <button onclick="closeModal('contactModal')" style="margin-top:20px; background:transparent; border:none; color:#64748b; cursor:pointer;">Close</button>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBsVbLw4mvFTJhmORUXCUNyGc98Rripj3M",
+    authDomain: "biu-students-hub.firebaseapp.com",
+    projectId: "biu-students-hub",
+    databaseURL: "https://biu-students-hub-default-rtdb.firebaseio.com",
+    appId: "1:128818531382:web:190dc5688d1b9d21321c97"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+  const auth = firebase.auth();
+
+  let currentCategory = 'All';
+
+  function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+  function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+  function setFilter(cat) {
+    currentCategory = cat;
+    document.querySelectorAll('.filter-chip').forEach(el => {
+        el.classList.toggle('active', el.innerText === cat || (cat === 'All' && el.innerText === 'All'));
+    });
+    renderProjects();
+  }
+
+  document.getElementById('submitBtn').addEventListener('click', async () => {
+    const user = auth.currentUser;
+    if(!user) return alert("Log in to post projects!");
+    const whatsappValue = document.getElementById('pWhatsApp').value.replace(/\D/g,'');
+
+    const project = {
+      title: document.getElementById('pTitle').value,
+      course: document.getElementById('pCourse').value,
+      category: document.getElementById('pCategory').value,
+      whatsapp: whatsappValue,
+      desc: document.getElementById('pDesc').value,
+      needed: parseInt(document.getElementById('pCount').value),
+      joined: 0,
+      owner: user.displayName || "Student",
+      ownerId: user.uid,
+      email: user.email,
+      timestamp: Date.now()
+    };
+
+    if(!project.title || !project.whatsapp || !project.desc) return alert("Fill all fields!");
+    await db.ref('skillswap_projects').push(project);
+    closeModal('postModal');
+    ['pTitle', 'pCourse', 'pWhatsApp', 'pDesc'].forEach(id => document.getElementById(id).value = '');
+  });
+
+  async function deleteProject(id) {
+    if(confirm("Delete this project?")) await db.ref(`skillswap_projects/${id}`).remove();
+  }
+
+  async function handleJoinClick(projectId, ownerId, currentJoined, needed, title, ownerEmail, ownerWA) {
+    const user = auth.currentUser;
+    if(!user) return alert("Log in to join!");
+    const projectRef = db.ref(`skillswap_projects/${projectId}`);
+    try {
+      const result = await projectRef.transaction((currentData) => {
+        if (currentData && currentData.joined < currentData.needed) {
+          currentData.joined++; return currentData;
+        }
+        return; 
+      });
+      if(result.committed) {
+        document.getElementById('waAction').onclick = () => window.open(`https://wa.me/${ownerWA}?text=Hi, I joined ${title} on BIU Hub!`, '_blank');
+        document.getElementById('mailAction').onclick = () => window.location.href = `mailto:${ownerEmail}?subject=SkillSwap: ${title}`;
+        openModal('contactModal');
+      }
+    } catch (e) { alert("Error joining."); }
+  }
+
+  let allProjects = {};
+  db.ref('skillswap_projects').on('value', (snap) => {
+    allProjects = snap.val() || {};
+    renderProjects();
+  });
+
+  function renderProjects() {
+    const grid = document.getElementById('projectGrid');
+    const myGrid = document.getElementById('myProjectsGrid');
+    const myContainer = document.getElementById('myProjectsContainer');
+    const user = auth.currentUser;
+
+    grid.innerHTML = ''; myGrid.innerHTML = '';
+    let hasMyProjects = false;
+    let foundAny = false;
+
+    Object.keys(allProjects).reverse().forEach(key => {
+      const p = allProjects[key];
+      const isOwner = user && user.uid === p.ownerId;
+      const isFull = p.joined >= p.needed;
+      const progress = (p.joined / p.needed) * 100;
+
+      const cardHTML = `
+        <div class="project-card">
+          <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:10px;">
+            <div>
+                <span class="cat-badge">${p.category || 'Other'}</span>
+                <span class="course-badge">${p.course || 'General'}</span>
+            </div>
+            ${isFull ? '<span class="full-tag"><span class="material-symbols-rounded" style="font-size:16px">check_circle</span> Full</span>' : ''}
+          </div>
+          <h3 style="margin:5px 0 8px; font-size:18px;">${p.title}</h3>
+          <p style="font-size:13px; color:#94a3b8; line-height:1.5; flex-grow:1;">${p.desc}</p>
+          <div class="partner-count">
+            <span style="font-weight:700; color:#fff;">${p.joined}/${p.needed}</span>
+            <div class="progress-bar"><div class="progress-fill" style="width:${progress}%; background:${isFull?'var(--success)':'var(--accent)'}"></div></div>
+          </div>
+          ${isOwner ? 
+            `<button class="btn-connect btn-delete" onclick="deleteProject('${key}')"><span class="material-symbols-rounded">delete</span> Delete Post</button>` : 
+            `<button class="btn-connect ${isFull ? 'btn-full' : 'btn-active'}" ${isFull ? 'disabled' : ''} 
+              onclick="handleJoinClick('${key}', '${p.ownerId}', ${p.joined}, ${p.needed}, '${p.title}', '${p.email}', '${p.whatsapp}')">
+              ${isFull ? 'Group Full' : 'Join Project'}
+            </button>`
+          }
+        </div>`;
+
+      if(isOwner) {
+        myGrid.innerHTML += cardHTML;
+        hasMyProjects = true;
+      } else if (currentCategory === 'All' || p.category === currentCategory) {
+        grid.innerHTML += cardHTML;
+        foundAny = true;
+      }
+    });
+
+    myContainer.style.display = hasMyProjects ? 'block' : 'none';
+    if(!foundAny) grid.innerHTML = `<p style="color:#64748b; grid-column:1/-1; text-align:center; padding:40px;">No ${currentCategory} projects yet.</p>`;
+  }
+</script>
+</body>
+</html>

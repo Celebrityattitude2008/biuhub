@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>BIU Hub — Assignments</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #050b1d; 
+      --card: rgba(13, 25, 48, 0.7); 
+      --accent: #6d28d9; 
+      --accent-2: #06b6d4; 
+      --muted: #94a3b8; 
+      --radius: 20px;
+      --border: rgba(255, 255, 255, 0.05);
+    }
+
+    body {
+      margin: 0; background: var(--bg); color: #f1f5f9; font-family: 'Inter', sans-serif;
+    }
+
+    .wrap { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+
+    /* Suggestion Form */
+    .suggestion-box {
+      background: linear-gradient(145deg, rgba(109, 40, 217, 0.1), rgba(6, 182, 212, 0.05));
+      border: 1px solid var(--border); padding: 30px; border-radius: var(--radius);
+      margin-bottom: 40px;
+    }
+
+    .input-group { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 8px; font-size: 14px; color: var(--muted); }
+    input, select {
+      width: 100%; padding: 12px; border-radius: 12px; background: rgba(0,0,0,0.2);
+      border: 1px solid var(--border); color: #fff; outline: none;
+    }
+
+    .btn-submit {
+      width: 100%; padding: 14px; border-radius: 12px; border: none;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      color: #fff; font-weight: 800; cursor: pointer; margin-top: 10px;
+    }
+
+    /* Assignment Feed */
+    .section-title { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+    .assignment-card {
+      background: var(--card); border: 1px solid var(--border); padding: 20px;
+      border-radius: 16px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;
+    }
+    .status-badge {
+      font-size: 10px; padding: 4px 8px; border-radius: 6px; background: rgba(6, 182, 212, 0.2); color: var(--accent-2);
+    }
+  </style>
+</head>
+<body>
+
+<div class="wrap">
+  <header style="margin-bottom: 40px;">
+    <h1>Assignment Hub</h1>
+    <p class="muted">Contribute assignments or download latest ones</p>
+  </header>
+
+  <div class="suggestion-box">
+    <h3 style="margin-top:0">Suggest an Assignment</h3>
+    <div class="input-group">
+      <label>Course Code</label>
+      <input type="text" id="courseCode" placeholder="e.g., MTH 111">
+    </div>
+    <div class="input-group">
+      <label>Assignment Title / Description</label>
+      <input type="text" id="assignTitle" placeholder="e.g., Vectors and Tensors PDF">
+    </div>
+    <div class="input-group">
+      <label>Google Drive Link (PDF or Doc)</label>
+      <input type="url" id="assignLink" placeholder="Paste link here">
+    </div>
+    <button class="btn-submit" onclick="submitSuggestion()">Submit for Approval</button>
+  </div>
+
+  <div class="section-title">
+    <span class="material-symbols-rounded">assignment</span>
+    <h2>Approved Assignments</h2>
+  </div>
+
+  <div id="assignmentFeed">
+    <div class="assignment-card" style="opacity: 0.5;">
+      <p>Waiting for admin to upload assignments...</p>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyBsVbLw4mvFTJhmORUXCUNyGc98Rripj3M",
+    authDomain: "biu-students-hub.firebaseapp.com",
+    projectId: "biu-students-hub",
+    databaseURL: "https://biu-students-hub-default-rtdb.firebaseio.com",
+    storageBucket: "biu-students-hub.appspot.com",
+    appId: "1:128818531382:web:190dc5688d1b9d21321c97"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  // 1. User submits suggestion to "pending" node
+  function submitSuggestion() {
+    const code = document.getElementById('courseCode').value;
+    const title = document.getElementById('assignTitle').value;
+    const link = document.getElementById('assignLink').value;
+
+    if(!code || !title || !link) return alert("Fill all fields!");
+
+    db.ref('pendingAssignments').push({
+      code, title, link,
+      status: 'pending',
+      timestamp: Date.now()
+    }).then(() => {
+      alert("Submission successful! Admin will review and approve.");
+      document.querySelectorAll('input').forEach(i => i.value = '');
+    });
+  }
+
+  // 2. Load only APPROVED assignments from admin
+  db.ref('approvedAssignments').on('value', (snap) => {
+    const feed = document.getElementById('assignmentFeed');
+    feed.innerHTML = '';
+    const data = snap.val();
+
+    if(!data) {
+        feed.innerHTML = '<p style="color:var(--muted)">No assignments uploaded yet.</p>';
+        return;
+    }
+
+    Object.values(data).forEach(item => {
+      feed.innerHTML += `
+        <div class="assignment-card">
+          <div>
+            <strong style="color:var(--accent-2)">${item.code}</strong>
+            <p style="margin:5px 0 0; font-size:14px">${item.title}</p>
+          </div>
+          <button class="btn-submit" style="width:auto; padding:8px 16px" onclick="window.open('${item.link}')">Download</button>
+        </div>
+      `;
+    });
+  });
+</script>
+
+</body>
+</html>

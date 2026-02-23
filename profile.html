@@ -4,207 +4,181 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>BIU Student Hub — Profile</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
   <style>
-    :root{
-      --bg:#071028; --card:#071827; --accent:#6d28d9; --accent-2:#06b6d4;
-      --muted:#9aa8bf; --glass: rgba(255,255,255,0.03); --radius:14px;
-      --success:#10b981; --danger:#ef4444;
-    }
-    *{box-sizing:border-box;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
-    html,body{height:100%;margin:0;background:
-      radial-gradient(900px 400px at 10% 10%, rgba(109,40,217,0.06), transparent 8%),
-      linear-gradient(180deg,#041026 0%, #071028 100%);
-      color:#e6eef8;-webkit-font-smoothing:antialiased;padding:20px;}
-    .container{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:360px 1fr;gap:20px;}
-    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:18px;border-radius:var(--radius);border:1px solid rgba(255,255,255,0.03);box-shadow:0 12px 40px rgba(2,6,23,0.6)}
-    .profile-header{display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center}
-    
-    .avatar{
-      position: relative;
-      width:120px;
-      height:120px;
-      border-radius:50%; 
-      background:linear-gradient(135deg,var(--accent),var(--accent-2));
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-weight:800;
-      color:#fff;
-      font-size:32px;
-      overflow:hidden;
-      background-size:cover;
-      background-position:center;
-      border: 4px solid rgba(255,255,255,0.05);
+    :root {
+      --bg: #050b1d; 
+      --card: rgba(13, 25, 48, 0.7); 
+      --accent: #1e40af; 
+      --accent-2: #38bdf8; 
+      --muted: #94a3b8; 
+      --radius: 20px;
+      --danger: #f43f5e;
+      --border: rgba(56, 189, 248, 0.1);
     }
 
-    /* SPINNER STYLE */
-    .spinner {
-      display: none;
-      width: 30px;
-      height: 30px;
-      border: 3px solid rgba(255,255,255,0.3);
-      border-radius: 50%;
-      border-top-color: #fff;
-      animation: spin 1s ease-in-out infinite;
-      position: absolute;
+    * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
+    body {
+      margin: 0; padding: 20px 20px 120px 20px;
+      background: radial-gradient(circle at top right, rgba(30, 64, 175, 0.15), transparent), var(--bg);
+      color: #f1f5f9;
     }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    
-    .name{font-weight:800;font-size:18px}
-    .muted{color:var(--muted)}
-    
-    .blue-tick{
-      display:inline-flex;
-      align-items:center;
-      gap:4px;
-      color:#0ea5e9;
-      font-weight:700;
-      background: rgba(14, 165, 233, 0.1);
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 12px;
+
+    .container { max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 15px; }
+
+    /* Cards & Glassmorphism */
+    .profile-card {
+      background: var(--card); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
+      border: 1px solid var(--border); border-radius: var(--radius); padding: 25px; text-align: center;
     }
-    
-    .small{font-size:13px;color:var(--muted)}
-    .form-row{display:flex;gap:8px;align-items:center;margin-top:8px}
-    input[type="text"], input[type="url"], select, textarea {width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:#e6eef8}
-    textarea{min-height:80px}
-    .btn{padding:10px 12px;border-radius:10px;border:none;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#fff;font-weight:700;cursor:pointer}
-    .btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
-    .btn.danger{background:linear-gradient(90deg,#ef4444,#f97316)}
-    .section-title{font-weight:800;margin-bottom:8px}
-    .social-list{display:flex;flex-direction:column;gap:8px}
-    .note{font-size:13px;color:var(--muted);margin-top:8px}
-    .calc-list{display:flex;flex-direction:column;gap:8px;max-height:220px;overflow:auto;padding-right:6px}
-    .calc-item{padding:10px;border-radius:10px;background:rgba(255,255,255,0.01);border:1px solid rgba(255,255,255,0.02)}
-    .divider{height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.03),transparent);margin:12px 0;border-radius:2px}
-    @media (max-width:980px){.container{grid-template-columns:1fr;}}
-    .fade-in{animation:fadeUp .45s ease-out both}
-    @keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-    .link{color:var(--accent);text-decoration:none;font-weight:700}
-    .status-pill{padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.02);color:var(--muted);font-weight:700}
-    .row{display:flex;gap:8px;align-items:center}
-    .muted-2{color:#9fb6d6}
+
+    /* Avatar Logic */
+    .avatar-wrapper { position: relative; width: 100px; height: 100px; margin: 0 auto 15px; }
+    .avatar {
+      width: 100%; height: 100%; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px; font-weight: 800; color: #fff;
+      border: 4px solid var(--bg); box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+      background-size: cover; background-position: center;
+    }
+
+    /* Menu Items */
+    .menu-item {
+      background: var(--card); border: 1px solid var(--border);
+      padding: 16px; border-radius: 16px; display: flex; align-items: center; gap: 12px;
+      cursor: pointer; transition: 0.2s; text-decoration: none; color: inherit;
+    }
+    .menu-item:hover { background: rgba(255,255,255,0.05); transform: translateX(4px); }
+    .menu-icon {
+      width: 38px; height: 38px; border-radius: 10px; background: rgba(56, 189, 248, 0.1);
+      display: flex; align-items: center; justify-content: center; color: var(--accent-2);
+    }
+    .menu-label { flex: 1; font-weight: 600; font-size: 14px; }
+
+    /* Upload Styling */
+    .upload-zone {
+      border: 2px dashed var(--border); border-radius: 15px; padding: 20px;
+      margin-top: 15px; cursor: pointer; background: rgba(56, 189, 248, 0.02);
+    }
+    .upload-zone:hover { border-color: var(--accent-2); background: rgba(56, 189, 248, 0.05); }
+
+    /* Form Elements */
+    input, select {
+      width: 100%; padding: 12px; border-radius: 12px; margin-top: 5px;
+      background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: #fff;
+    }
+
+    .btn {
+      width: 100%; padding: 14px; border-radius: 12px; border: none;
+      font-weight: 800; cursor: pointer; transition: 0.3s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-primary { background: linear-gradient(90deg, var(--accent), #1d4ed8); color: #fff; }
+    .btn-danger { background: rgba(244, 63, 94, 0.1); color: var(--danger); border: 1px solid rgba(244, 63, 94, 0.1); }
+
+    .section-label { font-size: 11px; font-weight: 800; color: var(--muted); margin: 20px 0 5px 5px; text-transform: uppercase; letter-spacing: 1px; }
+
+    /* Nav bar fixed */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0; height: 75px;
+      background: rgba(5, 11, 29, 0.9); backdrop-filter: blur(20px);
+      border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; z-index: 1000;
+    }
+    .nav-item { text-decoration: none; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 10px; flex:1; }
+    .nav-item.active { color: var(--accent-2); }
   </style>
 </head>
 <body>
+
   <div class="container">
-    <aside class="card fade-in" id="leftCard">
-      <div class="profile-header" id="profileHeader">
-        <div id="avatarEl" class="avatar">
-          <div id="avatarSpinner" class="spinner"></div>
-          <span id="initials">BI</span>
-        </div>
-        <div class="name" id="displayName">Student</div>
-        <div class="small muted" id="displayEmail">—</div>
-        <div id="verifiedBadge" style="margin-top:6px"></div>
+    <div class="profile-card">
+      <div class="avatar-wrapper">
+        <div id="avatarEl" class="avatar"><span id="initials">PA</span></div>
       </div>
+      <div id="displayName" style="font-size: 20px; font-weight: 800;">Paul Adamu</div>
+      <div id="displayEmail" style="color: var(--muted); font-size: 13px;">pauladamu600@gmail.com</div>
+      <div id="verifiedBadge" style="margin-top: 10px;"></div>
+    </div>
 
-      <div class="divider"></div>
-
-      <div>
-        <div class="section-title">Profile Picture (Google Drive)</div>
-        <div class="note">Verified images folder: <span class="muted-2">ProfilePics</span></div>
-        <div style="margin-top:8px">
-          <input id="profilePicLink" type="url" placeholder="Paste Drive share link" />
-          <div style="display:flex;gap:8px;margin-top:8px">
-            <button id="savePicLinkBtn" class="btn">Save Link</button>
-            <button id="clearPicBtn" class="btn btn-ghost">Clear</button>
-          </div>
-          <div id="picStatus" class="small muted" style="margin-top:8px"></div>
-        </div>
+    <div class="section-label">Media & Verification</div>
+    
+    <div class="profile-card" style="text-align: left;">
+      <div style="font-size: 14px; font-weight: 700; margin-bottom: 5px;">Profile Picture Link</div>
+      <div class="upload-zone" onclick="window.open('https://drive.google.com', '_blank')">
+        <span class="material-symbols-rounded" style="color:var(--accent-2)">cloud_upload</span>
+        <span style="font-size: 12px; margin-left: 10px;">Step 1: Upload to Drive & Copy Link</span>
       </div>
+      <input id="profilePicLink" type="url" placeholder="Step 2: Paste link here" style="margin-top:10px">
+      <button id="savePicLinkBtn" class="btn btn-primary" style="margin-top:10px; padding: 10px; font-size: 13px;">Update Picture</button>
+    </div>
 
-      <div class="divider"></div>
+    <a href="https://wa.me/2347041795388?text=Hello%20Admin,%20I%20would%20like%20to%20verify%20my%20BIU%20Student%20Hub%20Profile.%20My%20Email:%20pauladamu600@gmail.com" class="menu-item" style="border-color: #25d36633">
+      <div class="menu-icon" style="color: #25d366; background: #25d36611;"><span class="material-symbols-rounded">verified</span></div>
+      <div class="menu-label">Request Verification (WhatsApp)</div>
+      <span class="material-symbols-rounded" style="color:#25d366">open_in_new</span>
+    </a>
 
-      <div>
-        <div class="section-title">Verification Proof</div>
-        <div class="note">Upload receipt to PaymentProofs folder and paste link.</div>
-        <div style="margin-top:8px">
-          <input id="proofLink" type="url" placeholder="Paste proof link" />
-          <div style="display:flex;gap:8px;margin-top:8px">
-            <button id="submitProofLinkBtn" class="btn">Submit Link</button>
-            <button id="requestVerifyBtn" class="btn btn-ghost">Request Verification</button>
-          </div>
-          <div id="proofStatus" class="small muted" style="margin-top:8px"></div>
-        </div>
-      </div>
-    </aside>
+    <div class="section-label">Account details</div>
+    <div class="menu-item" onclick="toggleEdit()">
+      <div class="menu-icon"><span class="material-symbols-rounded">person</span></div>
+      <div class="menu-label">Edit Personal Information</div>
+      <span class="material-symbols-rounded">expand_more</span>
+    </div>
 
-    <main class="card fade-in" id="mainCard">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div>
-          <div class="section-title">Edit Profile</div>
-          <div class="small muted">Update your information and social handles.</div>
-        </div>
-        <button id="signOutBtn" class="btn ghost">Sign out</button>
-      </div>
+    <div id="editForm" class="profile-card" style="display:none; text-align: left;">
+        <label style="font-size:12px; color:var(--accent-2)">Full Name</label>
+        <input id="fullName" type="text" placeholder="Paul Adamu">
+        <label style="font-size:12px; color:var(--accent-2); margin-top:10px; display:block">Academic Level</label>
+        <select id="levelSelect">
+            <option value="100">100 Level</option>
+            <option value="200">200 Level</option>
+            <option value="300">300 Level</option>
+            <option value="400">400 Level</option>
+        </select>
+        <button id="saveLinksBtn" class="btn btn-primary" style="margin-top:15px">Save Profile</button>
+    </div>
 
-      <div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
-        <div>
-          <label class="small">Full name</label>
-          <input id="fullName" type="text" placeholder="Jane Doe" />
-        </div>
-        <div>
-          <label class="small">Level</label>
-          <select id="levelSelect">
-            <option value="100">100L</option>
-            <option value="200">200L</option>
-            <option value="300">300L</option>
-            <option value="400">400L</option>
-          </select>
-        </div>
-      </div>
+    <div class="section-label">Settings & Support</div>
+    <a href="privacy.html" class="menu-item">
+      <div class="menu-icon"><span class="material-symbols-rounded">shield</span></div>
+      <div class="menu-label">Privacy Policy</div>
+      <span class="material-symbols-rounded">chevron_right</span>
+    </a>
 
-      <div style="margin-top:12px">
-        <label class="small">Bio (optional)</label>
-        <textarea id="bio" placeholder="Tell us about yourself..."></textarea>
-      </div>
+    <a href="mailto:pauladamu600@gmail.com?subject=Support Request - BIU Student Hub" class="menu-item">
+      <div class="menu-icon"><span class="material-symbols-rounded">mail</span></div>
+      <div class="menu-label">Contact Support</div>
+      <span class="material-symbols-rounded">chevron_right</span>
+    </a>
 
-      <div style="margin-top:12px">
-        <div class="section-title">Social Links</div>
-        <div class="social-list">
-          <input id="instagram" type="url" placeholder="Instagram (https://...)" />
-          <input id="tiktok" type="url" placeholder="TikTok (https://...)" />
-          <input id="linkedin" type="url" placeholder="LinkedIn (https://...)" />
-        </div>
-        <div style="display:flex;gap:8px;margin-top:16px">
-          <button id="saveLinksBtn" class="btn">Save Profile Changes</button>
-          <button id="deleteProfileBtn" class="btn ghost danger">Delete Profile</button>
-        </div>
-        <div id="saveStatus" class="small muted" style="margin-top:8px"></div>
-      </div>
-
-      <div class="divider"></div>
-
-      <div>
-        <div class="section-title">Saved Calculations</div>
-        <div id="calcHistory" class="calc-list"></div>
-        <div style="display:flex;gap:8px;margin-top:12px">
-          <button id="refreshHistory" class="btn ghost">Refresh</button>
-          <button id="exportHistory" class="btn">Copy All</button>
-        </div>
-      </div>
-
-      <div class="divider"></div>
-
-      <div>
-        <div class="section-title">Share Profile</div>
-        <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
-          <input id="publicLink" type="text" readonly />
-          <button id="copyLinkBtn" class="btn ghost">Copy</button>
-          <button id="viewPublicBtn" class="btn">View Public</button>
-        </div>
-      </div>
-    </main>
+    <button id="signOutBtn" class="btn btn-danger" style="margin-top: 10px;">
+      <span class="material-symbols-rounded">logout</span> Logout
+    </button>
   </div>
+
+  <nav class="bottom-nav">
+    <a href="index.html" class="nav-item">
+      <span class="material-symbols-rounded">home</span>
+      <span>Home</span>
+    </a>
+    <a href="/subscriptions.html" class="nav-item">
+      <span class="material-symbols-rounded">account_balance_wallet</span>
+      <span>Budget</span>
+    </a>
+    <a href="profile.html" class="nav-item active">
+      <span class="material-symbols-rounded">person</span>
+      <span>Profile</span>
+    </a>
+  </nav>
 
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-
+  
   <script>
+    // 1. Firebase Configuration
     const firebaseConfig = {
       apiKey: "AIzaSyBsVbLw4mvFTJhmORUXCUNyGc98Rripj3M",
       authDomain: "biu-students-hub.firebaseapp.com",
@@ -214,216 +188,103 @@
       appId: "1:128818531382:web:190dc5688d1b9d21321c97",
       measurementId: "G-ELK8KN5SK7"
     };
+    
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.database();
-
-    // UI ELEMENTS
+  
+    // 2. UI Elements
     const avatarEl = document.getElementById('avatarEl');
-    const avatarSpinner = document.getElementById('avatarSpinner');
     const initialsEl = document.getElementById('initials');
     const displayNameEl = document.getElementById('displayName');
     const displayEmailEl = document.getElementById('displayEmail');
     const verifiedBadge = document.getElementById('verifiedBadge');
     const profilePicLinkInput = document.getElementById('profilePicLink');
-    const savePicLinkBtn = document.getElementById('savePicLinkBtn');
-    const clearPicBtn = document.getElementById('clearPicBtn');
-    const picStatus = document.getElementById('picStatus');
-    const proofLinkInput = document.getElementById('proofLink');
-    const submitProofLinkBtn = document.getElementById('submitProofLinkBtn');
-    const requestVerifyBtn = document.getElementById('requestVerifyBtn');
-    const proofStatus = document.getElementById('proofStatus');
     const fullNameInput = document.getElementById('fullName');
     const levelSelect = document.getElementById('levelSelect');
-    const bioInput = document.getElementById('bio');
-    const instagramInput = document.getElementById('instagram');
-    const tiktokInput = document.getElementById('tiktok');
-    const linkedinInput = document.getElementById('linkedin');
-    const saveLinksBtn = document.getElementById('saveLinksBtn');
-    const deleteProfileBtn = document.getElementById('deleteProfileBtn');
-    const saveStatus = document.getElementById('saveStatus');
-    const calcHistoryEl = document.getElementById('calcHistory');
-    const refreshHistoryBtn = document.getElementById('refreshHistory');
-    const exportHistoryBtn = document.getElementById('exportHistory');
-    const signOutBtn = document.getElementById('signOutBtn');
-    const publicLinkInput = document.getElementById('publicLink');
-    const copyLinkBtn = document.getElementById('copyLinkBtn');
-    const viewPublicBtn = document.getElementById('viewPublicBtn');
-
-    const urlParams = new URLSearchParams(window.location.search);
-    const viewUid = urlParams.get('uid');
-    let currentUid = null;
-    let isOwner = false;
-
-    // IMPROVED DRIVE HELPER
-    function driveViewUrl(url){
-      if(!url) return null;
+  
+    // 3. Helper: Drive Link Converter
+    function driveViewUrl(url) {
+      if (!url) return null;
       const match = url.match(/(?:\/d\/|id=)([a-zA-Z0-9_-]+)/);
       const id = match ? match[1] : null;
-      // Using thumbnail sz=w500 is more reliable for direct embeds
       return id ? `https://drive.google.com/thumbnail?sz=w500&id=${id}` : url;
     }
-
-    function shortInitials(name){
-      if(!name) return 'BI';
-      return name.split(' ').map(s=>s[0]).join('').slice(0,2).toUpperCase();
+  
+    function getInitials(name) {
+      return name ? name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'BI';
     }
-
-    function showProfileUI(data, uid){
-      displayNameEl.textContent = data.fullName || 'Student';
-      displayEmailEl.textContent = data.email || '';
-      
-      if(data.verified){
-        verifiedBadge.innerHTML = '<span class="blue-tick"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M22.5 12.5L20.3 10L20.6 6.8L17.5 6.1L15.8 3.3L12.5 4.7L9.2 3.3L7.5 6.1L4.4 6.8L4.7 10L2.5 12.5L4.7 15L4.4 18.2L7.5 18.9L9.2 21.7L12.5 20.3L15.8 21.7L17.5 18.9L20.6 18.2L20.3 15L22.5 12.5ZM10.5 17L6.5 13L7.9 11.6L10.5 14.2L16.1 8.6L17.5 10L10.5 17Z" /></svg> Verified Member</span>';
-      } else {
-        verifiedBadge.innerHTML = '<span class="status-pill">Pending Verification</span>';
-      }
-
-      // Profile Pic with Spinner Logic
-      if(data.profilePicUrl){
-        const directLink = driveViewUrl(data.profilePicUrl);
-        avatarSpinner.style.display = 'block';
+  
+    // 4. Core: Load & Show Profile
+    async function loadProfile(user) {
+      const snap = await db.ref(`profiles/${user.uid}`).once('value');
+      const data = snap.val() || {};
+  
+      // Set Text Details
+      displayNameEl.textContent = data.fullName || user.displayName || 'Student';
+      displayEmailEl.textContent = user.email;
+      fullNameInput.value = data.fullName || user.displayName || '';
+      levelSelect.value = data.level || '100';
+  
+      // Set Initials or Profile Pic
+      if (data.profilePicUrl) {
+        const directUrl = driveViewUrl(data.profilePicUrl);
+        avatarEl.style.backgroundImage = `url('${directUrl}')`;
         initialsEl.textContent = '';
-        
-        const img = new Image();
-        img.src = directLink;
-        img.onload = () => {
-          avatarEl.style.backgroundImage = `url('${directLink}')`;
-          avatarSpinner.style.display = 'none';
-        };
-        img.onerror = () => {
-          avatarSpinner.style.display = 'none';
-          avatarEl.style.backgroundImage = '';
-          initialsEl.textContent = data.fullName ? shortInitials(data.fullName) : 'BI';
-        };
       } else {
-        avatarEl.style.backgroundImage = '';
-        initialsEl.textContent = data.fullName ? shortInitials(data.fullName) : 'BI';
-        avatarSpinner.style.display = 'none';
+        avatarEl.style.backgroundImage = 'none';
+        initialsEl.textContent = getInitials(data.fullName || user.displayName);
       }
-
-      if(isOwner){
-        fullNameInput.value = data.fullName || '';
-        levelSelect.value = data.level || '100';
-        bioInput.value = data.bio || '';
-        instagramInput.value = (data.social && data.social.instagram) || '';
-        tiktokInput.value = (data.social && data.social.tiktok) || '';
-        linkedinInput.value = (data.social && data.social.linkedin) || '';
-        profilePicLinkInput.value = data.profilePicUrl || '';
+  
+      // Set Verification Status
+      if (data.verified) {
+        verifiedBadge.innerHTML = `<span style="color:var(--accent-2); font-size:12px; font-weight:700;">
+          <span class="material-symbols-rounded" style="font-size:14px; vertical-align:middle">verified</span> Verified Member</span>`;
       } else {
-        [fullNameInput, levelSelect, bioInput, instagramInput, tiktokInput, linkedinInput, saveLinksBtn, savePicLinkBtn, submitProofLinkBtn, requestVerifyBtn, deleteProfileBtn, profilePicLinkInput, proofLinkInput, clearPicBtn].forEach(el => el.disabled = true);
+        verifiedBadge.innerHTML = `<span style="color:var(--muted); font-size:12px;">Account Pending Verification</span>`;
       }
-      publicLinkInput.value = `${location.origin}${location.pathname}?uid=${uid}`;
     }
-
-    async function loadProfile(uidToLoad){
-      const snap = await db.ref(`profiles/${uidToLoad}`).once('value');
-      showProfileUI(snap.val() || {}, uidToLoad);
-    }
-
-    saveLinksBtn.addEventListener('click', async () => {
-      const updates = {
+  
+    // 5. Action: Save Profile Changes
+    document.getElementById('saveLinksBtn').addEventListener('click', async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+  
+      await db.ref(`profiles/${user.uid}`).update({
         fullName: fullNameInput.value.trim(),
-        level: levelSelect.value,
-        bio: bioInput.value.trim(),
-        social: {
-          instagram: instagramInput.value.trim(),
-          tiktok: tiktokInput.value.trim(),
-          linkedin: linkedinInput.value.trim()
-        }
-      };
-      await db.ref(`profiles/${currentUid}`).update(updates);
-      saveStatus.textContent = 'Profile updated successfully!';
-      setTimeout(() => saveStatus.textContent = '', 2000);
-      loadProfile(currentUid);
+        level: levelSelect.value
+      });
+      
+      alert('Profile Updated!');
+      loadProfile(user);
+      toggleEdit(); // Close form
     });
-
-    savePicLinkBtn.addEventListener('click', async () => {
+  
+    // 6. Action: Save Profile Pic Link
+    document.getElementById('savePicLinkBtn').addEventListener('click', async () => {
+      const user = auth.currentUser;
       const url = profilePicLinkInput.value.trim();
-      if(!url) return alert('Please paste a link first.');
-      await db.ref(`profiles/${currentUid}`).update({ profilePicUrl: url });
-      picStatus.textContent = 'Picture saved!';
-      loadProfile(currentUid);
-      setTimeout(() => picStatus.textContent = '', 2000);
+      if (!user || !url) return alert('Please paste a link first!');
+  
+      await db.ref(`profiles/${user.uid}`).update({ profilePicUrl: url });
+      alert('Picture Updated!');
+      loadProfile(user);
+      profilePicLinkInput.value = '';
     });
-
-    clearPicBtn.addEventListener('click', async () => {
-      if(!confirm('Remove profile picture?')) return;
-      await db.ref(`profiles/${currentUid}/profilePicUrl`).remove();
-      loadProfile(currentUid);
+  
+    // 7. Action: Sign Out
+    document.getElementById('signOutBtn').addEventListener('click', () => {
+      auth.signOut().then(() => window.location.href = 'index.html');
     });
-
-    submitProofLinkBtn.addEventListener('click', async () => {
-      const url = proofLinkInput.value.trim();
-      if(!url) return alert('Paste the link to your proof.');
-      const ref = db.ref(`paymentProofs/${currentUid}`).push();
-      await ref.set({
-        proofId: ref.key,
-        uid: currentUid,
-        fullName: fullNameInput.value || 'Student',
-        url: url,
-        status: 'uploaded',
-        uploadedAt: firebase.database.ServerValue.TIMESTAMP
-      });
-      proofStatus.textContent = 'Proof submitted for review.';
-      proofLinkInput.value = '';
-    });
-
-    requestVerifyBtn.addEventListener('click', () => {
-      alert('Verification request sent to admin. Please ensure you have submitted your proof link first.');
-    });
-
-    async function loadCalculations(){
-      if(!currentUid) return;
-      const snap = await db.ref(`profiles/${currentUid}/calculations`).once('value');
-      calcHistoryEl.innerHTML = '';
-      snap.forEach(child => {
-        const item = child.val();
-        const el = document.createElement('div');
-        el.className = 'calc-item';
-        el.innerHTML = `<div style="display:flex;justify-content:space-between">
-          <span>${item.label || 'Saved GPA'}</span>
-          <strong>${Number(item.gpa).toFixed(2)}</strong>
-        </div>`;
-        calcHistoryEl.appendChild(el);
-      });
-    }
-
-    signOutBtn.addEventListener('click', () => auth.signOut().then(() => window.location.href = 'index.html'));
-
-    copyLinkBtn.addEventListener('click', () => {
-      publicLinkInput.select();
-      document.execCommand('copy');
-      alert('Link copied to clipboard!');
-    });
-
-    viewPublicBtn.addEventListener('click', () => window.open(publicLinkInput.value, '_blank'));
-
-    auth.onAuthStateChanged(async (user) => {
-      if(user){
-        currentUid = user.uid;
-        isOwner = (!viewUid) || (viewUid === currentUid);
-        const uidToLoad = viewUid || currentUid;
-        
-        const snap = await db.ref(`profiles/${uidToLoad}`).once('value');
-        if(!snap.exists() && isOwner){
-           await db.ref(`profiles/${currentUid}`).set({
-              fullName: user.displayName || '',
-              email: user.email,
-              level: '100',
-              verified: false,
-              createdAt: firebase.database.ServerValue.TIMESTAMP
-           });
-        }
-        showProfileUI(snap.val() || {}, uidToLoad);
-        loadCalculations();
-      } else if (!viewUid) {
-        window.location.href = 'signup.html';
+  
+    // 8. Auth Listener
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        loadProfile(user);
       } else {
-        loadProfile(viewUid);
+        window.location.href = 'signup.html'; // Redirect if not logged in
       }
     });
-
   </script>
 </body>
 </html>
