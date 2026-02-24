@@ -109,18 +109,21 @@
 
     let isAdmin = false;
 
-    // Check Admin Status
     auth.onAuthStateChanged(async (user) => {
-      if (user) {
-        const snap = await db.ref('profiles/' + user.uid).once('value');
-        const profile = snap.val();
-        if (profile && profile.role === 'admin') {
-          isAdmin = true;
+  if (user) {
+    const snap = await db.ref('profiles/' + user.uid).once('value');
+    const profile = snap.val();
+    
+    // This allows you to see the Admin Post box and Delete buttons
+    if (profile && (profile.role === 'admin' || user.email === 'pauladamu600@gmail.com')) {
+      isAdmin = true;
+      if(document.getElementById('adminSection')) {
           document.getElementById('adminSection').style.display = 'block';
-        }
       }
-      loadNews(); // Always load news regardless of status
-    });
+    }
+  }
+  loadNews();
+});
 
     // Load News
     function loadNews() {
@@ -179,7 +182,7 @@
         title: document.getElementById('postTitle').value,
         content: document.getElementById('postContent').value,
         timestamp: firebase.database.ServerValue.TIMESTAMP,
-        postedBy: auth.currentUser.displayName || "Admin"
+        postedBy: auth.currentUser.displayName || "Adin"
       };
 
       try {
