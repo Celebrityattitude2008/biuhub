@@ -222,6 +222,13 @@
         animation: glow-pulse 2s infinite;
     }
 
+    /* Add this to your existing <style> */
+.apk-badge.hidden {
+    opacity: 0;
+    transform: translateY(20px) scale(0.8);
+    pointer-events: none; /* Prevents clicking it while invisible */
+}
+
     .apk-icon span { font-size: 20px; }
 
     .apk-text { display: flex; flex-direction: column; }
@@ -533,6 +540,20 @@
             loadDiscussions();
         }
     }
+    let lastScrollY = window.scrollY;
+    const apkBadge = document.querySelector('.apk-badge');
+
+    window.addEventListener('scroll', () => {
+        // If user scrolls down more than 10px, hide it
+        if (window.scrollY > lastScrollY && window.scrollY > 100) {
+            apkBadge.classList.add('hidden');
+        } 
+        // If user scrolls up, show it
+        else {
+            apkBadge.classList.remove('hidden');
+        }
+        lastScrollY = window.scrollY;
+    });
   </script>
 </body>
 </html>
