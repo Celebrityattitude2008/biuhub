@@ -3,148 +3,215 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Archive Note | Biu Archive</title>
+    <title>Biu Archive | Resource Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
     <style>
         :root {
-            --primary-blue: #4285F4;
-            --success-green: #34a853;
-            --text-dark: #333;
-            --bg-light: #f8f9fa;
+            --primary: #4285F4;
+            --accent: #34a853;
+            --bg: #f8f9fa;
+            --card: #ffffff;
+            --text: #1a1a1b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 10px 30px -10px rgba(0,0,0,0.05);
         }
 
+        [data-theme="dark"] {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --shadow: 0 20px 40px -15px rgba(0,0,0,0.3);
+        }
+
+        * { box-sizing: border-box; transition: background 0.3s, border-color 0.3s; }
         body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            line-height: 1.6; 
-            color: var(--text-dark); 
-            max-width: 900px; 
-            margin: 0 auto; 
-            padding: 2rem; 
-            background: var(--bg-light); 
+            font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); 
+            max-width: 800px; margin: 0 auto; padding: 2rem 1.5rem; line-height: 1.5;
         }
 
-        .back-link { display: inline-block; margin-bottom: 1.5rem; text-decoration: none; color: #666; font-weight: 500; }
-        .back-link:hover { color: var(--primary-blue); }
-
-        .card { 
-            background: white; 
-            padding: 2.5rem; 
-            border-radius: 12px; 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.08); 
-            margin-bottom: 2rem; 
-        }
-
-        h1, h2, h3 { color: #111; margin-top: 0; }
+        /* Header Navigation */
+        .nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        .back-btn { text-decoration: none; color: var(--text-muted); font-weight: 600; font-size: 0.9rem; display: flex; align-items: center; gap: 5px; }
+        .back-btn:hover { color: var(--primary); }
         
-        /* How-To Section */
-        .how-to-step { display: flex; gap: 15px; margin-bottom: 1.2rem; align-items: flex-start; }
-        .step-num { 
-            background: var(--success-green); color: white; border-radius: 50%; 
-            width: 28px; height: 28px; display: flex; align-items: center; 
-            justify-content: center; flex-shrink: 0; font-weight: bold; font-size: 0.9rem;
+        #theme-btn { 
+            background: var(--card); border: 1px solid var(--border); color: var(--text);
+            padding: 8px 12px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 0.8rem;
         }
 
-        /* Form Styling */
-        .form-group { margin-bottom: 1.2rem; }
-        label { display: block; margin-bottom: 5px; font-weight: 600; font-size: 0.9rem; }
-        input, textarea { 
-            width: 100%; padding: 12px; border: 1.5px solid #ddd; 
-            border-radius: 6px; box-sizing: border-box; font-size: 1rem;
-            transition: border-color 0.3s;
-        }
-        input:focus { border-color: var(--primary-blue); outline: none; }
+        .card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 2rem; margin-bottom: 1.5rem; box-shadow: var(--shadow); }
 
-        .btn { 
-            background: var(--primary-blue); color: white; border: none; 
-            padding: 12px 24px; border-radius: 6px; cursor: pointer; 
-            font-weight: bold; width: 100%; font-size: 1rem;
+        /* Accordion: How to Upload */
+        .how-to-trigger { 
+            width: 100%; background: none; border: none; padding: 0; cursor: pointer;
+            display: flex; justify-content: space-between; align-items: center; color: var(--text);
         }
-        .btn:disabled { background: #ccc; cursor: not-allowed; }
+        .how-to-content { max-height: 0; overflow: hidden; transition: max-height 0.4s ease; }
+        .how-to-content.open { max-height: 500px; margin-top: 1.5rem; }
 
-        /* Comments area */
-        .comment-item { border-bottom: 1px solid #eee; padding: 1rem 0; }
-        .comment-meta { font-size: 0.8rem; color: #888; margin-bottom: 5px; }
+        .step { display: flex; gap: 15px; margin-bottom: 1rem; }
+        .step-n { background: var(--accent); color: white; width: 24px; height: 24px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.75rem; flex-shrink: 0; }
+
+        /* Form Controls */
+        label { display: block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); margin-bottom: 0.5rem; }
+        input { width: 100%; padding: 12px 16px; border-radius: 12px; border: 2px solid var(--border); background: var(--bg); color: var(--text); font-size: 1rem; margin-bottom: 1.2rem; outline: none; }
+        input:focus { border-color: var(--primary); }
+        .btn-main { width: 100%; background: var(--primary); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 15px rgba(66, 133, 244, 0.2); }
+        .btn-main:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        /* Approved Notes Display */
+        .notes-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+        .note-item { 
+            background: var(--bg); padding: 1rem; border-radius: 14px; border: 1px solid var(--border);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .note-info h4 { margin: 0; font-size: 1rem; font-weight: 700; }
+        .note-info span { font-size: 0.75rem; color: var(--text-muted); }
+        .view-link { background: var(--card); color: var(--primary); text-decoration: none; padding: 6px 14px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; border: 1px solid var(--border); }
+        .view-link:hover { background: var(--primary); color: white; border-color: var(--primary); }
+
+        .empty-msg { text-align: center; color: var(--text-muted); padding: 2rem; font-style: italic; }
     </style>
 </head>
 <body>
 
-    <a href="index.html" class="back-link">← Return to Archive Index</a>
+    <nav class="nav">
+        <a href="index.html" class="back-btn">
+            <span class="material-symbols-rounded">arrow_back</span> Return
+        </a>
+        <button id="theme-btn">
+            <span class="material-symbols-rounded" style="font-size: 18px;">dark_mode</span> Theme
+        </button>
+    </nav>
 
-    <article class="card">
-        <div style="font-size: 0.8rem; color: var(--primary-blue); font-weight: bold; letter-spacing: 1px; margin-bottom: 10px;">PRESERVING KNOWLEDGE</div>
-        <h1>Course Resource Details</h1>
-        <p>This page allows you to view archived materials and contribute your own study resources to the community database.</p>
-    </article>
+    <div class="card">
+        <h1 style="margin: 0 0 0.5rem 0; font-weight: 800; letter-spacing: -1px;">Archive Hub</h1>
+        <p style="margin: 0; color: var(--text-muted);">Access verified study materials or contribute your own notes to the database.</p>
+    </div>
 
-    <section class="card" style="border-left: 6px solid var(--success-green);">
-        <h3>How to Contribute to Biu Archive</h3>
-        <div class="how-to-step">
-            <div class="step-num">1</div>
-            <div><strong>Upload to Drive:</strong> Upload your file to your Google Drive.</div>
+    <div class="card">
+        <button class="how-to-trigger" onclick="toggleHowTo()">
+            <span style="font-weight: 700; display: flex; align-items: center; gap: 8px;">
+                <span class="material-symbols-rounded" style="color: var(--accent);">info</span> How to Upload Resources
+            </span>
+            <span class="material-symbols-rounded" id="chevron">expand_more</span>
+        </button>
+        <div class="how-to-content" id="howToContent">
+            <div class="step">
+                <div class="step-n">1</div>
+                <div><strong>Cloud Upload:</strong> Save your PDF or file to Google Drive.</div>
+            </div>
+            <div class="step">
+                <div class="step-n">2</div>
+                <div><strong>Public Access:</strong> Set the sharing permission to <u>"Anyone with the link"</u>.</div>
+            </div>
+            <div class="step">
+                <div class="step-n">3</div>
+                <div><strong>Submission:</strong> Copy that link and paste it into the form below.</div>
+            </div>
         </div>
-        <div class="how-to-step">
-            <div class="step-num">2</div>
-            <div><strong>Set Permissions:</strong> Right-click file > Share > Change "Restricted" to <strong>"Anyone with the link"</strong>.</div>
-        </div>
-        <div class="how-to-step">
-            <div class="step-num">3</div>
-            <div><strong>Paste Link:</strong> Copy the link and paste it into the submission form below.</div>
-        </div>
-    </section>
+    </div>
 
-    <section class="card">
-        <h3>Submit New Resource</h3>
+    <div class="card">
+        <h3 style="margin-top: 0; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+            <span class="material-symbols-rounded" style="color: var(--primary);">verified</span> Approved Archives
+        </h3>
+        <div id="notesList" class="notes-grid">
+            <div class="empty-msg">Fetching resources...</div>
+        </div>
+    </div>
+
+    <div class="card" style="border-top: 5px solid var(--primary);">
+        <h3 style="margin-top: 0;">Submit Resource</h3>
         <form id="upload-form">
-            <div class="form-group">
-                <label>Course Title</label>
-                <input type="text" id="courseTitle" name="courseTitle" placeholder="e.g. MTH 101: General Mathematics" required>
-            </div>
-            <div class="form-group">
-                <label>Google Drive Link</label>
-                <input type="url" id="driveLink" name="driveLink" placeholder="https://drive.google.com/..." required>
-            </div>
-            <button type="submit" id="submit-btn" class="btn">Add to Archive</button>
+            <label>Course Name & Code</label>
+            <input type="text" id="courseTitle" placeholder="e.g. GST 111: Communication in English" required>
+            
+            <label>Google Drive URL</label>
+            <input type="url" id="driveLink" placeholder="https://drive.google.com/file/d/..." required>
+            
+            <button type="submit" id="submit-btn" class="btn-main">Add to Database</button>
         </form>
-    </section>
-
-    <section class="card">
-        <h3>Discussion & Feedback</h3>
-        <div id="comment-list">
-            <p style="color: #999; font-style: italic;">No discussions started yet.</p>
-        </div>
-        <hr style="margin: 2rem 0; border: 0; border-top: 1px solid #eee;">
-        <form id="comment-form">
-            <textarea id="commentInput" placeholder="Ask a question or leave a note about this resource..." rows="3" required></textarea>
-            <button type="submit" class="btn" style="background: #333; margin-top: 10px; width: auto;">Post Comment</button>
-        </form>
-    </section>
+    </div>
 
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
     <script>
-        // Firebase Configuration
+        // Toggle How-To Accordion
+        function toggleHowTo() {
+            const content = document.getElementById('howToContent');
+            const chevron = document.getElementById('chevron');
+            content.classList.toggle('open');
+            chevron.style.transform = content.classList.contains('open') ? 'rotate(180deg)' : 'rotate(0deg)';
+        }
+
+        // Theme Persistence Logic
+        const themeBtn = document.getElementById('theme-btn');
+        const setHeaderTheme = (theme) => {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('archive-theme', theme);
+            themeBtn.innerHTML = theme === 'dark' ? 
+                '<span class="material-symbols-rounded" style="font-size: 18px;">light_mode</span> Light' : 
+                '<span class="material-symbols-rounded" style="font-size: 18px;">dark_mode</span> Dark';
+        };
+
+        const savedTheme = localStorage.getItem('archive-theme') || 'light';
+        setHeaderTheme(savedTheme);
+
+        themeBtn.addEventListener('click', () => {
+            const current = document.documentElement.getAttribute('data-theme');
+            setHeaderTheme(current === 'dark' ? 'light' : 'dark');
+        });
+
+        // Firebase Setup
         const firebaseConfig = {
             apiKey: "AIzaSyBsVbLw4mvFTJhmORUXCUNyGc98Rripj3M",
             authDomain: "biu-students-hub.firebaseapp.com",
             projectId: "biu-students-hub",
-            storageBucket: "biu-students-hub.appspot.com",
             databaseURL: "https://biu-students-hub-default-rtdb.firebaseio.com"
         };
-
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // Form elements
+        // Load Approved Notes
+        const notesList = document.getElementById('notesList');
+        db.ref('archives').on('value', (snapshot) => {
+            notesList.innerHTML = "";
+            if (!snapshot.exists()) {
+                notesList.innerHTML = '<div class="empty-msg">No verified resources yet. Be the first to upload!</div>';
+                return;
+            }
+            
+            snapshot.forEach(child => {
+                const note = child.val();
+                const date = new Date(note.timestamp).toLocaleDateString();
+                const item = `
+                    <div class="note-item">
+                        <div class="note-info">
+                            <h4>${note.courseTitle}</h4>
+                            <span>Verified on ${date}</span>
+                        </div>
+                        <a href="${note.driveLink}" target="_blank" class="view-link">View File</a>
+                    </div>
+                `;
+                notesList.insertAdjacentHTML('afterbegin', item);
+            });
+        });
+
+        // Form Submit
         const uploadForm = document.getElementById('upload-form');
         const submitBtn = document.getElementById('submit-btn');
 
-        // Handling Resource Upload
         uploadForm.addEventListener('submit', e => {
             e.preventDefault();
-            
             submitBtn.disabled = true;
-            submitBtn.innerText = "Submitting to Archive...";
+            submitBtn.innerText = "Processing...";
 
             const resourceData = {
                 courseTitle: document.getElementById('courseTitle').value,
@@ -153,28 +220,18 @@
                 status: 'pending'
             };
 
-            // Push to Firebase pendingResources node
             db.ref('pendingResources').push(resourceData)
                 .then(() => {
-                    alert("Success! Your resource has been submitted for Admin review.");
+                    alert("Submission Successful! An admin will verify the link shortly.");
                     submitBtn.disabled = false;
-                    submitBtn.innerText = "Add to Archive";
+                    submitBtn.innerText = "Add to Database";
                     uploadForm.reset();
                 })
-                .catch(error => {
-                    console.error("Firebase Error:", error);
-                    alert("Submission failed. Please check your connection.");
+                .catch(() => {
+                    alert("Submission error. Please check your link.");
                     submitBtn.disabled = false;
-                    submitBtn.innerText = "Add to Archive";
                 });
         });
-
-        // Simple Comment logic (Optional: Can also be saved to Firebase)
-        document.getElementById('comment-form').onsubmit = (e) => {
-            e.preventDefault();
-            alert("Comment system is being updated! Your message will be visible soon.");
-            e.target.reset();
-        };
     </script>
 </body>
 </html>

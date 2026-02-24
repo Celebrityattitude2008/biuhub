@@ -3,118 +3,126 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>BIU Student Hub — Command Center</title>
+  <title>Admin Panel — Command Center</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
   <style>
     :root {
-      --bg: #071028; --card: #0b1a3d; --accent: #6d28d9; --accent-2: #06b6d4;
-      --muted: #9aa8bf; --glass: rgba(255,255,255,0.03); --radius: 14px;
+      --bg: #030712; --card: #111827; --accent: #8b5cf6; --accent-2: #06b6d4;
+      --muted: #94a3b8; --border: rgba(255,255,255,0.06); --radius: 18px;
       --success: #10b981; --warning: #f59e0b; --danger: #ef4444;
     }
-    * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
+    * { box-sizing: border-box; font-family: 'Inter', sans-serif; scrollbar-width: thin; }
     body { 
-      margin: 0; background: var(--bg); color: #e6eef8; 
-      background-attachment: fixed; min-height: 100vh;
+      margin: 0; background: var(--bg); color: #f8fafc; 
+      background-image: radial-gradient(circle at top right, rgba(139, 92, 246, 0.05), transparent);
+      min-height: 100vh;
     }
-    .wrap { max-width: 1200px; margin: 0 auto; padding: 30px 20px; }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
     
-    header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 30px; }
+    header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 40px; }
     .brand { display: flex; align-items: center; gap: 15px; }
     .logo { 
-      width: 50px; height: 50px; border-radius: 12px; 
+      width: 45px; height: 45px; border-radius: 12px; 
       background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      display: flex; align-items: center; justify-content: center; font-weight: 800;
+      display: flex; align-items: center; justify-content: center; font-weight: 900;
+      box-shadow: 0 10px 20px rgba(139, 92, 246, 0.2);
     }
+
+    /* Stats Dashboard */
+    .stats-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px; }
+    .stat-card { background: var(--card); padding: 20px; border-radius: var(--radius); border: 1px solid var(--border); }
+    .stat-val { font-size: 24px; font-weight: 800; display: block; }
+    .stat-label { font-size: 11px; text-transform: uppercase; color: var(--muted); letter-spacing: 1px; }
 
     .card { 
       background: var(--card); border-radius: var(--radius); 
-      border: 1px solid var(--glass); padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-      margin-bottom: 20px;
+      border: 1px solid var(--border); padding: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+      margin-bottom: 25px; position: relative;
     }
 
-    .list { display: flex; flex-direction: column; gap: 10px; max-height: 350px; overflow-y: auto; padding-right: 5px; }
-    
+    .list { display: flex; flex-direction: column; gap: 12px; max-height: 400px; overflow-y: auto; padding-right: 8px; }
     .item { 
-      display: flex; justify-content: space-between; align-items: center; padding: 15px; 
-      background: rgba(255,255,255,0.02); border-radius: 10px; border: 1px solid transparent; transition: 0.2s;
+      display: flex; justify-content: space-between; align-items: center; padding: 16px; 
+      background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid var(--border); transition: 0.3s;
     }
-    .item:hover { background: rgba(255,255,255,0.05); }
+    .item:hover { border-color: var(--accent); background: rgba(139, 92, 246, 0.03); }
+    .item.is-banned { border-left: 4px solid var(--danger); opacity: 0.8; }
 
     .btn { 
-      padding: 8px 14px; border-radius: 8px; border: none; font-weight: 700; 
-      cursor: pointer; transition: 0.2s; font-size: 11px; display: flex; align-items: center; gap: 5px;
+      padding: 10px 18px; border-radius: 10px; border: none; font-weight: 700; 
+      cursor: pointer; transition: 0.2s; font-size: 12px; display: flex; align-items: center; gap: 8px;
     }
     .btn-primary { background: var(--accent); color: white; }
-    .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
-    .btn-ghost { background: transparent; border: 1px solid var(--glass); color: var(--muted); }
+    .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+    .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+    .btn:hover { transform: translateY(-2px); }
 
-    .badge { padding: 3px 8px; border-radius: 5px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
-    .badge-verify { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+    .badge { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
+    .badge-verify { background: rgba(16, 185, 129, 0.15); color: var(--success); }
 
-    input.search { 
-      background: rgba(0,0,0,0.2); border: 1px solid var(--glass); color: white; 
-      padding: 10px 15px; border-radius: 10px; width: 100%; outline: none;
+    .input-box { 
+      background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: white; 
+      padding: 12px 18px; border-radius: 12px; width: 100%; outline: none; transition: 0.3s;
     }
+    .input-box:focus { border-color: var(--accent-2); box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.1); }
 
-    .grid-admin { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 20px; }
-    .section-title { margin: 0 0 15px; font-size: 14px; color: var(--accent-2); text-transform: uppercase; letter-spacing: 1px; font-weight: 800; display: flex; justify-content: space-between; }
+    .section-title { margin: 0 0 20px; font-size: 13px; color: var(--accent-2); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 800; }
+    
+    #liveMonitor { font-size: 12px; color: var(--success); background: rgba(16, 185, 129, 0.05); padding: 10px; border-radius: 8px; margin-top: 15px; border-left: 3px solid var(--success); }
   </style>
 </head>
 <body>
 
-<div class="wrap">
+<div class="wrap" id="adminGate" style="display:none">
   <header>
     <div class="brand">
       <div class="logo">HUB</div>
       <div>
-        <h1 style="margin:0; font-size:22px;">Command Center</h1>
-        <div style="font-size:12px; color:var(--muted)">pauladamu600@gmail.com</div>
+        <h1 style="margin:0; font-size:24px; letter-spacing:-1px;">Command Center</h1>
+        <div id="adminEmail" style="font-size:12px; color:var(--muted)">Checking Session...</div>
       </div>
     </div>
     <button id="signOut" class="btn btn-ghost">Sign Out</button>
   </header>
 
-  <div id="authNotice" class="card" style="text-align:center;">Checking Admin Access...</div>
+  <div class="stats-bar">
+    <div class="stat-card"><span class="stat-label">Total Users</span><span id="statUsers" class="stat-val">0</span></div>
+    <div class="stat-card"><span class="stat-label">Pending Archives</span><span id="statPending" class="stat-val" style="color:var(--warning)">0</span></div>
+    <div class="stat-card"><span class="stat-label">Live Broadcast</span><span id="statLive" class="stat-val" style="font-size:14px; color:var(--success)">OFFLINE</span></div>
+  </div>
 
-  <div id="mainContent" style="display:none">
-    
-    <div class="card" style="border-top: 2px solid var(--accent-2);">
-        <h3 class="section-title">Global Header Message</h3>
-        <div style="display: flex; gap: 10px;">
-            <input id="broadcastInput" class="search" placeholder="Broadcast a new announcement to all students..." />
-            <button id="sendBroadcast" class="btn btn-primary">Update</button>
-            <button id="clearBroadcast" class="btn btn-ghost" style="color:var(--danger)">Clear</button>
-        </div>
+  <div class="card" style="border-top: 3px solid var(--accent-2);">
+    <h3 class="section-title">Announcement Broadcast</h3>
+    <div style="display: flex; gap: 12px;">
+      <input id="broadcastInput" class="input-box" placeholder="Type an alert for all students..." />
+      <button id="sendBroadcast" class="btn btn-primary">Push Update</button>
+      <button id="clearBroadcast" class="btn btn-danger">Kill</button>
     </div>
+    <div id="liveMonitor"><b>Current Live Message:</b> <span id="currentMsg">None</span></div>
+  </div>
 
-    <div class="grid-admin">
-      
-      <div class="card">
-        <h3 class="section-title">Pending Assignments <span>Uploads</span></h3>
-        <div id="assignmentList" class="list">
-            <p style="font-size: 12px; color: var(--muted);">No pending assignment uploads.</p>
-        </div>
+  <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap:25px;">
+    <div class="card">
+      <h3 class="section-title">Archive Requests</h3>
+      <div id="assignmentList" class="list">
+        <p style="font-size:12px; color:var(--muted);">Checking for new uploads...</p>
       </div>
-
-      <div class="card">
-        <h3 class="section-title">SkillSwap <span>Active Posts</span></h3>
-        <div id="skillSwapList" class="list">
-            <p style="font-size: 12px; color: var(--muted);">No active project posts.</p>
-        </div>
-      </div>
-
     </div>
 
     <div class="card">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-          <h3 class="section-title" style="margin:0;">User Management</h3>
-          <input type="text" id="userSearch" class="search" placeholder="Search by name..." style="max-width:250px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h3 class="section-title" style="margin:0;">Users</h3>
+        <input type="text" id="userSearch" class="input-box" placeholder="Search students..." style="max-width:180px; padding:8px 12px;">
       </div>
-      <div class="list" id="userList" style="max-height:450px;"></div>
+      <div class="list" id="userList"></div>
     </div>
-
   </div>
+</div>
+
+<div id="gateLoading" style="height:100vh; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:20px;">
+  <div class="logo">HUB</div>
+  <p style="color:var(--muted); font-size:14px;">Authenticating Admin...</p>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -131,26 +139,44 @@
 
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth(), db = firebase.database();
-
   const ADMIN_EMAIL = 'pauladamu600@gmail.com';
 
   auth.onAuthStateChanged(user => {
     if (user && user.email === ADMIN_EMAIL) {
-      document.getElementById('authNotice').style.display = 'none';
-      document.getElementById('mainContent').style.display = 'block';
-      loadAdminData();
+      document.getElementById('gateLoading').style.display = 'none';
+      document.getElementById('adminGate').style.display = 'block';
+      document.getElementById('adminEmail').innerText = user.email;
+      initDashboard();
     } else {
-      auth.signOut();
+      window.location.href = 'index.html'; // Kick out if not admin
     }
   });
 
-  function loadAdminData() {
-    loadAssignments();
-    loadSkillSwap();
-    loadUsers();
+  function initDashboard() {
+    // Sync Broadcast Monitor
+    db.ref('broadcast').on('value', snap => {
+      const data = snap.val();
+      document.getElementById('currentMsg').innerText = data ? data.message : 'No message currently broadcasted.';
+      document.getElementById('statLive').innerText = data ? 'ACTIVE' : 'OFFLINE';
+      document.getElementById('statLive').style.color = data ? 'var(--success)' : 'var(--muted)';
+    });
+
+    // Sync Stats & Lists
+    db.ref('pendingResources').on('value', snap => {
+      document.getElementById('statPending').innerText = snap.numChildren() || 0;
+      renderPending(snap);
+    });
+
+    db.ref('profiles').on('value', snap => {
+      document.getElementById('statUsers').innerText = snap.numChildren() || 0;
+      let users = [];
+      snap.forEach(u => users.push({ uid: u.key, ...u.val() }));
+      window.cachedUsers = users;
+      renderUsers(users);
+    });
   }
 
-  // --- Broadcast ---
+  // Actions
   document.getElementById('sendBroadcast').onclick = () => {
     const msg = document.getElementById('broadcastInput').value.trim();
     if (msg) db.ref('broadcast').set({ message: msg, timestamp: Date.now() });
@@ -158,68 +184,34 @@
   };
   document.getElementById('clearBroadcast').onclick = () => db.ref('broadcast').remove();
 
-  // --- Assignment Moderation (biuarchive.site) ---
-  function loadAssignments() {
-    db.ref('pendingResources').on('value', snap => {
-      const list = document.getElementById('assignmentList');
-      list.innerHTML = '';
-      if(!snap.exists()) { list.innerHTML = '<p style="color:var(--muted); font-size:12px;">All clear!</p>'; return; }
-      
-      snap.forEach(child => {
-        const res = child.val();
-        const div = document.createElement('div');
-        div.className = 'item';
-        div.innerHTML = `
-          <div>
-            <div style="font-weight:700; font-size:13px;">${res.courseCode}: ${res.courseTitle}</div>
-            <a href="${res.driveLink}" target="_blank" style="font-size:11px; color:var(--accent-2);">View Uploaded File</a>
-          </div>
-          <div style="display:flex; gap:5px;">
-            <button class="btn btn-primary" onclick="approveResource('${child.key}')">Publish</button>
-            <button class="btn btn-danger" onclick="deleteFromDb('pendingResources', '${child.key}')">Delete</button>
-          </div>`;
-        list.appendChild(div);
-      });
+  function renderPending(snap) {
+    const list = document.getElementById('assignmentList');
+    list.innerHTML = '';
+    if(!snap.exists()) { list.innerHTML = '<p style="color:var(--muted); font-size:12px;">Queue is empty.</p>'; return; }
+    
+    snap.forEach(child => {
+      const res = child.val();
+      const div = document.createElement('div');
+      div.className = 'item';
+      div.innerHTML = `
+        <div style="max-width:60%">
+          <div style="font-weight:700; font-size:13px;">${res.courseTitle}</div>
+          <a href="${res.driveLink}" target="_blank" style="font-size:11px; color:var(--accent-2); text-decoration:none;">🔗 Review Link</a>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-primary" onclick="approveResource('${child.key}')">Approve</button>
+          <button class="btn btn-danger" onclick="deleteRes('${child.key}')">Trash</button>
+        </div>`;
+      list.appendChild(div);
     });
   }
 
   async function approveResource(id) {
     const snap = await db.ref(`pendingResources/${id}`).once('value');
-    await db.ref('liveResources').push(snap.val());
+    const data = snap.val();
+    data.status = 'approved';
+    await db.ref('archives').push(data); // Matches your Archive Hub node
     await db.ref(`pendingResources/${id}`).remove();
-    alert("Assignment is now live!");
-  }
-
-  // --- SkillSwap Cleanup ---
-  function loadSkillSwap() {
-    db.ref('skillswap_projects').on('value', snap => {
-      const list = document.getElementById('skillSwapList');
-      list.innerHTML = '';
-      if(!snap.exists()) { list.innerHTML = '<p style="color:var(--muted); font-size:12px;">No posts.</p>'; return; }
-
-      snap.forEach(child => {
-        const p = child.val();
-        const div = document.createElement('div');
-        div.className = 'item';
-        div.innerHTML = `
-          <div style="max-width:65%;">
-            <div style="font-weight:700; font-size:12px;">${p.title}</div>
-            <div style="font-size:10px; color:var(--muted)">By ${p.owner}</div>
-          </div>
-          <button class="btn btn-danger" onclick="deleteFromDb('skillswap_projects', '${child.key}')">Remove</button>`;
-        list.appendChild(div);
-      });
-    });
-  }
-
-  // --- Users ---
-  let cachedUsers = [];
-  function loadUsers() {
-    db.ref('profiles').on('value', snap => {
-      cachedUsers = [];
-      snap.forEach(u => cachedUsers.push({ uid: u.key, ...u.val() }));
-      renderUsers(cachedUsers);
-    });
   }
 
   function renderUsers(data) {
@@ -227,31 +219,37 @@
     list.innerHTML = '';
     data.forEach(u => {
       const div = document.createElement('div');
-      div.className = 'item';
+      div.className = `item ${u.banned ? 'is-banned' : ''}`;
       div.innerHTML = `
         <div>
-          <div style="font-weight:700;">${u.fullName || 'User'} ${u.verified ? '<span class="badge badge-verify">Verified</span>' : ''}</div>
+          <div style="font-weight:700; font-size:13px;">${u.fullName || 'Anonymous'} ${u.verified ? '<span class="badge badge-verify">Verified</span>' : ''}</div>
           <div style="font-size:11px; color:var(--muted)">${u.email}</div>
         </div>
-        <div style="display:flex; gap:8px;">
-          <button class="btn btn-ghost" onclick="updateUser('${u.uid}', 'verified', ${!u.verified})">${u.verified ? 'Unverify' : 'Verify'}</button>
-          <button class="btn btn-danger" onclick="updateUser('${u.uid}', 'banned', ${!u.banned})">${u.banned ? 'Unban' : 'Ban'}</button>
+        <div style="display:flex; gap:6px;">
+          <button class="btn btn-ghost" style="padding:6px 10px;" onclick="toggleStatus('${u.uid}', 'verified', ${!u.verified})">
+            <span class="material-symbols-rounded" style="font-size:16px;">${u.verified ? 'verified' : 'new_releases'}</span>
+          </button>
+          <button class="btn btn-danger" style="padding:6px 10px;" onclick="toggleStatus('${u.uid}', 'banned', ${!u.banned})">
+            <span class="material-symbols-rounded" style="font-size:16px;">${u.banned ? 'undo' : 'block'}</span>
+          </button>
         </div>`;
       list.appendChild(div);
     });
   }
 
-  async function updateUser(uid, field, status) {
+  async function toggleStatus(uid, field, status) {
     await db.ref(`profiles/${uid}/${field}`).set(status);
   }
 
-  async function deleteFromDb(path, id) {
-    if(confirm("Confirm Deletion?")) await db.ref(`${path}/${id}`).remove();
+  async function deleteRes(id) {
+    if(confirm("Discard this upload?")) await db.ref(`pendingResources/${id}`).remove();
   }
 
   document.getElementById('userSearch').oninput = (e) => {
     const val = e.target.value.toLowerCase();
-    renderUsers(cachedUsers.filter(u => (u.fullName || '').toLowerCase().includes(val)));
+    renderUsers(window.cachedUsers.filter(u => 
+      (u.fullName || '').toLowerCase().includes(val) || (u.email || '').toLowerCase().includes(val)
+    ));
   };
 
   document.getElementById('signOut').onclick = () => auth.signOut();

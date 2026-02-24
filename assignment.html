@@ -92,7 +92,7 @@
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script> <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <script>
   const firebaseConfig = {
@@ -103,39 +103,73 @@
     storageBucket: "biu-students-hub.appspot.com",
     appId: "1:128818531382:web:190dc5688d1b9d21321c97"
   };
+  
   firebase.initializeApp(firebaseConfig);
   const db = firebase.database();
+  const auth = firebase.auth();
 
-  // 1. User submits suggestion to "pending" node
+  // IMPORTANT: This checks if you are actually logged in
+  auth.onAuthStateChanged(user => {
+    if (user) {
+      console.log("Logged in as:", user.email);
+    } else {
+      console.warn("No user detected. Redirecting to login...");
+      // Optional: window.location.href = "login.html";
+    }
+  });
+
   function submitSuggestion() {
-    const code = document.getElementById('courseCode').value;
-    const title = document.getElementById('assignTitle').value;
-    const link = document.getElementById('assignLink').value;
+    const user = auth.currentUser;
+    
+    if (!user) {
+      alert("Error: You are not logged in. Please log in first.");
+      return;
+    }
+
+    const code = document.getElementById('courseCode').value.trim();
+    const title = document.getElementById('assignTitle').value.trim();
+    const link = document.getElementById('assignLink').value.trim();
 
     if(!code || !title || !link) return alert("Fill all fields!");
 
+    // Adding a loading state to the button
+    const btn = document.querySelector('.btn-submit');
+    btn.innerText = "Uploading...";
+    btn.disabled = true;
+
     db.ref('pendingAssignments').push({
-      code, title, link,
+      code: code,
+      title: title,
+      link: link,
       status: 'pending',
+      uploaderEmail: user.email,
+      uid: user.uid,
       timestamp: Date.now()
-    }).then(() => {
-      alert("Submission successful! Admin will review and approve.");
+    })
+    .then(() => {
+      alert("Success! Admin will review your submission.");
       document.querySelectorAll('input').forEach(i => i.value = '');
+    })
+    .catch(err => {
+      console.error("Submission Error:", err);
+      alert("Permission Denied. Check if your Firebase Rules allow writing to 'pendingAssignments'.");
+    })
+    .finally(() => {
+      btn.innerText = "Submit for Approval";
+      btn.disabled = false;
     });
   }
 
-  // 2. Load only APPROVED assignments from admin
+  // Load only APPROVED assignments
   db.ref('approvedAssignments').on('value', (snap) => {
     const feed = document.getElementById('assignmentFeed');
     feed.innerHTML = '';
-    const data = snap.val();
-
-    if(!data) {
-        feed.innerHTML = '<p style="color:var(--muted)">No assignments uploaded yet.</p>';
+    if(!snap.exists()) {
+        feed.innerHTML = '<p style="color:var(--muted)">No approved assignments yet.</p>';
         return;
     }
-
-    Object.values(data).forEach(item => {
+    snap.forEach(child => {
+      const item = child.val();
       feed.innerHTML += `
         <div class="assignment-card">
           <div>
