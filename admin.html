@@ -19,7 +19,6 @@
       min-height: 100vh;
     }
     .wrap { max-width: 1100px; margin: 0 auto; padding: 40px 20px; }
-    
     header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 40px; }
     .brand { display: flex; align-items: center; gap: 15px; }
     .logo { 
@@ -28,47 +27,20 @@
       display: flex; align-items: center; justify-content: center; font-weight: 900;
       box-shadow: 0 10px 20px rgba(139, 92, 246, 0.2);
     }
-
-    /* Stats Dashboard */
     .stats-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px; }
     .stat-card { background: var(--card); padding: 20px; border-radius: var(--radius); border: 1px solid var(--border); }
     .stat-val { font-size: 24px; font-weight: 800; display: block; }
     .stat-label { font-size: 11px; text-transform: uppercase; color: var(--muted); letter-spacing: 1px; }
-
-    .card { 
-      background: var(--card); border-radius: var(--radius); 
-      border: 1px solid var(--border); padding: 25px; box-shadow: 0 20px 50px rgba(0,0,0,0.4);
-      margin-bottom: 25px; position: relative;
-    }
-
-    .list { display: flex; flex-direction: column; gap: 12px; max-height: 400px; overflow-y: auto; padding-right: 8px; }
-    .item { 
-      display: flex; justify-content: space-between; align-items: center; padding: 16px; 
-      background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid var(--border); transition: 0.3s;
-    }
-    .item:hover { border-color: var(--accent); background: rgba(139, 92, 246, 0.03); }
-    .item.is-banned { border-left: 4px solid var(--danger); opacity: 0.8; }
-
-    .btn { 
-      padding: 10px 18px; border-radius: 10px; border: none; font-weight: 700; 
-      cursor: pointer; transition: 0.2s; font-size: 12px; display: flex; align-items: center; gap: 8px;
-    }
+    .card { background: var(--card); border-radius: var(--radius); border: 1px solid var(--border); padding: 25px; margin-bottom: 25px; }
+    .list { display: flex; flex-direction: column; gap: 12px; max-height: 500px; overflow-y: auto; padding-right: 8px; }
+    .item { display: flex; justify-content: space-between; align-items: center; padding: 16px; background: rgba(255,255,255,0.02); border-radius: 12px; border: 1px solid var(--border); }
+    .item.is-banned { border-left: 4px solid var(--danger); }
+    .btn { padding: 10px 18px; border-radius: 10px; border: none; font-weight: 700; cursor: pointer; font-size: 12px; display: flex; align-items: center; gap: 8px; transition: 0.2s; text-decoration: none; }
     .btn-primary { background: var(--accent); color: white; }
     .btn-danger { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
     .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--muted); }
-    .btn:hover { transform: translateY(-2px); }
-
-    .badge { padding: 4px 10px; border-radius: 6px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
-    .badge-verify { background: rgba(16, 185, 129, 0.15); color: var(--success); }
-
-    .input-box { 
-      background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: white; 
-      padding: 12px 18px; border-radius: 12px; width: 100%; outline: none; transition: 0.3s;
-    }
-    .input-box:focus { border-color: var(--accent-2); box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.1); }
-
+    .input-box { background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: white; padding: 12px 18px; border-radius: 12px; width: 100%; outline: none; }
     .section-title { margin: 0 0 20px; font-size: 13px; color: var(--accent-2); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 800; }
-    
     #liveMonitor { font-size: 12px; color: var(--success); background: rgba(16, 185, 129, 0.05); padding: 10px; border-radius: 8px; margin-top: 15px; border-left: 3px solid var(--success); }
   </style>
 </head>
@@ -79,11 +51,16 @@
     <div class="brand">
       <div class="logo">HUB</div>
       <div>
-        <h1 style="margin:0; font-size:24px; letter-spacing:-1px;">Command Center</h1>
-        <div id="adminEmail" style="font-size:12px; color:var(--muted)">Checking Session...</div>
+        <h1 style="margin:0; font-size:24px;">Command Center</h1>
+        <div id="adminEmail" style="font-size:12px; color:var(--muted)">Checking...</div>
       </div>
     </div>
-    <button id="signOut" class="btn btn-ghost">Sign Out</button>
+    <div style="display:flex; gap:10px;">
+      <a href="https://docs.google.com/spreadsheets/d/10PXZ8wp8jVyWQKfvQMVPX8S9h0HTof2SOMZS49pYNuk/edit" target="_blank" class="btn btn-ghost">
+        <span class="material-symbols-rounded">table_chart</span> Spreadsheet Unit
+      </a>
+      <button id="signOut" class="btn btn-danger">Sign Out</button>
+    </div>
   </header>
 
   <div class="stats-bar">
@@ -99,21 +76,19 @@
       <button id="sendBroadcast" class="btn btn-primary">Push Update</button>
       <button id="clearBroadcast" class="btn btn-danger">Kill</button>
     </div>
-    <div id="liveMonitor"><b>Current Live Message:</b> <span id="currentMsg">None</span></div>
+    <div id="liveMonitor"><b>Live Message:</b> <span id="currentMsg">None</span></div>
   </div>
 
   <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap:25px;">
     <div class="card">
       <h3 class="section-title">Archive Requests</h3>
-      <div id="assignmentList" class="list">
-        <p style="font-size:12px; color:var(--muted);">Checking for new uploads...</p>
-      </div>
+      <div id="assignmentList" class="list"></div>
     </div>
 
     <div class="card">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
         <h3 class="section-title" style="margin:0;">Users</h3>
-        <input type="text" id="userSearch" class="input-box" placeholder="Search students..." style="max-width:180px; padding:8px 12px;">
+        <input type="text" id="userSearch" class="input-box" placeholder="Search..." style="max-width:150px;">
       </div>
       <div class="list" id="userList"></div>
     </div>
@@ -122,7 +97,7 @@
 
 <div id="gateLoading" style="height:100vh; display:flex; align-items:center; justify-content:center; flex-direction:column; gap:20px;">
   <div class="logo">HUB</div>
-  <p style="color:var(--muted); font-size:14px;">Authenticating Admin...</p>
+  <p style="color:var(--muted); font-size:14px;">Authenticating...</p>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -147,71 +122,53 @@
       document.getElementById('adminGate').style.display = 'block';
       document.getElementById('adminEmail').innerText = user.email;
       initDashboard();
+    } else if (user) {
+      auth.signOut();
     } else {
-      window.location.href = 'index.html'; // Kick out if not admin
+      window.location.href = 'index.html'; 
     }
   });
 
   function initDashboard() {
-    // Sync Broadcast Monitor
+    // BROADCAST
     db.ref('broadcast').on('value', snap => {
       const data = snap.val();
-      document.getElementById('currentMsg').innerText = data ? data.message : 'No message currently broadcasted.';
+      document.getElementById('currentMsg').innerText = data ? data.message : 'No message active.';
       document.getElementById('statLive').innerText = data ? 'ACTIVE' : 'OFFLINE';
-      document.getElementById('statLive').style.color = data ? 'var(--success)' : 'var(--muted)';
     });
 
-    // Sync Stats & Lists
+    document.getElementById('sendBroadcast').onclick = () => {
+      const msg = document.getElementById('broadcastInput').value;
+      if(msg) db.ref('broadcast').set({ message: msg, timestamp: Date.now() });
+      document.getElementById('broadcastInput').value = '';
+    };
+    document.getElementById('clearBroadcast').onclick = () => db.ref('broadcast').remove();
+
+    // ARCHIVES
     db.ref('pendingResources').on('value', snap => {
       document.getElementById('statPending').innerText = snap.numChildren() || 0;
       renderPending(snap);
     });
 
+    // PROFILES (Fixed Loop)
     db.ref('profiles').on('value', snap => {
-      document.getElementById('statUsers').innerText = snap.numChildren() || 0;
-      let users = [];
-      snap.forEach(u => users.push({ uid: u.key, ...u.val() }));
+      const users = [];
+      snap.forEach(child => {
+        const d = child.val();
+        if (child.key !== 'admin' && typeof d === 'object') {
+          users.push({
+            uid: child.key,
+            fullName: d.fullName || "Student",
+            email: d.email || "No Email",
+            verified: d.verified === true,
+            banned: d.banned === true
+          });
+        }
+      });
       window.cachedUsers = users;
+      document.getElementById('statUsers').innerText = users.length;
       renderUsers(users);
     });
-  }
-
-  // Actions
-  document.getElementById('sendBroadcast').onclick = () => {
-    const msg = document.getElementById('broadcastInput').value.trim();
-    if (msg) db.ref('broadcast').set({ message: msg, timestamp: Date.now() });
-    document.getElementById('broadcastInput').value = '';
-  };
-  document.getElementById('clearBroadcast').onclick = () => db.ref('broadcast').remove();
-
-  function renderPending(snap) {
-    const list = document.getElementById('assignmentList');
-    list.innerHTML = '';
-    if(!snap.exists()) { list.innerHTML = '<p style="color:var(--muted); font-size:12px;">Queue is empty.</p>'; return; }
-    
-    snap.forEach(child => {
-      const res = child.val();
-      const div = document.createElement('div');
-      div.className = 'item';
-      div.innerHTML = `
-        <div style="max-width:60%">
-          <div style="font-weight:700; font-size:13px;">${res.courseTitle}</div>
-          <a href="${res.driveLink}" target="_blank" style="font-size:11px; color:var(--accent-2); text-decoration:none;">🔗 Review Link</a>
-        </div>
-        <div style="display:flex; gap:8px;">
-          <button class="btn btn-primary" onclick="approveResource('${child.key}')">Approve</button>
-          <button class="btn btn-danger" onclick="deleteRes('${child.key}')">Trash</button>
-        </div>`;
-      list.appendChild(div);
-    });
-  }
-
-  async function approveResource(id) {
-    const snap = await db.ref(`pendingResources/${id}`).once('value');
-    const data = snap.val();
-    data.status = 'approved';
-    await db.ref('archives').push(data); // Matches your Archive Hub node
-    await db.ref(`pendingResources/${id}`).remove();
   }
 
   function renderUsers(data) {
@@ -221,18 +178,31 @@
       const div = document.createElement('div');
       div.className = `item ${u.banned ? 'is-banned' : ''}`;
       div.innerHTML = `
-        <div>
-          <div style="font-weight:700; font-size:13px;">${u.fullName || 'Anonymous'} ${u.verified ? '<span class="badge badge-verify">Verified</span>' : ''}</div>
+        <div style="flex:1">
+          <div style="font-weight:700; font-size:13px;">${u.fullName}</div>
           <div style="font-size:11px; color:var(--muted)">${u.email}</div>
         </div>
-        <div style="display:flex; gap:6px;">
-          <button class="btn btn-ghost" style="padding:6px 10px;" onclick="toggleStatus('${u.uid}', 'verified', ${!u.verified})">
-            <span class="material-symbols-rounded" style="font-size:16px;">${u.verified ? 'verified' : 'new_releases'}</span>
-          </button>
-          <button class="btn btn-danger" style="padding:6px 10px;" onclick="toggleStatus('${u.uid}', 'banned', ${!u.banned})">
-            <span class="material-symbols-rounded" style="font-size:16px;">${u.banned ? 'undo' : 'block'}</span>
-          </button>
+        <div style="display:flex; gap:8px;">
+           <button class="btn btn-ghost" onclick="toggleStatus('${u.uid}', 'verified', ${!u.verified})">${u.verified ? '✅' : '⏳'}</button>
+           <button class="btn btn-danger" onclick="toggleStatus('${u.uid}', 'banned', ${!u.banned})">${u.banned ? '🔓' : '🚫'}</button>
         </div>`;
+      list.appendChild(div);
+    });
+  }
+
+  function renderPending(snap) {
+    const list = document.getElementById('assignmentList');
+    list.innerHTML = '';
+    snap.forEach(child => {
+      const res = child.val();
+      const div = document.createElement('div');
+      div.className = 'item';
+      div.innerHTML = `
+        <div style="flex:1">
+          <div style="font-weight:700; font-size:13px;">${res.title || 'Untitled'}</div>
+          <div style="font-size:11px; color:var(--muted)">${res.courseCode || 'N/A'}</div>
+        </div>
+        <button class="btn btn-danger" onclick="deleteRes('${child.key}')">Discard</button>`;
       list.appendChild(div);
     });
   }
@@ -242,18 +212,18 @@
   }
 
   async function deleteRes(id) {
-    if(confirm("Discard this upload?")) await db.ref(`pendingResources/${id}`).remove();
+    if(confirm("Discard this?")) await db.ref(`pendingResources/${id}`).remove();
   }
 
   document.getElementById('userSearch').oninput = (e) => {
     const val = e.target.value.toLowerCase();
-    renderUsers(window.cachedUsers.filter(u => 
-      (u.fullName || '').toLowerCase().includes(val) || (u.email || '').toLowerCase().includes(val)
-    ));
+    const filtered = window.cachedUsers.filter(u => 
+      u.fullName.toLowerCase().includes(val) || u.email.toLowerCase().includes(val)
+    );
+    renderUsers(filtered);
   };
 
   document.getElementById('signOut').onclick = () => auth.signOut();
 </script>
-
 </body>
 </html>
