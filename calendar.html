@@ -136,8 +136,7 @@
     <div class="cal-weekdays">
       <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
     </div>
-    <div class="cal-days" id="calendarDays">
-      </div>
+    <div class="cal-days" id="calendarDays"></div>
   </div>
 
   <div class="events-section">
@@ -161,7 +160,7 @@
       <span class="material-symbols-rounded">assignment</span>
       <span>Assignment</span>
     </a>
-    <a href="/subscriptions.html" class="nav-item active">
+    <a href="/subscriptions.html" class="nav-item">
       <span class="material-symbols-rounded">account_balance_wallet</span>
       <span>Budget</span>
     </a>
@@ -220,6 +219,21 @@
     }
     initTheme();
 
+    // --- Service Worker & Notification Registration ---
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').then(reg => {
+        console.log('Service Worker Registered');
+      }).catch(err => console.log('SW Registration Error', err));
+    }
+
+    function requestNotificationPermission() {
+      if ("Notification" in window) {
+        Notification.requestPermission().then(permission => {
+          if (permission === "granted") console.log("Notification permission granted");
+        });
+      }
+    }
+
     // --- Firebase Init ---
     const firebaseConfig = {
       apiKey: "AIzaSyBsVbLw4mvFTJhmORUXCUNyGc98Rripj3M",
@@ -237,7 +251,7 @@
     // --- Calendar Variables ---
     let currentDate = new Date();
     let selectedDate = new Date();
-    let eventsData = {}; // Stores fetched events
+    let eventsData = {}; 
     
     const colorMap = {
         'assignment': 'var(--evt-assignment)',
@@ -250,11 +264,45 @@
         window.location.href = '/signup.html';
       } else {
         currentUser = user;
+        requestNotificationPermission();
         fetchEvents();
       }
     });
 
-    // --- Calendar Logic ---
+    // --- Background Monitoring (The "Alarm") ---
+    setInterval(() => {
+      const now = new Date();
+      const dateKey = formatDateStr(now.getFullYear(), now.getMonth(), now.getDate());
+      const currentTime = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+
+      if (eventsData[dateKey]) {
+        Object.entries(eventsData[dateKey]).forEach(([id, evt]) => {
+          // Trigger if time matches and we haven't notified for this specific task yet
+          if (evt.time === currentTime && !evt.notified) {
+            triggerSystemNotification(evt.title, formatAMPM(evt.time));
+            // Update Firebase so it only buzzes once
+            db.ref(`profiles/${currentUser.uid}/schedule/${dateKey}/${id}`).update({ notified: true });
+          }
+        });
+      }
+    }, 60000); // Check every minute
+
+    function triggerSystemNotification(title, time) {
+      if (Notification.permission === "granted") {
+        navigator.serviceWorker.ready.then(registration => {
+          registration.showNotification("BIU HUB Reminder", {
+            body: `Starting now: ${title} (${time})`,
+            icon: '/icon.png', // Update with your logo path
+            badge: '/badge.png', // Small white icon for status bar
+            vibrate: [200, 100, 200, 100, 200], // The "Signal"
+            tag: 'scheduler-alert',
+            renotify: true
+          });
+        });
+      }
+    }
+
+    // --- Calendar Rendering Logic ---
     function renderCalendar() {
       const year = currentDate.getFullYear();
       const month = currentDate.getMonth();
@@ -264,16 +312,13 @@
       
       const firstDay = new Date(year, month, 1).getDay();
       const daysInMonth = new Date(year, month + 1, 0).getDate();
-      
       const calendarDays = document.getElementById('calendarDays');
       calendarDays.innerHTML = '';
 
-      // Blank spaces for start of month
       for (let i = 0; i < firstDay; i++) {
         calendarDays.innerHTML += `<div class="cal-day empty"></div>`;
       }
 
-      // Actual days
       for (let day = 1; day <= daysInMonth; day++) {
         const dateStr = formatDateStr(year, month, day);
         let classes = 'cal-day';
@@ -281,7 +326,6 @@
         if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) classes += ' today';
         if (dateStr === formatDateStr(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate())) classes += ' selected';
 
-        // Dots for events
         let dotsHtml = '<div class="evt-dots">';
         if (eventsData[dateStr]) {
             const types = new Set(Object.values(eventsData[dateStr]).map(e => e.type));
@@ -302,25 +346,20 @@
 
     function selectDate(year, month, day) {
       selectedDate = new Date(year, month, day);
-      // Format display string e.g., "Feb 23, 2026"
       document.getElementById('selectedDateDisplay').textContent = selectedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
       renderCalendar();
       renderEventsList();
     }
 
     function formatDateStr(year, month, day) {
-      // Returns YYYY-MM-DD
       return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
     }
 
-    // --- Firebase Event Handling ---
     async function fetchEvents() {
       const ref = db.ref(`profiles/${currentUser.uid}/schedule`);
       ref.on('value', (snapshot) => {
         eventsData = snapshot.val() || {};
         renderCalendar();
-        
-        // Initialize selected date to today on load
         selectDate(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
       });
     }
@@ -333,11 +372,10 @@
       list.innerHTML = '';
 
       if (!todaysEvents || Object.keys(todaysEvents).length === 0) {
-        list.innerHTML = `<div style="text-align:center; color:var(--text-muted); font-size:13px; margin-top:20px; font-family:'Caveat', cursive; font-size:18px;">No tasks scheduled for this day. Take a break!</div>`;
+        list.innerHTML = `<div style="text-align:center; color:var(--text-muted); margin-top:20px; font-family:'Caveat', cursive; font-size:18px;">No tasks scheduled for this day. Take a break!</div>`;
         return;
       }
 
-      // Convert object to array and sort by time
       const eventsArr = Object.entries(todaysEvents).map(([id, data]) => ({ id, ...data }));
       eventsArr.sort((a, b) => a.time.localeCompare(b.time));
 
@@ -362,12 +400,10 @@
         let [hours, minutes] = time24.split(':');
         hours = parseInt(hours);
         const ampm = hours >= 12 ? 'PM' : 'AM';
-        hours = hours % 12;
-        hours = hours ? hours : 12; 
+        hours = hours % 12 || 12;
         return `${hours}:${minutes} ${ampm}`;
     }
 
-    // --- Modal Logic ---
     function openEventModal() { document.getElementById('eventModal').style.display = 'flex'; }
     function closeEventModal() { 
         document.getElementById('eventModal').style.display = 'none'; 
@@ -389,6 +425,7 @@
         title: title,
         time: time,
         type: type,
+        notified: false, // Tracking flag for notifications
         createdAt: firebase.database.ServerValue.TIMESTAMP
       });
 
