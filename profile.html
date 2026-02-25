@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>BIU Student Hub — Profile</title>
+  <title>BIU Student Hub — My Profile</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet" />
   <style>
@@ -27,13 +27,11 @@
 
     .container { max-width: 600px; margin: 0 auto; display: flex; flex-direction: column; gap: 15px; }
 
-    /* Cards & Glassmorphism */
     .profile-card {
       background: var(--card); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
       border: 1px solid var(--border); border-radius: var(--radius); padding: 25px; text-align: center;
     }
 
-    /* Avatar Logic */
     .avatar-wrapper { position: relative; width: 100px; height: 100px; margin: 0 auto 15px; }
     .avatar {
       width: 100%; height: 100%; border-radius: 50%;
@@ -44,7 +42,6 @@
       background-size: cover; background-position: center;
     }
 
-    /* Menu Items */
     .menu-item {
       background: var(--card); border: 1px solid var(--border);
       padding: 16px; border-radius: 16px; display: flex; align-items: center; gap: 12px;
@@ -57,17 +54,14 @@
     }
     .menu-label { flex: 1; font-weight: 600; font-size: 14px; }
 
-    /* Upload Styling */
     .upload-zone {
       border: 2px dashed var(--border); border-radius: 15px; padding: 20px;
-      margin-top: 15px; cursor: pointer; background: rgba(56, 189, 248, 0.02);
+      margin-top: 15px; cursor: pointer; background: rgba(56, 189, 248, 0.02); text-align: center;
     }
-    .upload-zone:hover { border-color: var(--accent-2); background: rgba(56, 189, 248, 0.05); }
 
-    /* Form Elements */
     input, select {
       width: 100%; padding: 12px; border-radius: 12px; margin-top: 5px;
-      background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: #fff;
+      background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: #fff; outline: none;
     }
 
     .btn {
@@ -76,14 +70,13 @@
       display: flex; align-items: center; justify-content: center; gap: 8px;
     }
     .btn-primary { background: linear-gradient(90deg, var(--accent), #1d4ed8); color: #fff; }
-    .btn-danger { background: rgba(244, 63, 94, 0.1); color: var(--danger); border: 1px solid rgba(244, 63, 94, 0.1); }
+    .btn-danger { background: rgba(244, 63, 94, 0.1); color: var(--danger); border: 1px solid rgba(244, 63, 94, 0.1); margin-top: 20px;}
 
     .section-label { font-size: 11px; font-weight: 800; color: var(--muted); margin: 20px 0 5px 5px; text-transform: uppercase; letter-spacing: 1px; }
 
-    /* Nav bar fixed */
     .bottom-nav {
       position: fixed; bottom: 0; left: 0; right: 0; height: 75px;
-      background: rgba(5, 11, 29, 0.9); backdrop-filter: blur(20px);
+      background: rgba(5, 11, 29, 0.95); backdrop-filter: blur(20px);
       border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; z-index: 1000;
     }
     .nav-item { text-decoration: none; color: var(--muted); display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 10px; flex:1; }
@@ -95,28 +88,28 @@
   <div class="container">
     <div class="profile-card">
       <div class="avatar-wrapper">
-        <div id="avatarEl" class="avatar"><span id="initials">PA</span></div>
+        <div id="avatarEl" class="avatar"><span id="initials">??</span></div>
       </div>
-      <div id="displayName" style="font-size: 20px; font-weight: 800;">Paul Adamu</div>
-      <div id="displayEmail" style="color: var(--muted); font-size: 13px;">pauladamu600@gmail.com</div>
+      <div id="displayName" style="font-size: 20px; font-weight: 800;">Loading...</div>
+      <div id="displayEmail" style="color: var(--muted); font-size: 13px;">...</div>
       <div id="verifiedBadge" style="margin-top: 10px;"></div>
     </div>
 
     <div class="section-label">Media & Verification</div>
     
     <div class="profile-card" style="text-align: left;">
-      <div style="font-size: 14px; font-weight: 700; margin-bottom: 5px;">Profile Picture Link</div>
+      <div style="font-size: 14px; font-weight: 700; margin-bottom: 5px;">Profile Picture (Google Drive)</div>
       <div class="upload-zone" onclick="window.open('https://drive.google.com', '_blank')">
         <span class="material-symbols-rounded" style="color:var(--accent-2)">cloud_upload</span>
-        <span style="font-size: 12px; margin-left: 10px;">Step 1: Upload to Drive & Copy Link</span>
+        <span style="font-size: 12px; margin-left: 10px;">1. Upload to Drive & Set to "Anyone with link"</span>
       </div>
-      <input id="profilePicLink" type="url" placeholder="Step 2: Paste link here" style="margin-top:10px">
-      <button id="savePicLinkBtn" class="btn btn-primary" style="margin-top:10px; padding: 10px; font-size: 13px;">Update Picture</button>
+      <input id="profilePicLink" type="url" placeholder="2. Paste the Share Link here" style="margin-top:10px">
+      <button id="savePicLinkBtn" class="btn btn-primary" style="margin-top:10px; padding: 10px; font-size: 13px;">Update Avatar</button>
     </div>
 
-    <a href="https://wa.me/2347041795388?text=Hello%20Admin,%20I%20would%20like%20to%20verify%20my%20BIU%20Student%20Hub%20Profile.%20My%20Email:%20pauladamu600@gmail.com" class="menu-item" style="border-color: #25d36633">
+    <a id="whatsappVerifyLink" href="#" target="_blank" class="menu-item" style="border-color: #25d36633">
       <div class="menu-icon" style="color: #25d366; background: #25d36611;"><span class="material-symbols-rounded">verified</span></div>
-      <div class="menu-label">Request Verification (WhatsApp)</div>
+      <div class="menu-label">Request Verification</div>
       <span class="material-symbols-rounded" style="color:#25d366">open_in_new</span>
     </a>
 
@@ -124,36 +117,25 @@
     <div class="menu-item" onclick="toggleEdit()">
       <div class="menu-icon"><span class="material-symbols-rounded">person</span></div>
       <div class="menu-label">Edit Personal Information</div>
-      <span class="material-symbols-rounded">expand_more</span>
+      <span id="expandIcon" class="material-symbols-rounded">expand_more</span>
     </div>
 
     <div id="editForm" class="profile-card" style="display:none; text-align: left;">
         <label style="font-size:12px; color:var(--accent-2)">Full Name</label>
-        <input id="fullName" type="text" placeholder="Paul Adamu">
+        <input id="fullName" type="text" placeholder="Your Name">
+        
         <label style="font-size:12px; color:var(--accent-2); margin-top:10px; display:block">Academic Level</label>
         <select id="levelSelect">
             <option value="100">100 Level</option>
             <option value="200">200 Level</option>
             <option value="300">300 Level</option>
             <option value="400">400 Level</option>
+            <option value="500">500 Level</option>
         </select>
-        <button id="saveLinksBtn" class="btn btn-primary" style="margin-top:15px">Save Profile</button>
+        <button id="saveLinksBtn" class="btn btn-primary" style="margin-top:15px">Save Changes</button>
     </div>
 
-    <div class="section-label">Settings & Support</div>
-    <a href="privacy.html" class="menu-item">
-      <div class="menu-icon"><span class="material-symbols-rounded">shield</span></div>
-      <div class="menu-label">Privacy Policy</div>
-      <span class="material-symbols-rounded">chevron_right</span>
-    </a>
-
-    <a href="mailto:pauladamu600@gmail.com?subject=Support Request - BIU Student Hub" class="menu-item">
-      <div class="menu-icon"><span class="material-symbols-rounded">mail</span></div>
-      <div class="menu-label">Contact Support</div>
-      <span class="material-symbols-rounded">chevron_right</span>
-    </a>
-
-    <button id="signOutBtn" class="btn btn-danger" style="margin-top: 10px;">
+    <button id="signOutBtn" class="btn btn-danger">
       <span class="material-symbols-rounded">logout</span> Logout
     </button>
   </div>
@@ -163,9 +145,9 @@
       <span class="material-symbols-rounded">home</span>
       <span>Home</span>
     </a>
-    <a href="/subscriptions.html" class="nav-item">
-      <span class="material-symbols-rounded">account_balance_wallet</span>
-      <span>Budget</span>
+    <a href="archive.html" class="nav-item">
+      <span class="material-symbols-rounded">folder_open</span>
+      <span>Archive</span>
     </a>
     <a href="profile.html" class="nav-item active">
       <span class="material-symbols-rounded">person</span>
@@ -178,22 +160,17 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
   
   <script>
-    // 1. Firebase Configuration
     const firebaseConfig = {
       apiKey: "AIzaSyBsVbLw4mvFTJhmORUXCUNyGc98Rripj3M",
       authDomain: "biu-students-hub.firebaseapp.com",
       projectId: "biu-students-hub",
-      storageBucket: "biu-students-hub.firebasestorage.app",
-      messagingSenderId: "128818531382",
-      appId: "1:128818531382:web:190dc5688d1b9d21321c97",
-      measurementId: "G-ELK8KN5SK7"
+      databaseURL: "https://biu-students-hub-default-rtdb.firebaseio.com"
     };
     
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.database();
   
-    // 2. UI Elements
     const avatarEl = document.getElementById('avatarEl');
     const initialsEl = document.getElementById('initials');
     const displayNameEl = document.getElementById('displayName');
@@ -202,8 +179,17 @@
     const profilePicLinkInput = document.getElementById('profilePicLink');
     const fullNameInput = document.getElementById('fullName');
     const levelSelect = document.getElementById('levelSelect');
+
+    let currentUser = null; // Store the currently logged in user
+
+    function toggleEdit() {
+      const form = document.getElementById('editForm');
+      const icon = document.getElementById('expandIcon');
+      const isOpen = form.style.display === 'block';
+      form.style.display = isOpen ? 'none' : 'block';
+      icon.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+    }
   
-    // 3. Helper: Drive Link Converter
     function driveViewUrl(url) {
       if (!url) return null;
       const match = url.match(/(?:\/d\/|id=)([a-zA-Z0-9_-]+)/);
@@ -212,77 +198,108 @@
     }
   
     function getInitials(name) {
-      return name ? name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) : 'BI';
+      if (!name) return 'BI';
+      const parts = name.trim().split(' ');
+      if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
     }
   
-    // 4. Core: Load & Show Profile
-    async function loadProfile(user) {
-      const snap = await db.ref(`profiles/${user.uid}`).once('value');
-      const data = snap.val() || {};
-  
-      // Set Text Details
-      displayNameEl.textContent = data.fullName || user.displayName || 'Student';
-      displayEmailEl.textContent = user.email;
-      fullNameInput.value = data.fullName || user.displayName || '';
-      levelSelect.value = data.level || '100';
-  
-      // Set Initials or Profile Pic
-      if (data.profilePicUrl) {
-        const directUrl = driveViewUrl(data.profilePicUrl);
-        avatarEl.style.backgroundImage = `url('${directUrl}')`;
-        initialsEl.textContent = '';
-      } else {
-        avatarEl.style.backgroundImage = 'none';
-        initialsEl.textContent = getInitials(data.fullName || user.displayName);
-      }
-  
-      // Set Verification Status
-      if (data.verified) {
-        verifiedBadge.innerHTML = `<span style="color:var(--accent-2); font-size:12px; font-weight:700;">
-          <span class="material-symbols-rounded" style="font-size:14px; vertical-align:middle">verified</span> Verified Member</span>`;
-      } else {
-        verifiedBadge.innerHTML = `<span style="color:var(--muted); font-size:12px;">Account Pending Verification</span>`;
-      }
-    }
-  
-    // 5. Action: Save Profile Changes
-    document.getElementById('saveLinksBtn').addEventListener('click', async () => {
-      const user = auth.currentUser;
-      if (!user) return;
-  
-      await db.ref(`profiles/${user.uid}`).update({
-        fullName: fullNameInput.value.trim(),
-        level: levelSelect.value
-      });
+    // Listen for changes on the specific user's node
+    function loadProfile(user) {
+      const userRef = db.ref(`profiles/${user.uid}`);
       
-      alert('Profile Updated!');
-      loadProfile(user);
-      toggleEdit(); // Close form
+      userRef.on('value', (snapshot) => {
+        const data = snapshot.val() || {};
+        
+        // Populate UI elements
+        const nameToDisplay = data.fullName || 'Student';
+        displayNameEl.textContent = nameToDisplay;
+        displayEmailEl.textContent = user.email;
+        fullNameInput.value = data.fullName || '';
+        levelSelect.value = data.level || '100';
+
+        // Setup WhatsApp Link
+        const waMsg = encodeURIComponent(`Hello Admin, I'd like to verify my BIU Hub Profile.\nName: ${nameToDisplay}\nEmail: ${user.email}`);
+        document.getElementById('whatsappVerifyLink').href = `https://wa.me/2347041795388?text=${waMsg}`;
+    
+        // Handle Avatar
+        if (data.profilePicUrl) {
+          const directUrl = driveViewUrl(data.profilePicUrl);
+          avatarEl.style.backgroundImage = `url('${directUrl}')`;
+          initialsEl.textContent = '';
+        } else {
+          avatarEl.style.backgroundImage = 'none';
+          initialsEl.textContent = getInitials(nameToDisplay);
+        }
+    
+        // Handle Verification Badge
+        if (data.verified) {
+          verifiedBadge.innerHTML = `<span style="color:var(--accent-2); font-size:12px; font-weight:700;"><span class="material-symbols-rounded" style="font-size:14px; vertical-align:middle">verified</span> Verified Student</span>`;
+        } else {
+          verifiedBadge.innerHTML = `<span style="color:var(--muted); font-size:12px;">Account Pending Verification</span>`;
+        }
+      });
+    }
+  
+    // Save Personal Info
+    document.getElementById('saveLinksBtn').addEventListener('click', async () => {
+      if (!currentUser) return;
+      
+      const updatedName = fullNameInput.value.trim();
+      const updatedLevel = levelSelect.value;
+
+      try {
+          await db.ref(`profiles/${currentUser.uid}`).update({
+            fullName: updatedName,
+            level: updatedLevel
+          });
+          alert('Profile Updated Successfully!');
+          toggleEdit();
+      } catch (error) {
+          console.error("Update error:", error);
+          alert("Error updating profile. Please try again.");
+      }
     });
   
-    // 6. Action: Save Profile Pic Link
+    // Save Avatar Link
     document.getElementById('savePicLinkBtn').addEventListener('click', async () => {
-      const user = auth.currentUser;
+      if (!currentUser) return;
       const url = profilePicLinkInput.value.trim();
-      if (!user || !url) return alert('Please paste a link first!');
-  
-      await db.ref(`profiles/${user.uid}`).update({ profilePicUrl: url });
-      alert('Picture Updated!');
-      loadProfile(user);
-      profilePicLinkInput.value = '';
+      
+      if (!url) {
+          alert('Please paste a link first!');
+          return;
+      }
+
+      try {
+          await db.ref(`profiles/${currentUser.uid}`).update({ profilePicUrl: url });
+          alert('Avatar Updated!');
+          profilePicLinkInput.value = '';
+      } catch (error) {
+          console.error("Avatar update error:", error);
+          alert("Error updating avatar. Please try again.");
+      }
     });
   
-    // 7. Action: Sign Out
+    // Sign Out
     document.getElementById('signOutBtn').addEventListener('click', () => {
-      auth.signOut().then(() => window.location.href = 'index.html');
+      if(confirm('Log out of BIU Hub?')) {
+          auth.signOut().then(() => {
+              window.location.href = 'index.html'; // Or wherever your login page is
+          }).catch(error => {
+              console.error("Sign out error:", error);
+          });
+      }
     });
   
-    // 8. Auth Listener
+    // Authentication State Observer
     auth.onAuthStateChanged((user) => {
       if (user) {
+        currentUser = user;
         loadProfile(user);
       } else {
-        window.location.href = 'signup.html'; // Redirect if not logged in
+        // Redirect to login if not authenticated
+        window.location.href = 'signup.html'; // Assuming signup.html handles login too
       }
     });
   </script>
