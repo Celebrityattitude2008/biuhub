@@ -12,7 +12,6 @@
 
   <style>
     :root {
-      /* Light Mode Variables */
       --bg: #f8f9fb;
       --card-bg: #ffffff;
       --text-main: #1a1f36;
@@ -21,15 +20,12 @@
       --border: #e5e7eb;
       --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
       --icon-bg: #f3f4f6;
-      
-      /* Event Colors */
       --evt-assignment: #3b82f6;
       --evt-exam: #ef4444;
       --evt-personal: #f59e0b;
     }
 
     [data-theme="dark"] {
-      /* Dark Mode Variables */
       --bg: #0f172a;
       --card-bg: #1e293b;
       --text-main: #f1f5f9;
@@ -43,7 +39,6 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
     body { background-color: var(--bg); color: var(--text-main); transition: background 0.3s, color 0.3s; padding-bottom: 100px; }
 
-    /* Header */
     .top-header {
       background: var(--primary); color: #ffffff; padding: 30px 20px 40px;
       border-bottom-left-radius: 30px; border-bottom-right-radius: 30px;
@@ -51,9 +46,15 @@
     .header-top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
     .welcome-text { font-size: 24px; font-weight: 800; }
     .subtitle { font-family: 'Caveat', cursive; font-size: 20px; opacity: 0.9; }
-    .theme-toggle { background: rgba(255,255,255,0.2); border: none; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(5px); }
+    
+    .header-actions { display: flex; gap: 10px; }
+    .theme-toggle, .test-btn { 
+      background: rgba(255,255,255,0.2); border: none; color: white; 
+      width: 40px; height: 40px; border-radius: 50%; display: flex; 
+      align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(5px); 
+    }
+    .test-btn { background: #ef4444; } /* Red for the test button */
 
-    /* Calendar Card */
     .calendar-container {
       background: var(--card-bg); margin: -25px 20px 20px; border-radius: 20px;
       box-shadow: var(--shadow); padding: 20px; border: 1px solid var(--border);
@@ -73,25 +74,22 @@
     }
     .cal-day:hover { background: var(--icon-bg); }
     .cal-day.empty { cursor: default; }
-    .cal-day.empty:hover { background: transparent; }
     .cal-day.today { color: var(--primary); font-weight: 800; border: 1px solid var(--primary); }
     .cal-day.selected { background: var(--primary); color: #fff; border: none; }
     
     .evt-dots { display: flex; gap: 2px; position: absolute; bottom: 4px; }
     .dot { width: 4px; height: 4px; border-radius: 50%; }
 
-    /* Event List Section */
     .events-section { padding: 0 20px; }
     .section-title { font-family: 'Caveat', cursive; font-size: 26px; font-weight: 700; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;}
-    .add-btn { background: var(--primary); color: white; border: none; padding: 6px 12px; border-radius: 12px; font-weight: 700; font-size: 12px; display: flex; align-items: center; gap: 4px; cursor: pointer; font-family: 'Inter', sans-serif;}
+    .add-btn { background: var(--primary); color: white; border: none; padding: 6px 12px; border-radius: 12px; font-weight: 700; font-size: 12px; display: flex; align-items: center; gap: 4px; cursor: pointer; }
     
     .event-list { display: flex; flex-direction: column; gap: 12px; }
-    .event-card { background: var(--card-bg); border-left: 4px solid var(--primary); padding: 15px; border-radius: 12px; box-shadow: var(--shadow); border-top: 1px solid var(--border); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;}
+    .event-card { background: var(--card-bg); border-left: 4px solid var(--primary); padding: 15px; border-radius: 12px; box-shadow: var(--shadow); border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center;}
     .event-title { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
     .event-time { font-size: 12px; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
     .delete-evt { color: #ef4444; background: none; border: none; cursor: pointer; padding: 5px; }
 
-    /* Bottom Navigation */
     .bottom-nav {
       position: fixed; bottom: 0; left: 0; right: 0; background: var(--primary); color: #fff;
       display: flex; justify-content: space-around; padding: 12px 0 calc(12px + env(safe-area-inset-bottom));
@@ -100,7 +98,6 @@
     .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: rgba(255,255,255,0.6); text-decoration: none; font-size: 10px; font-weight: 600; }
     .nav-item.active { color: #fff; }
 
-    /* Modal */
     .modal-overlay {
       position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
       display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px;
@@ -109,7 +106,7 @@
     .modal-close { position: absolute; top: 20px; right: 20px; cursor: pointer; color: var(--text-muted); background: var(--icon-bg); border-radius: 50%; padding: 4px; }
     .form-group { margin-bottom: 15px; }
     .form-group label { display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; }
-    .form-group input, .form-group select { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--icon-bg); color: var(--text-main); font-family: 'Inter', sans-serif;}
+    .form-group input, .form-group select { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--icon-bg); color: var(--text-main); }
     .btn-primary { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: 700; font-size: 16px; cursor: pointer; margin-top: 10px; }
   </style>
 </head>
@@ -121,9 +118,14 @@
         <div class="welcome-text">Scheduler</div>
         <div class="subtitle">Organize assignments & deadlines</div>
       </div>
-      <button class="theme-toggle" onclick="toggleTheme()">
-        <span class="material-symbols-rounded" id="themeIcon">dark_mode</span>
-      </button>
+      <div class="header-actions">
+        <button class="test-btn" onclick="testNotification()" title="Test Signal">
+          <span class="material-symbols-rounded">notifications_active</span>
+        </button>
+        <button class="theme-toggle" onclick="toggleTheme()">
+          <span class="material-symbols-rounded" id="themeIcon">dark_mode</span>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -178,7 +180,6 @@
     <div class="modal-content">
       <span class="material-symbols-rounded modal-close" onclick="closeEventModal()">close</span>
       <h2 style="margin-bottom: 20px; font-size:20px;">New Schedule</h2>
-      
       <div class="form-group">
         <label>Task Title</label>
         <input type="text" id="evtTitle" placeholder="e.g. MTH101 Assignment" required>
@@ -219,19 +220,41 @@
     }
     initTheme();
 
-    // --- Service Worker & Notification Registration ---
+    // --- Service Worker Logic ---
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js').then(reg => {
-        console.log('Service Worker Registered');
-      }).catch(err => console.log('SW Registration Error', err));
+        console.log('✅ Service Worker Registered');
+      }).catch(err => console.log('❌ SW Error:', err));
     }
 
-    function requestNotificationPermission() {
-      if ("Notification" in window) {
-        Notification.requestPermission().then(permission => {
-          if (permission === "granted") console.log("Notification permission granted");
-        });
+    // --- TEST NOTIFICATION FUNCTION ---
+    function testNotification() {
+      console.log("🔔 Test Button Clicked...");
+      
+      if (!("Notification" in window)) {
+        alert("This browser does not support notifications.");
+        return;
       }
+
+      Notification.requestPermission().then(permission => {
+        console.log("Current Permission:", permission);
+        
+        if (permission === "granted") {
+          navigator.serviceWorker.ready.then(registration => {
+            console.log("🚀 Service Worker Ready. Showing alert...");
+            registration.showNotification("BIU HUB: Test Success!", {
+              body: "Your phone is now connected for schedule alerts! 🚀",
+              vibrate: [200, 100, 200, 100, 200],
+              tag: 'test-notification'
+            });
+          }).catch(err => {
+            alert("SW not ready. Refresh and wait 3 seconds.");
+            console.error(err);
+          });
+        } else {
+          alert("Permission Denied. Please enable notifications in browser settings.");
+        }
+      });
     }
 
     // --- Firebase Init ---
@@ -248,28 +271,17 @@
     const db = firebase.database();
     let currentUser = null;
 
-    // --- Calendar Variables ---
     let currentDate = new Date();
     let selectedDate = new Date();
     let eventsData = {}; 
-    
-    const colorMap = {
-        'assignment': 'var(--evt-assignment)',
-        'exam': 'var(--evt-exam)',
-        'personal': 'var(--evt-personal)'
-    };
+    const colorMap = { 'assignment': 'var(--evt-assignment)', 'exam': 'var(--evt-exam)', 'personal': 'var(--evt-personal)' };
 
     auth.onAuthStateChanged(user => {
-      if (!user) {
-        window.location.href = '/signup.html';
-      } else {
-        currentUser = user;
-        requestNotificationPermission();
-        fetchEvents();
-      }
+      if (!user) { window.location.href = '/signup.html'; } 
+      else { currentUser = user; fetchEvents(); }
     });
 
-    // --- Background Monitoring (The "Alarm") ---
+    // Background Monitor
     setInterval(() => {
       const now = new Date();
       const dateKey = formatDateStr(now.getFullYear(), now.getMonth(), now.getDate());
@@ -277,83 +289,60 @@
 
       if (eventsData[dateKey]) {
         Object.entries(eventsData[dateKey]).forEach(([id, evt]) => {
-          // Trigger if time matches and we haven't notified for this specific task yet
           if (evt.time === currentTime && !evt.notified) {
             triggerSystemNotification(evt.title, formatAMPM(evt.time));
-            // Update Firebase so it only buzzes once
             db.ref(`profiles/${currentUser.uid}/schedule/${dateKey}/${id}`).update({ notified: true });
           }
         });
       }
-    }, 60000); // Check every minute
+    }, 60000);
 
     function triggerSystemNotification(title, time) {
       if (Notification.permission === "granted") {
-        navigator.serviceWorker.ready.then(registration => {
-          registration.showNotification("BIU HUB Reminder", {
-            body: `Starting now: ${title} (${time})`,
-            icon: '/icon.png', // Update with your logo path
-            badge: '/badge.png', // Small white icon for status bar
-            vibrate: [200, 100, 200, 100, 200], // The "Signal"
-            tag: 'scheduler-alert',
-            renotify: true
+        navigator.serviceWorker.ready.then(reg => {
+          reg.showNotification("Task Reminder", {
+            body: `${title} at ${time}`,
+            vibrate: [200, 100, 200],
+            tag: 'task-alert'
           });
         });
       }
     }
 
-    // --- Calendar Rendering Logic ---
+    // --- Calendar Rendering ---
     function renderCalendar() {
       const year = currentDate.getFullYear();
       const month = currentDate.getMonth();
       const today = new Date();
-      
       document.getElementById('monthDisplay').textContent = currentDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-      
       const firstDay = new Date(year, month, 1).getDay();
       const daysInMonth = new Date(year, month + 1, 0).getDate();
       const calendarDays = document.getElementById('calendarDays');
       calendarDays.innerHTML = '';
-
-      for (let i = 0; i < firstDay; i++) {
-        calendarDays.innerHTML += `<div class="cal-day empty"></div>`;
-      }
-
+      for (let i = 0; i < firstDay; i++) { calendarDays.innerHTML += `<div class="cal-day empty"></div>`; }
       for (let day = 1; day <= daysInMonth; day++) {
         const dateStr = formatDateStr(year, month, day);
         let classes = 'cal-day';
-        
         if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) classes += ' today';
         if (dateStr === formatDateStr(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate())) classes += ' selected';
-
         let dotsHtml = '<div class="evt-dots">';
         if (eventsData[dateStr]) {
             const types = new Set(Object.values(eventsData[dateStr]).map(e => e.type));
-            types.forEach(type => {
-                dotsHtml += `<div class="dot" style="background:${colorMap[type]}"></div>`;
-            });
+            types.forEach(type => { dotsHtml += `<div class="dot" style="background:${colorMap[type]}"></div>`; });
         }
         dotsHtml += '</div>';
-
         calendarDays.innerHTML += `<div class="${classes}" onclick="selectDate(${year}, ${month}, ${day})">${day}${dotsHtml}</div>`;
       }
     }
 
-    function changeMonth(dir) {
-      currentDate.setMonth(currentDate.getMonth() + dir);
-      renderCalendar();
-    }
-
+    function changeMonth(dir) { currentDate.setMonth(currentDate.getMonth() + dir); renderCalendar(); }
     function selectDate(year, month, day) {
       selectedDate = new Date(year, month, day);
       document.getElementById('selectedDateDisplay').textContent = selectedDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
       renderCalendar();
       renderEventsList();
     }
-
-    function formatDateStr(year, month, day) {
-      return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    }
+    function formatDateStr(year, month, day) { return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`; }
 
     async function fetchEvents() {
       const ref = db.ref(`profiles/${currentUser.uid}/schedule`);
@@ -368,75 +357,44 @@
       const list = document.getElementById('eventList');
       const dateKey = formatDateStr(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
       const todaysEvents = eventsData[dateKey];
-
       list.innerHTML = '';
-
       if (!todaysEvents || Object.keys(todaysEvents).length === 0) {
-        list.innerHTML = `<div style="text-align:center; color:var(--text-muted); margin-top:20px; font-family:'Caveat', cursive; font-size:18px;">No tasks scheduled for this day. Take a break!</div>`;
+        list.innerHTML = `<div style="text-align:center; color:var(--text-muted); margin-top:20px; font-family:'Caveat', cursive; font-size:18px;">No tasks for this day.</div>`;
         return;
       }
-
       const eventsArr = Object.entries(todaysEvents).map(([id, data]) => ({ id, ...data }));
       eventsArr.sort((a, b) => a.time.localeCompare(b.time));
-
       eventsArr.forEach(evt => {
-        const t12 = formatAMPM(evt.time);
         list.innerHTML += `
           <div class="event-card" style="border-left-color: ${colorMap[evt.type]}">
             <div>
               <div class="event-title">${evt.title}</div>
-              <div class="event-time"><span class="material-symbols-rounded" style="font-size:14px;">schedule</span> ${t12} • <span style="text-transform:capitalize">${evt.type}</span></div>
+              <div class="event-time"><span class="material-symbols-rounded" style="font-size:14px;">schedule</span> ${formatAMPM(evt.time)} • ${evt.type}</div>
             </div>
-            <button class="delete-evt" onclick="deleteEvent('${dateKey}', '${evt.id}')">
-              <span class="material-symbols-rounded">delete</span>
-            </button>
-          </div>
-        `;
+            <button class="delete-evt" onclick="deleteEvent('${dateKey}', '${evt.id}')"><span class="material-symbols-rounded">delete</span></button>
+          </div>`;
       });
     }
 
     function formatAMPM(time24) {
-        if(!time24) return "";
-        let [hours, minutes] = time24.split(':');
-        hours = parseInt(hours);
-        const ampm = hours >= 12 ? 'PM' : 'AM';
-        hours = hours % 12 || 12;
-        return `${hours}:${minutes} ${ampm}`;
+      if(!time24) return "";
+      let [h, m] = time24.split(':');
+      h = parseInt(h);
+      return `${h % 12 || 12}:${m} ${h >= 12 ? 'PM' : 'AM'}`;
     }
 
     function openEventModal() { document.getElementById('eventModal').style.display = 'flex'; }
-    function closeEventModal() { 
-        document.getElementById('eventModal').style.display = 'none'; 
-        document.getElementById('evtTitle').value = '';
-        document.getElementById('evtTime').value = '';
-    }
-
+    function closeEventModal() { document.getElementById('eventModal').style.display = 'none'; }
     async function saveEvent() {
       const title = document.getElementById('evtTitle').value;
       const time = document.getElementById('evtTime').value;
       const type = document.getElementById('evtType').value;
-
-      if(!title || !time) { alert("Please fill in the title and time."); return; }
-
+      if(!title || !time) return alert("Fill all fields");
       const dateKey = formatDateStr(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
-      const newEventRef = db.ref(`profiles/${currentUser.uid}/schedule/${dateKey}`).push();
-      
-      await newEventRef.set({
-        title: title,
-        time: time,
-        type: type,
-        notified: false, // Tracking flag for notifications
-        createdAt: firebase.database.ServerValue.TIMESTAMP
-      });
-
+      await db.ref(`profiles/${currentUser.uid}/schedule/${dateKey}`).push({ title, time, type, notified: false });
       closeEventModal();
     }
-
-    async function deleteEvent(dateKey, eventId) {
-      if(confirm("Delete this task?")) {
-        await db.ref(`profiles/${currentUser.uid}/schedule/${dateKey}/${eventId}`).remove();
-      }
-    }
+    async function deleteEvent(d, i) { if(confirm("Delete?")) await db.ref(`profiles/${currentUser.uid}/schedule/${d}/${i}`).remove(); }
   </script>
 </body>
 </html>
