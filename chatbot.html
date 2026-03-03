@@ -139,8 +139,9 @@
   const typingIndicator = document.getElementById('typingIndicator');
   const quickActions = document.getElementById('quickActions');
 
-  let lastTopic = null;
-  let memoryTimer = null;
+  // the brain script already declares these; we don't need to reset them here
+  // let lastTopic = null;
+  // let memoryTimer = null;
 
   // --- 2. THEME TOGGLE ---
   function toggleTheme() {
@@ -154,7 +155,13 @@
   if(localStorage.getItem('theme')) document.body.setAttribute('data-theme', localStorage.getItem('theme'));
 
   // --- 3. CONNECTION & DATA ---
+  // --- 3. CONNECTION & DATA ---
+  // watch realtime-database connectivity; this should fire quickly after
+  // firebase.initializeApp.  If the listener never fires the status will
+  // remain at the default "Connecting..." text.
+  console.log('[Firebase] initializing connection listener');
   db.ref(".info/connected").on("value", (snap) => {
+    console.log('[Firebase] connected state=', snap.val());
     const statusDot = document.getElementById('statusDot');
     const statusText = document.getElementById('statusText');
     if (snap.val() === true) {
@@ -164,6 +171,13 @@
       statusDot.style.background = "#ef4444";
       statusText.innerText = "Offline Mode";
     }
+  }, (err) => {
+    // listener error (e.g. security rules, network issue)
+    console.error('[Firebase] connection listener failed', err);
+    const statusDot = document.getElementById('statusDot');
+    const statusText = document.getElementById('statusText');
+    statusDot.style.background = "#ef4444";
+    statusText.innerText = "Connection error";
   });
 
   db.ref('broadcast').on('value', snap => {
@@ -195,19 +209,7 @@
   // --- 4. BRAIN LOGIC ---
   async function getResponse(query) {
     const input = query.toLowerCase().replace(/[^\w\s]/gi, '').trim();
-    try {
-      // 1. Log the question (Don't 'await' this, so it doesn't freeze if it fails)
-      db.ref('unanswered_questions').push({ 
-        query: query, 
-        time: Date.now() 
-      }).catch(err => console.warn("Could not log question:", err));
-
-      // 2. Fetch the cloud brain
-      const snap = await db.ref('bot_brain').once('value');
-      const cloudBrain = snap.val() || {};
-      // 3. Merge with local brain
-      const fullBrainData = { ...localBrain, ...cloudBrain };
-
+    
     // Memory Reset
     clearTimeout(memoryTimer);
     memoryTimer = setTimeout(() => { lastTopic = null; }, 120000);
@@ -219,6 +221,13 @@
     }
 
     try {
+      // 1. Log the question (Don't 'await' this, so it doesn't freeze if it fails)
+      db.ref('unanswered_questions').push({ 
+        query: query, 
+        time: Date.now() 
+      }).catch(err => console.warn("Could not log question:", err));
+
+      // 2. Fetch the cloud brain
       const snap = await db.ref('bot_brain').once('value');
       const cloudBrain = snap.val() || {};
       const fullBrainData = { ...localBrain, ...cloudBrain };
