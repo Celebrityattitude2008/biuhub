@@ -195,6 +195,18 @@
   // --- 4. BRAIN LOGIC ---
   async function getResponse(query) {
     const input = query.toLowerCase().replace(/[^\w\s]/gi, '').trim();
+    try {
+      // 1. Log the question (Don't 'await' this, so it doesn't freeze if it fails)
+      db.ref('unanswered_questions').push({ 
+        query: query, 
+        time: Date.now() 
+      }).catch(err => console.warn("Could not log question:", err));
+
+      // 2. Fetch the cloud brain
+      const snap = await db.ref('bot_brain').once('value');
+      const cloudBrain = snap.val() || {};
+      // 3. Merge with local brain
+      const fullBrainData = { ...localBrain, ...cloudBrain };
 
     // Memory Reset
     clearTimeout(memoryTimer);
