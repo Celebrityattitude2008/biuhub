@@ -12,72 +12,101 @@
 
   <style>
     :root {
-      --bg: #071028; --card: #0b1a3d; --accent: #6d28d9; --accent-2: #06b6d4;
-      --text: #e6eef8; --muted: #9aa8bf; --glass: rgba(255,255,255,0.05);
+      --bg: #f8f9fb;
+      --card-bg: #ffffff;
+      --text-main: #1a1f36;
+      --text-muted: #6b7280;
+      --primary: #6d28d9;
+      --border: #e5e7eb;
+      --shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      --glass: rgba(0, 0, 0, 0.05);
+      --bot-msg: #f3f4f6;
     }
-    * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
-    body { margin: 0; background: var(--bg); color: var(--text); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+    [data-theme="dark"] {
+      --bg: #071028;
+      --card-bg: #0b1a3d;
+      --text-main: #e6eef8;
+      --text-muted: #9aa8bf;
+      --primary: #7c3aed;
+      --border: rgba(255,255,255,0.1);
+      --shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      --glass: rgba(255,255,255,0.05);
+      --bot-msg: #162447;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+    body { background-color: var(--bg); color: var(--text-main); transition: 0.3s; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+    /* Header Styling */
+    header {
+      background: var(--primary); color: #fff; padding: 20px;
+      border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;
+      display: flex; justify-content: space-between; align-items: center;
+      box-shadow: var(--shadow);
+    }
+    .header-info { display: flex; align-items: center; gap: 12px; }
+    .back-btn { color: white; text-decoration: none; font-size: 20px; font-weight: bold; }
+    .status-dot { width: 10px; height: 10px; background: #94a3b8; border-radius: 50%; }
+    
+    .theme-toggle {
+      background: rgba(255,255,255,0.2); border: none; color: white; 
+      width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; font-size: 18px;
+    }
 
     /* Broadcast Banner */
     #broadcastBanner {
-      display: none; background: linear-gradient(90deg, var(--accent), var(--accent-2));
-      color: white; padding: 10px 20px; text-align: center; font-size: 13px; font-weight: 600;
-      animation: slideDown 0.5s ease;
+      display: none; background: #06b6d4; color: white; padding: 8px 20px;
+      text-align: center; font-size: 12px; font-weight: 600;
     }
-    @keyframes slideDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }
-
-    /* Header */
-    header {
-      padding: 15px 20px; background: var(--card); border-bottom: 1px solid var(--glass);
-      display: flex; align-items: center; gap: 15px;
-    }
-    .back-btn { color: var(--muted); text-decoration: none; font-size: 20px; }
-    .status-dot { width: 10px; height: 10px; background: #94a3b8; border-radius: 50%; transition: 0.3s; }
 
     /* Chat Area */
-    #chatWindow { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; scroll-behavior: smooth; }
-    .msg { max-width: 85%; padding: 12px 16px; border-radius: 18px; line-height: 1.5; font-size: 14px; animation: fadeIn 0.3s ease; }
+    #chatWindow { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px; }
+    
+    .msg { max-width: 80%; padding: 12px 16px; border-radius: 18px; font-size: 14px; line-height: 1.5; animation: fadeIn 0.3s ease; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     
-    .bot { background: var(--card); align-self: flex-start; border-bottom-left-radius: 4px; border: 1px solid var(--glass); }
-    .user { background: linear-gradient(135deg, var(--accent), var(--accent-2)); align-self: flex-end; border-bottom-right-radius: 4px; color: white; }
+    .bot { background: var(--bot-msg); align-self: flex-start; border-bottom-left-radius: 4px; color: var(--text-main); }
+    .user { background: var(--primary); align-self: flex-end; border-bottom-right-radius: 4px; color: white; }
 
     /* Quick Actions */
     #quickActions {
-      padding: 10px 20px; display: flex; gap: 8px; overflow-x: auto; 
-      white-space: nowrap; scrollbar-width: none; background: rgba(7, 16, 40, 0.4);
+      padding: 10px 20px; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;
     }
-    #quickActions::-webkit-scrollbar { display: none; }
     .action-chip {
-      padding: 7px 14px; background: var(--glass); border: 1px solid var(--accent);
-      border-radius: 20px; color: var(--text); font-size: 12px; cursor: pointer; transition: 0.2s;
+      padding: 8px 16px; background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 20px; color: var(--text-main); font-size: 12px; cursor: pointer; white-space: nowrap; transition: 0.2s;
     }
-    .action-chip:hover { background: var(--accent); color: white; }
+    .action-chip:hover { border-color: var(--primary); background: var(--primary); color: white; }
 
     /* Input Area */
-    .input-area { padding: 15px 20px; background: var(--card); border-top: 1px solid var(--glass); display: flex; gap: 10px; }
-    input { flex: 1; background: rgba(0,0,0,0.2); border: 1px solid var(--glass); border-radius: 12px; padding: 12px 15px; color: white; outline: none; }
-    .send-btn { background: var(--accent); border: none; width: 45px; height: 45px; border-radius: 12px; color: white; cursor: pointer; }
-    
-    .typing { font-size: 12px; color: var(--muted); padding: 5px 20px; display: none; }
+    .input-area { padding: 15px 20px; background: var(--card-bg); border-top: 1px solid var(--border); display: flex; gap: 10px; }
+    input { flex: 1; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 12px 15px; color: var(--text-main); outline: none; }
+    .send-btn { background: var(--primary); border: none; width: 45px; height: 45px; border-radius: 12px; color: white; cursor: pointer; }
+
+    .typing { font-size: 12px; color: var(--text-muted); padding: 5px 25px; display: none; }
   </style>
 </head>
-<body>
+<body data-theme="dark">
 
 <div id="broadcastBanner"><span id="broadcastText"></span></div>
 
 <header>
-  <a href="index.html" class="back-btn">←</a>
-  <div>
-    <div style="font-weight: 700; display: flex; align-items: center; gap: 8px;">
-      Study Assistant <div id="statusDot" class="status-dot"></div>
+  <div class="header-info">
+    <a href="index.html" class="back-btn">←</a>
+    <div>
+      <div style="font-weight: 700; display: flex; align-items: center; gap: 8px;">
+        Study Assistant <div id="statusDot" class="status-dot"></div>
+      </div>
+      <div id="statusText" style="font-size: 11px; opacity: 0.8;">Connecting...</div>
     </div>
-    <div id="statusText" style="font-size: 12px; color: var(--muted);">Connecting...</div>
   </div>
+  <button class="theme-toggle" onclick="toggleTheme()">🌓</button>
 </header>
 
 <div id="chatWindow">
-  <div class="msg bot">Hello! I'm your BIU Assistant. Ask me about CGPA, Library, Hostels, or school fees!</div>
+  <div class="msg bot">Welcome back! I'm synchronized with the BIU Hub brain. Ask me anything.</div>
 </div>
 
 <div id="typingIndicator" class="typing">Assistant is thinking...</div>
@@ -85,159 +114,155 @@
 <div id="quickActions"></div>
 
 <form class="input-area" id="chatForm">
-  <input type="text" id="userInput" placeholder="Ask me anything..." autocomplete="off">
+  <input type="text" id="userInput" placeholder="Ask about CGPA, Library, Fees..." autocomplete="off">
   <button type="submit" class="send-btn">➔</button>
 </form>
 
 <script src="brain.js"></script>
 
 <script>
-const firebaseConfig = {
-  apiKey: "AIzaSyBsVbLw4mvFTJhmORUXCUNyGc98Rripj3M",
-  authDomain: "biu-students-hub.firebaseapp.com",
-  projectId: "biu-students-hub",
-  databaseURL: "https://biu-students-hub-default-rtdb.firebaseio.com",
-  appId: "1:128818531382:web:190dc5688d1b9d21321c97"
-};
+  // --- 1. CONFIG & INIT ---
+  const firebaseConfig = {
+    apiKey: "AIzaSyBsVbLw4mvFTJhmORUXCUNyGc98Rripj3M",
+    authDomain: "biu-students-hub.firebaseapp.com",
+    projectId: "biu-students-hub",
+    databaseURL: "https://biu-students-hub-default-rtdb.firebaseio.com",
+    appId: "1:128818531382:web:190dc5688d1b9d21321c97"
+  };
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
 
-const chatWindow = document.getElementById('chatWindow');
-const chatForm = document.getElementById('chatForm');
-const userInput = document.getElementById('userInput');
-const typingIndicator = document.getElementById('typingIndicator');
-const quickActions = document.getElementById('quickActions');
+  const chatWindow = document.getElementById('chatWindow');
+  const chatForm = document.getElementById('chatForm');
+  const userInput = document.getElementById('userInput');
+  const typingIndicator = document.getElementById('typingIndicator');
+  const quickActions = document.getElementById('quickActions');
 
-// --- NEW: Global variables for Context & Memory ---
-let lastTopic = null;
-let memoryTimer = null;
+  let lastTopic = null;
+  let memoryTimer = null;
 
-// 1. Connection Monitoring
-db.ref(".info/connected").on("value", (snap) => {
-  const statusDot = document.getElementById('statusDot');
-  const statusText = document.getElementById('statusText');
-  if (snap.val() === true) {
-    statusDot.style.background = "#10b981";
-    statusText.innerText = "Online Knowledge Brain";
-  } else {
-    statusDot.style.background = "#ef4444";
-    statusText.innerText = "Offline (Local Mode)";
+  // --- 2. THEME TOGGLE ---
+  function toggleTheme() {
+    const body = document.body;
+    const current = body.getAttribute('data-theme');
+    const next = current === 'dark' ? 'light' : 'dark';
+    body.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
   }
-});
+  // Load saved theme
+  if(localStorage.getItem('theme')) document.body.setAttribute('data-theme', localStorage.getItem('theme'));
 
-// 2. Load Broadcasts
-db.ref('broadcast').on('value', snap => {
-  const data = snap.val();
-  const banner = document.getElementById('broadcastBanner');
-  if (data && data.message) {
-    document.getElementById('broadcastText').innerText = "📢 " + data.message;
-    banner.style.display = 'block';
-  } else {
-    banner.style.display = 'none';
-  }
-});
-
-// 3. Load Quick Buttons
-async function loadSuggestions() {
-  db.ref('bot_brain').limitToFirst(8).on('value', snap => {
-    const data = snap.val();
-    if (!data) return;
-    quickActions.innerHTML = '';
-    Object.keys(data).forEach(key => {
-      const btn = document.createElement('div');
-      btn.className = 'action-chip';
-      btn.innerText = key.toUpperCase();
-      btn.onclick = () => {
-        userInput.value = key;
-        chatForm.dispatchEvent(new Event('submit'));
-      };
-      quickActions.appendChild(btn);
-    });
+  // --- 3. CONNECTION & DATA ---
+  db.ref(".info/connected").on("value", (snap) => {
+    const statusDot = document.getElementById('statusDot');
+    const statusText = document.getElementById('statusText');
+    if (snap.val() === true) {
+      statusDot.style.background = "#10b981";
+      statusText.innerText = "Online Knowledge Brain";
+    } else {
+      statusDot.style.background = "#ef4444";
+      statusText.innerText = "Offline Mode";
+    }
   });
-}
 
-// 4. SMART RESPONSE LOGIC (Integrated Features)
-async function getResponse(query) {
-  const input = query.toLowerCase().replace(/[^\w\s]/gi, '').trim();
+  db.ref('broadcast').on('value', snap => {
+    const data = snap.val();
+    const banner = document.getElementById('broadcastBanner');
+    if (data && data.message) {
+      document.getElementById('broadcastText').innerText = "📢 " + data.message;
+      banner.style.display = 'block';
+    } else {
+      banner.style.display = 'none';
+    }
+  });
 
-  // A. Memory Timer (Clears after 2 mins)
-  clearTimeout(memoryTimer);
-  memoryTimer = setTimeout(() => { lastTopic = null; }, 120000);
+  async function loadSuggestions() {
+    db.ref('bot_brain').limitToFirst(6).on('value', snap => {
+      const data = snap.val();
+      quickActions.innerHTML = '';
+      if (!data) return;
+      Object.keys(data).forEach(key => {
+        const btn = document.createElement('div');
+        btn.className = 'action-chip';
+        btn.innerText = key.toUpperCase();
+        btn.onclick = () => { userInput.value = key; chatForm.dispatchEvent(new Event('submit')); };
+        quickActions.appendChild(btn);
+      });
+    });
+  }
 
-  // B. Contextual Awareness Check (using the contextBrain from brain.js)
-  if (lastTopic && typeof contextBrain !== 'undefined' && contextBrain[lastTopic]) {
+  // --- 4. BRAIN LOGIC ---
+  async function getResponse(query) {
+    const input = query.toLowerCase().replace(/[^\w\s]/gi, '').trim();
+
+    // Memory Reset
+    clearTimeout(memoryTimer);
+    memoryTimer = setTimeout(() => { lastTopic = null; }, 120000);
+
+    // Context Check
+    if (lastTopic && typeof contextBrain !== 'undefined' && contextBrain[lastTopic]) {
       if (input.includes("where") || input.includes("location")) return contextBrain[lastTopic].location;
       if (input.includes("when") || input.includes("time") || input.includes("open")) return contextBrain[lastTopic].time;
-  }
-
-  try {
-    const snap = await db.ref('bot_brain').once('value');
-    const cloudBrain = snap.val() || {};
-    
-    // Merge Local (brain.js) and Cloud
-    const fullBrainData = { ...localBrain, ...cloudBrain };
-
-    // Prepare for Fuzzy Search
-    const searchList = Object.keys(fullBrainData).map(k => ({ 
-        key: k, 
-        ans: fullBrainData[k] 
-    }));
-    
-    const fuse = new Fuse(searchList, { keys: ['key'], threshold: 0.4 });
-    const result = fuse.search(input);
-    
-    if (result.length > 0) {
-        const match = result[0].item;
-        lastTopic = match.key; // Update memory
-        
-        // --- VARIETY LOGIC ---
-        // Check if the answer is an array, if so, pick a random one
-        if (Array.isArray(match.ans)) {
-            return match.ans[Math.floor(Math.random() * match.ans.length)];
-        }
-        return match.ans; // Return string as is
     }
 
-    // If unknown
-    db.ref('unanswered_questions').push({ query: query, time: Date.now() });
-    return "I'm still learning about that! I've shared this with the BIU Hub team to update my brain.";
+    try {
+      const snap = await db.ref('bot_brain').once('value');
+      const cloudBrain = snap.val() || {};
+      const fullBrainData = { ...localBrain, ...cloudBrain };
 
-  } catch (e) {
-    console.error("Brain Error:", e);
-    return "My brain feels a bit fuzzy. Can you try asking that again?";
+      const searchList = Object.keys(fullBrainData).map(k => ({ key: k, ans: fullBrainData[k] }));
+      const fuse = new Fuse(searchList, { keys: ['key'], threshold: 0.4 });
+      const result = fuse.search(input);
+      
+      if (result.length > 0) {
+        const match = result[0].item;
+        lastTopic = match.key;
+        // Handle Variety
+        if (Array.isArray(match.ans)) {
+          return match.ans[Math.floor(Math.random() * match.ans.length)];
+        }
+        return match.ans;
+      }
+
+      db.ref('unanswered_questions').push({ query: query, time: Date.now() });
+      return "I'm not 100% sure about that yet. I've sent your question to the admin to update my brain!";
+
+    } catch (e) {
+      console.error(e);
+      return "Error connecting to my brain. Please check your internet!";
+    }
   }
-}
 
-// 5. Chat UI Logic
-chatForm.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const query = userInput.value.trim();
-  if (!query) return;
+  // --- 5. UI INTERACTION ---
+  chatForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const query = userInput.value.trim();
+    if (!query) return;
 
-  appendMessage('user', query);
-  userInput.value = '';
-  typingIndicator.style.display = 'block';
+    appendMessage('user', query);
+    userInput.value = '';
+    typingIndicator.style.display = 'block';
 
-  const reply = await getResponse(query);
-  
-  setTimeout(() => {
-    typingIndicator.style.display = 'none';
-    appendMessage('bot', reply);
-  }, 600);
-});
+    const reply = await getResponse(query);
+    
+    setTimeout(() => {
+      typingIndicator.style.display = 'none';
+      appendMessage('bot', reply);
+    }, 600);
+  });
 
-function appendMessage(role, text) {
-  const div = document.createElement('div');
-  div.className = `msg ${role}`;
-  // Safety check: ensure text is a string before replacing
-  const displayText = typeof text === 'string' ? text : "I encountered an error processing that response.";
-  div.innerHTML = displayText.replace(/\n/g, '<br>');
-  chatWindow.appendChild(div);
-  chatWindow.scrollTop = chatWindow.scrollHeight;
-}
+  function appendMessage(role, text) {
+    const div = document.createElement('div');
+    div.className = `msg ${role}`;
+    // Fixed string check to prevent array crashes
+    const displayText = typeof text === 'string' ? text : "Error: Response format invalid.";
+    div.innerHTML = displayText.replace(/\n/g, '<br>');
+    chatWindow.appendChild(div);
+    chatWindow.scrollTo({ top: chatWindow.scrollHeight, behavior: 'smooth' });
+  }
 
-loadSuggestions();
+  loadSuggestions();
 </script>
 
 </body>
