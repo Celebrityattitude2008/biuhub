@@ -94,6 +94,12 @@
     .feature-label { font-size: 12px; font-weight: 600; color: var(--text-main); text-align: center; }
     
     .badge { position: absolute; top: -5px; right: -5px; background: #f59e0b; color: #fff; font-size: 9px; padding: 2px 6px; border-radius: 10px; font-weight: 800; }
+    .badge.new { background: #10b981; animation: badge-pulse 1.5s infinite; }
+    @keyframes badge-pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.2); }
+        100% { transform: scale(1); }
+    }
 
     /* Colored Icons (using specific colors to match your design) */
     .icon-ai { color: #8b5cf6; }
@@ -311,7 +317,9 @@
     </a>
 
     <a href="https://app.studentsmarket.com.ng" class="feature-item">
-      <div class="feature-icon-wrapper"><span class="material-symbols-rounded icon-mar">storefront</span>
+      <div class="feature-icon-wrapper">
+        <span class="badge new">New</span>
+      <span class="material-symbols-rounded icon-mar">storefront</span>
       </div>
       <span class="feature-label">Marketplace</span>
     </a>
