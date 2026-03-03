@@ -92,142 +92,152 @@
 <script src="brain.js"></script>
 
 <script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyBsVbLw4mvFTJhmORUXCUNyGc98Rripj3M",
-    authDomain: "biu-students-hub.firebaseapp.com",
-    projectId: "biu-students-hub",
-    databaseURL: "https://biu-students-hub-default-rtdb.firebaseio.com",
-    appId: "1:128818531382:web:190dc5688d1b9d21321c97"
-  };
+const firebaseConfig = {
+  apiKey: "AIzaSyBsVbLw4mvFTJhmORUXCUNyGc98Rripj3M",
+  authDomain: "biu-students-hub.firebaseapp.com",
+  projectId: "biu-students-hub",
+  databaseURL: "https://biu-students-hub-default-rtdb.firebaseio.com",
+  appId: "1:128818531382:web:190dc5688d1b9d21321c97"
+};
 
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.database();
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
 
-  const chatWindow = document.getElementById('chatWindow');
-  const chatForm = document.getElementById('chatForm');
-  const userInput = document.getElementById('userInput');
-  const typingIndicator = document.getElementById('typingIndicator');
-  const quickActions = document.getElementById('quickActions');
+const chatWindow = document.getElementById('chatWindow');
+const chatForm = document.getElementById('chatForm');
+const userInput = document.getElementById('userInput');
+const typingIndicator = document.getElementById('typingIndicator');
+const quickActions = document.getElementById('quickActions');
+
+// --- NEW: Global variables for Context & Memory ---
+let lastTopic = null;
+let memoryTimer = null;
+
+// 1. Connection Monitoring
+db.ref(".info/connected").on("value", (snap) => {
   const statusDot = document.getElementById('statusDot');
   const statusText = document.getElementById('statusText');
+  if (snap.val() === true) {
+    statusDot.style.background = "#10b981";
+    statusText.innerText = "Online Knowledge Brain";
+  } else {
+    statusDot.style.background = "#ef4444";
+    statusText.innerText = "Offline (Local Mode)";
+  }
+});
 
-  // 1. Connection Monitoring
-  db.ref(".info/connected").on("value", (snap) => {
-    if (snap.val() === true) {
-      statusDot.style.background = "#10b981";
-      statusDot.style.boxShadow = "0 0 10px #10b981";
-      statusText.innerText = "Online Knowledge Brain";
-    } else {
-      statusDot.style.background = "#ef4444";
-      statusDot.style.boxShadow = "0 0 10px #ef4444";
-      statusText.innerText = "Offline (Reconnecting...)";
-    }
-  });
+// 2. Load Broadcasts
+db.ref('broadcast').on('value', snap => {
+  const data = snap.val();
+  const banner = document.getElementById('broadcastBanner');
+  if (data && data.message) {
+    document.getElementById('broadcastText').innerText = "📢 " + data.message;
+    banner.style.display = 'block';
+  } else {
+    banner.style.display = 'none';
+  }
+});
 
-  // 2. Load Broadcasts
-  db.ref('broadcast').on('value', snap => {
+// 3. Load Quick Buttons
+async function loadSuggestions() {
+  db.ref('bot_brain').limitToFirst(8).on('value', snap => {
     const data = snap.val();
-    const banner = document.getElementById('broadcastBanner');
-    if (data && data.message) {
-      document.getElementById('broadcastText').innerText = "📢 " + data.message;
-      banner.style.display = 'block';
-    } else {
-      banner.style.display = 'none';
-    }
-  });
-
-  // 3. Load Quick Buttons
-  async function loadSuggestions() {
-    db.ref('bot_brain').limitToFirst(8).on('value', snap => {
-      const data = snap.val();
-      if (!data) return;
-      quickActions.innerHTML = '';
-      Object.keys(data).forEach(key => {
-        const btn = document.createElement('div');
-        btn.className = 'action-chip';
-        btn.innerText = key.toUpperCase();
-        btn.onclick = () => {
-          userInput.value = key;
-          chatForm.dispatchEvent(new Event('submit'));
-        };
-        quickActions.appendChild(btn);
-      });
+    if (!data) return;
+    quickActions.innerHTML = '';
+    Object.keys(data).forEach(key => {
+      const btn = document.createElement('div');
+      btn.className = 'action-chip';
+      btn.innerText = key.toUpperCase();
+      btn.onclick = () => {
+        userInput.value = key;
+        chatForm.dispatchEvent(new Event('submit'));
+      };
+      quickActions.appendChild(btn);
     });
+  });
+}
+
+// 4. SMART RESPONSE LOGIC (Integrated Features)
+async function getResponse(query) {
+  const input = query.toLowerCase().replace(/[^\w\s]/gi, '').trim();
+
+  // A. Memory Timer (Clears after 2 mins)
+  clearTimeout(memoryTimer);
+  memoryTimer = setTimeout(() => { lastTopic = null; }, 120000);
+
+  // B. Contextual Awareness Check (using the contextBrain from brain.js)
+  if (lastTopic && typeof contextBrain !== 'undefined' && contextBrain[lastTopic]) {
+      if (input.includes("where") || input.includes("location")) return contextBrain[lastTopic].location;
+      if (input.includes("when") || input.includes("time") || input.includes("open")) return contextBrain[lastTopic].time;
   }
 
-  // 4. Fuzzy Search Logic
-async function getResponse(query) {
-  const input = query.toLowerCase().trim();
-  
   try {
-      // 1. Fetch Cloud Brain (Firebase)
-      const snap = await db.ref('bot_brain').once('value');
-      const cloudBrain = snap.val() || {};
+    const snap = await db.ref('bot_brain').once('value');
+    const cloudBrain = snap.val() || {};
+    
+    // Merge Local (brain.js) and Cloud
+    const fullBrainData = { ...localBrain, ...cloudBrain };
 
-      // 2. Merge Cloud Brain with Local brain.js 
-      // Cloud brain wins if there is a conflict
-      const fullBrainData = { ...localBrain, ...cloudBrain };
+    // Prepare for Fuzzy Search
+    const searchList = Object.keys(fullBrainData).map(k => ({ 
+        key: k, 
+        ans: fullBrainData[k] 
+    }));
+    
+    const fuse = new Fuse(searchList, { keys: ['key'], threshold: 0.4 });
+    const result = fuse.search(input);
+    
+    if (result.length > 0) {
+        const match = result[0].item;
+        lastTopic = match.key; // Update memory
+        
+        // --- VARIETY LOGIC ---
+        // Check if the answer is an array, if so, pick a random one
+        if (Array.isArray(match.ans)) {
+            return match.ans[Math.floor(Math.random() * match.ans.length)];
+        }
+        return match.ans; // Return string as is
+    }
 
-      // 3. Prepare for Fuzzy Search
-      const searchList = Object.keys(fullBrainData).map(k => ({ 
-          key: k, 
-          ans: fullBrainData[k] 
-      }));
-      
-      const fuse = new Fuse(searchList, { 
-          keys: ['key'], 
-          threshold: 0.4 
-      });
-
-      const result = fuse.search(input);
-      
-      if (result.length > 0) {
-          return result[0].item.ans;
-      }
-
-      // 4. Log if still unknown
-      db.ref('unanswered_questions').push({ query: query, time: Date.now() });
-      return "I'm still learning! I've logged this for the admin to answer soon.";
+    // If unknown
+    db.ref('unanswered_questions').push({ query: query, time: Date.now() });
+    return "I'm still learning about that! I've shared this with the BIU Hub team to update my brain.";
 
   } catch (e) {
-      // 5. Emergency Fallback: If Firebase is totally offline, use Local Brain only
-      console.warn("Firebase offline, using local brain fallback.");
-      const localList = Object.keys(localBrain).map(k => ({ key: k, ans: localBrain[k] }));
-      const localFuse = new Fuse(localList, { keys: ['key'], threshold: 0.4 });
-      const localResult = localFuse.search(input);
-      
-      return localResult.length > 0 ? localResult[0].item.ans : "I'm offline and couldn't find an answer in my local memory.";
+    console.error("Brain Error:", e);
+    return "My brain feels a bit fuzzy. Can you try asking that again?";
   }
 }
 
-  // 5. Chat UI Logic
-  chatForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const query = userInput.value.trim();
-    if (!query) return;
+// 5. Chat UI Logic
+chatForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const query = userInput.value.trim();
+  if (!query) return;
 
-    appendMessage('user', query);
-    userInput.value = '';
-    typingIndicator.style.display = 'block';
-    chatWindow.scrollTop = chatWindow.scrollHeight;
+  appendMessage('user', query);
+  userInput.value = '';
+  typingIndicator.style.display = 'block';
 
-    const reply = await getResponse(query);
-    
-    setTimeout(() => {
-      typingIndicator.style.display = 'none';
-      appendMessage('bot', reply);
-    }, 600);
-  });
+  const reply = await getResponse(query);
+  
+  setTimeout(() => {
+    typingIndicator.style.display = 'none';
+    appendMessage('bot', reply);
+  }, 600);
+});
 
-  function appendMessage(role, text) {
-    const div = document.createElement('div');
-    div.className = `msg ${role}`;
-    div.innerHTML = text.replace(/\n/g, '<br>');
-    chatWindow.appendChild(div);
-    chatWindow.scrollTop = chatWindow.scrollHeight;
-  }
+function appendMessage(role, text) {
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  // Safety check: ensure text is a string before replacing
+  const displayText = typeof text === 'string' ? text : "I encountered an error processing that response.";
+  div.innerHTML = displayText.replace(/\n/g, '<br>');
+  chatWindow.appendChild(div);
+  chatWindow.scrollTop = chatWindow.scrollHeight;
+}
 
-  loadSuggestions();
+loadSuggestions();
 </script>
 
 </body>
