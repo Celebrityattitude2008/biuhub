@@ -72,7 +72,33 @@
 
     /* Quick Actions */
     #quickActions {
-      padding: 10px 20px; display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;
+      padding: 10px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 250px;
+      overflow-y: auto;
+      scrollbar-width: thin;
+    }
+    #quickActions details {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 10px;
+    }
+    #quickActions summary {
+      cursor: pointer;
+      font-weight: 600;
+      margin-bottom: 4px;
+      list-style: none;
+    }
+    #quickActions details[open] summary {
+      color: var(--primary);
+    }
+    /* chip styling adjusted for more compact layout */
+    .action-chip {
+      padding: 6px 12px;
+      font-size: 12px;
     }
     .action-chip {
       padding: 8px 16px; background: var(--card-bg); border: 1px solid var(--border);
@@ -191,18 +217,101 @@
     }
   });
 
+  // mapping of localBrain keys into named sections.  order matters.
+  const suggestionSections = [
+    { title: 'GREETINGS & IDENTITY', keys: [
+        'hi','hello','hey','good morning','who are you','help'
+      ] },
+    { title: 'ACADEMICS', keys: [
+        'cgpa','grading','gpa','carryover','it','probation','result',
+        'timetable','exam','assignment','library','fees'
+      ] },
+    { title: 'DEPARTMENTS & FACULTIES', keys: [
+        'law','engineering','science','social science','agriculture'
+      ] },
+    { title: 'CAMPUS LOGISTICS', keys: [
+        'portal','hostel','chapel','health center','clinic','security','wifi'
+      ] },
+    { title: 'MONEY & FEES', keys: [
+        'bursary','clearance','scholarship','payment proof'
+      ] },
+    { title: 'FOOD & LIFESTYLE', keys: [
+        'food','buttery','shuttle','clothes','stressed','tired'
+      ] },
+    { title: 'SMALL TALK', keys: [
+        'how are you','thanks','cool','benson idahosa'
+      ] },
+    { title: 'TECH SUPPORT', keys: [
+        'developer','errors','offline'
+      ] }
+  ];
+
   async function loadSuggestions() {
-    db.ref('bot_brain').limitToFirst(6).on('value', snap => {
-      const data = snap.val();
-      quickActions.innerHTML = '';
-      if (!data) return;
-      Object.keys(data).forEach(key => {
-        const btn = document.createElement('div');
-        btn.className = 'action-chip';
-        btn.innerText = key.toUpperCase();
-        btn.onclick = () => { userInput.value = key; chatForm.dispatchEvent(new Event('submit')); };
-        quickActions.appendChild(btn);
+    // we'll render a details/summary accordion for each section,
+    // populating chips from localBrain then adding cloud items to a
+    // "MORE" section if they aren't already listed.
+    quickActions.innerHTML = '';
+
+    // optional icon mapping for some keywords
+    const iconMap = {
+      cgpa: '📊', library: '📚', fees: '💰', hostel: '🏠', portal: '🔗', food: '🍽', shuttle: '🚌', health: '🏥', developer: '👨‍💻', help: '❓'
+    };
+
+    // helper to create a chip button with icon
+    function makeChip(key) {
+      const btn = document.createElement('div');
+      btn.className = 'action-chip';
+      const icon = iconMap[key] || '';
+      btn.innerHTML = icon + ' ' + key.toUpperCase();
+      btn.onclick = () => { userInput.value = key; chatForm.dispatchEvent(new Event('submit')); };
+      return btn;
+    }
+
+    // build map of added keys to avoid duplicates
+    const added = new Set();
+
+    suggestionSections.forEach(section => {
+      const detail = document.createElement('details');
+      const summary = document.createElement('summary');
+      summary.textContent = section.title;
+      detail.appendChild(summary);
+      const container = document.createElement('div');
+      container.style.display = 'flex';
+      container.style.flexWrap = 'wrap';
+      container.style.gap = '8px';
+
+      section.keys.forEach(k => {
+        if (localBrain[k]) {
+          container.appendChild(makeChip(k));
+          added.add(k);
+        }
       });
+      detail.appendChild(container);
+      quickActions.appendChild(detail);
+    });
+
+    // now attach cloud listener; any new keys go into a special "More" section.
+    db.ref('bot_brain').on('value', snap => {
+      const data = snap.val() || {};
+      // remove existing 'More' if present
+      const existingMore = quickActions.querySelector('details[data-cloud]');
+      if (existingMore) quickActions.removeChild(existingMore);
+
+      const moreKeys = Object.keys(data).filter(k => !added.has(k));
+      if (moreKeys.length) {
+        const detail = document.createElement('details');
+        detail.setAttribute('data-cloud', '');
+        const summary = document.createElement('summary');
+        summary.textContent = 'MORE';
+        detail.appendChild(summary);
+        const container = document.createElement('div');
+        container.style.display = 'flex';
+        container.style.flexWrap = 'wrap';
+        container.style.gap = '8px';
+        moreKeys.slice(0, 12).forEach(k => container.appendChild(makeChip(k)));
+        detail.appendChild(container);
+        quickActions.appendChild(detail);
+      }
     });
   }
 
