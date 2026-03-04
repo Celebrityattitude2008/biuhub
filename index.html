@@ -149,6 +149,24 @@
     .form-group label { display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; }
     .form-group select { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--border); background: var(--icon-bg); color: var(--text-main); font-weight: 600; font-size: 14px; outline: none; }
     .btn-primary { width: 100%; padding: 16px; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: 700; font-size: 16px; cursor: pointer; margin-top: 10px; }
+
+    /* Social Section */
+    .social-section {
+      padding: 30px 20px; margin-bottom: 20px;
+    }
+    .social-title { font-family: 'Caveat', cursive; font-size: 28px; font-weight: 700; color: var(--text-main); margin-bottom: 20px; }
+    .social-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); gap: 15px; }
+    .social-link {
+      display: flex; flex-direction: column; align-items: center; gap: 10px; text-decoration: none; color: var(--text-main);
+      padding: 15px; background: var(--card-bg); border-radius: 16px; border: 1px solid var(--border);
+      transition: all 0.3s ease; box-shadow: var(--shadow);
+    }
+    .social-link:hover {
+      transform: translateY(-5px); background: var(--primary);
+      color: white; border-color: var(--primary);
+    }
+    .social-link span { font-size: 32px; }
+    .social-label { font-size: 11px; font-weight: 600; text-align: center; }
   </style>
 </head>
 <body>
@@ -349,6 +367,25 @@
     <div class="feed-card">
       <div class="feed-title">Loading active threads...</div>
       <div class="feed-desc">Fetching the latest student discussions from the hub.</div>
+    </div>
+  </div>
+
+  <!-- Social Section -->
+  <div class="social-section">
+    <div class="social-title">Connect With Us</div>
+    <div class="social-grid">
+      <a href="https://instagram.com/@zti_2026" target="_blank" class="social-link" title="Instagram">
+        <span class="material-symbols-rounded">photo_camera</span>
+        <span class="social-label">Instagram</span>
+      </a>
+      <a href="https://youtube.com/@officialpauladamu" target="_blank" class="social-link" title="YouTube">
+        <span class="material-symbols-rounded">play_circle</span>
+        <span class="social-label">YouTube</span>
+      </a>
+      <a href="https://linkedin.com/in/paul-adamu-67bb46324" target="_blank" class="social-link" title="LinkedIn">
+        <span class="material-symbols-rounded">business_center</span>
+        <span class="social-label">LinkedIn</span>
+      </a>
     </div>
   </div>
 

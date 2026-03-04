@@ -170,97 +170,115 @@
   </div>
 
   <script>
+  // 1. Updated Data with 'sem' property
     const courseData = [
-      { code: 'GST 111', name: 'Communication English', cat: 'cat-gst', link: 'https://docs.google.com/document/d/1cICV9V2Wtywaofp_1cA84ItLXu-vve-p/edit' },
-      { code: 'GST 112', name: 'People and Culture', cat: 'cat-gst', link: 'https://drive.google.com/file/d/1o290W5ofDBxyoik0WC-y-VdjyHUqylJN/view' },
-      { code: 'IDS 111', name: 'Rudiments of Faith', cat: 'cat-gst', link: 'https://docs.google.com/document/d/1dYTcgJQBICb8L5ZNvX4z_nb6H2d7Pd_M/edit' },
-      { code: 'MTH 111', name: 'General Mathematics', cat: 'cat-sci', link: 'https://docs.google.com/document/d/1IHjwn7HRnlUoypBEOJL2-k_u0ptZ8GEq/edit' },
-      { code: 'MTH 112', name: 'Elementary Statistics', cat: 'cat-sci', link: 'https://docs.google.com/document/d/1jFZFlzQvHxNbnzY35d19kOoOGLX6NxyF/edit' },
-      { code: 'CSC 113', name: 'Intro Programming II', cat: 'cat-sci', link: 'https://docs.google.com/document/d/1QJxLjtQTpA1AHVFRgEfwe24QPZPHGti-/edit' },
-      { code: 'CHM 111', name: 'General Chemistry I', cat: 'cat-sci', link: 'https://drive.google.com/file/d/1w8e61Q8bRlr3mnwR_ELex5n-tTeOsi8k/view' },
-      { code: 'CSC 111', name: 'Intro to Computer Science', cat: 'cat-dept', link: 'https://docs.google.com/document/d/1tGh6b6NQTMQoF_IpiMb6HY-xQ5HrsPyf/view' },
-      { code: 'CHM 113', name: 'Organic & Inorganic Basics', cat: 'cat-sci', link: 'https://drive.google.com/file/d/1YQTm7bRCGPls4Q0SaGnGA57cPOCXhPB3/view' },
-      { code: 'ZOO 111', name: 'Introductory Zoology', cat: 'cat-sci', link: 'https://drive.google.com/file/d/1d5X3OVPWjmrQhd1ybgulCBHZEqgvvbSp/view' }
+        // --- Semester 1 ---
+        { code: 'GST 111', name: 'Communication English', cat: 'cat-gst', sem: '1', link: 'https://docs.google.com/document/d/1cICV9V2Wtywaofp_1cA84ItLXu-vve-p/edit' },
+        { code: 'GST 112', name: 'People and Culture', cat: 'cat-gst', sem: '1', link: 'https://drive.google.com/file/d/1o290W5ofDBxyoik0WC-y-VdjyHUqylJN/view' },
+        { code: 'IDS 111', name: 'Rudiments of Faith', cat: 'cat-gst', sem: '1', link: 'https://docs.google.com/document/d/1dYTcgJQBICb8L5ZNvX4z_nb6H2d7Pd_M/edit' },
+        { code: 'MTH 111', name: 'General Mathematics', cat: 'cat-sci', sem: '1', link: 'https://docs.google.com/document/d/1IHjwn7HRnlUoypBEOJL2-k_u0ptZ8GEq/edit' },
+        { code: 'MTH 112', name: 'Elementary Statistics', cat: 'cat-sci', sem: '1', link: 'https://docs.google.com/document/d/1jFZFlzQvHxNbnzY35d19kOoOGLX6NxyF/edit' },
+        { code: 'CSC 113', name: 'Intro Programming II', cat: 'cat-sci', sem: '1', link: 'https://docs.google.com/document/d/1QJxLjtQTpA1AHVFRgEfwe24QPZPHGti-/edit' },
+        { code: 'CHM 111', name: 'General Chemistry I', cat: 'cat-sci', sem: '1', link: 'https://drive.google.com/file/d/1w8e61Q8bRlr3mnwR_ELex5n-tTeOsi8k/view' },
+        { code: 'CSC 111', name: 'Intro to Computer Science', cat: 'cat-dept', sem: '1', link: 'https://docs.google.com/document/d/1tGh6b6NQTMQoF_IpiMb6HY-xQ5HrsPyf/view' },
+        { code: 'CHM 113', name: 'Organic & Inorganic Basics', cat: 'cat-sci', sem: '1', link: 'https://drive.google.com/file/d/1YQTm7bRCGPls4Q0SaGnGA57cPOCXhPB3/view' },
+        { code: 'ZOO 111', name: 'Introductory Zoology', cat: 'cat-sci', sem: '1', link: 'https://drive.google.com/file/d/1d5X3OVPWjmrQhd1ybgulCBHZEqgvvbSp/view' },
+    
+        // --- Semester 2 (New Additions) ---
+        { code: 'CSC 121', name: 'Intro to Web Programming', cat: 'cat-sci', sem: '2', link: 'https://docs.google.com/document/d/1ktzpZwUGPHUCS3xS9baz6DJjfW9HhEHN/edit?usp=sharing&ouid=111271384522252483913&rtpof=true&sd=true' },
+        { code: 'GST 112', name: 'People and Culture (Sem 2)', cat: 'cat-gst', sem: '2', link: 'https://docs.google.com/document/d/1CBOGTnI6hyJY3zN3zqy2gNCwEx5Jy-oz/edit?usp=sharing&ouid=111271384522252483913&rtpof=true&sd=true' },
+        { code: 'MTH 121', name: 'Vector and Algebra', cat: 'cat-sci', sem: '2', link: 'https://drive.google.com/file/d/1AmB8JoLIm_kQW_FZsd2M01xp8nCLpSrr/view?usp=sharing' },
+        { code: 'IDS 111', name: 'Rudiments of Faith (Sem 2)', cat: 'cat-gst', sem: '2', link: 'https://docs.google.com/document/d/12mf92g4L9O-N_BkGYZw95HCSZhgJyyG_/edit?usp=sharing&ouid=111271384522252483913&rtpof=true&sd=true' },
+        { code: 'PHY 121', name: 'General Physics II', cat: 'cat-sci', sem: '2', link: 'https://docs.google.com/document/d/1sZJDyBbsMon5_GQXlmWSMcotv3zzxOEN/edit?usp=sharing&ouid=111271384522252483913&rtpof=true&sd=true' }
     ];
-
+    
     const courseList = document.getElementById('courseList');
     const searchInput = document.getElementById('searchInput');
     const tabBtns = document.querySelectorAll('.tab-btn');
-
-    function render(filter = 'all', query = '') {
-      courseList.innerHTML = '';
-      const filtered = courseData.filter(c => {
-        const matchesTab = filter === 'all' || c.cat === filter;
-        const matchesSearch = c.code.toLowerCase().includes(query) || c.name.toLowerCase().includes(query);
-        return matchesTab && matchesSearch;
-      });
-
-      if(filtered.length === 0) {
-        courseList.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:50px; color:var(--muted)">No results found for "${query}"</div>`;
-        return;
-      }
-
-      filtered.forEach(c => {
-        const card = document.createElement('div');
-        card.className = 'course-card';
-        card.innerHTML = `
-          <div class="card-tag">${c.cat.split('-')[1]}</div>
-          <div class="course-info">
-            <h3>${c.code}</h3>
-            <p>${c.name}</p>
-          </div>
-          <div class="card-actions">
-            <button class="btn-view" onclick="window.open('${c.link}', '_blank')">
-              <span class="material-symbols-rounded">visibility</span> View PQ
-            </button>
-            <button class="btn-share" onclick="copyLink('${c.link}')" title="Copy Link">
-              <span class="material-symbols-rounded">content_copy</span>
-            </button>
-          </div>
-        `;
-        courseList.appendChild(card);
-      });
-    }
-
-    // Event Listeners
-    searchInput.addEventListener('input', (e) => {
-      const activeFilter = document.querySelector('.tab-btn.active').dataset.filter;
-      render(activeFilter, e.target.value.toLowerCase());
-    });
-
-    tabBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-        tabBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        render(btn.dataset.filter, searchInput.value.toLowerCase());
-      });
-    });
-
-    function copyLink(url) {
-      navigator.clipboard.writeText(url);
-      alert('Link copied! You can now share it with friends.');
-    }
-
-    // Modal Control
     const levelSelect = document.getElementById('levelSelect');
     const semesterSelect = document.getElementById('semesterSelect');
     const overlay = document.getElementById('upgradeOverlay');
-
+    
+    // 2. Updated Render Function to include Semester filter
+    function render(filter = 'all', query = '') {
+        const currentSemester = semesterSelect.value; // Get sem 1 or 2 from dropdown
+        courseList.innerHTML = '';
+        
+        const filtered = courseData.filter(c => {
+            const matchesSem = c.sem === currentSemester;
+            const matchesTab = filter === 'all' || c.cat === filter;
+            const matchesSearch = c.code.toLowerCase().includes(query) || c.name.toLowerCase().includes(query);
+            return matchesSem && matchesTab && matchesSearch;
+        });
+    
+        if(filtered.length === 0) {
+            courseList.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:50px; color:var(--muted)">No content found for this selection.</div>`;
+            return;
+        }
+    
+        filtered.forEach(c => {
+            const card = document.createElement('div');
+            card.className = 'course-card';
+            card.innerHTML = `
+                <div class="card-tag">${c.cat.split('-')[1]}</div>
+                <div class="course-info">
+                    <h3>${c.code}</h3>
+                    <p>${c.name}</p>
+                </div>
+                <div class="card-actions">
+                    <button class="btn-view" onclick="window.open('${c.link}', '_blank')">
+                        <span class="material-symbols-rounded">visibility</span> View PQ
+                    </button>
+                    <button class="btn-share" onclick="copyLink('${c.link}')" title="Copy Link">
+                        <span class="material-symbols-rounded">content_copy</span>
+                    </button>
+                </div>
+            `;
+            courseList.appendChild(card);
+        });
+    }
+    
+    // 3. Updated checkRedirect to allow 100L Semester 2
     function checkRedirect() {
-      if (levelSelect.value !== '100' || semesterSelect.value !== '1') {
-        overlay.style.display = 'flex';
-      }
+        // Only show overlay if Level is NOT 100
+        if (levelSelect.value !== '100') {
+            overlay.style.display = 'flex';
+        } else {
+            // If it is 100L (either semester), just re-render
+            render(document.querySelector('.tab-btn.active').dataset.filter, searchInput.value.toLowerCase());
+        }
     }
-
+    
     function closeOverlay() {
-      overlay.style.display = 'none';
-      levelSelect.value = '100';
-      semesterSelect.value = '1';
+        overlay.style.display = 'none';
+        levelSelect.value = '100';
+        render();
     }
-
+    
+    // Event Listeners (Kept original logic)
+    searchInput.addEventListener('input', (e) => {
+        const activeFilter = document.querySelector('.tab-btn.active').dataset.filter;
+        render(activeFilter, e.target.value.toLowerCase());
+    });
+    
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            tabBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            render(btn.dataset.filter, searchInput.value.toLowerCase());
+        });
+    });
+    
     levelSelect.addEventListener('change', checkRedirect);
-    semesterSelect.addEventListener('change', checkRedirect);
-
+    semesterSelect.addEventListener('change', () => {
+        render(document.querySelector('.tab-btn.active').dataset.filter, searchInput.value.toLowerCase());
+    });
+    
+    function copyLink(url) {
+        navigator.clipboard.writeText(url);
+        alert('Link copied! You can now share it with friends.');
+    }
+    
     // Initial load
     render();
   </script>
