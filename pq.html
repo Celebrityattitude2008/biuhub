@@ -128,7 +128,7 @@
         <div class="logo">BIU</div>
         <div>
           <h1>Past Questions</h1>
-          <div class="sub">Verified 100L Semester 1 Database</div>
+          <div class="sub">Verified 100L Database</div>
         </div>
       </div>
       <div class="controls-wrapper">
@@ -189,8 +189,11 @@
         { code: 'GST 112', name: 'People and Culture (Sem 2)', cat: 'cat-gst', sem: '2', link: 'https://docs.google.com/document/d/1CBOGTnI6hyJY3zN3zqy2gNCwEx5Jy-oz/edit?usp=sharing&ouid=111271384522252483913&rtpof=true&sd=true' },
         { code: 'MTH 121', name: 'Vector and Algebra', cat: 'cat-sci', sem: '2', link: 'https://drive.google.com/file/d/1AmB8JoLIm_kQW_FZsd2M01xp8nCLpSrr/view?usp=sharing' },
         { code: 'IDS 111', name: 'Rudiments of Faith (Sem 2)', cat: 'cat-gst', sem: '2', link: 'https://docs.google.com/document/d/12mf92g4L9O-N_BkGYZw95HCSZhgJyyG_/edit?usp=sharing&ouid=111271384522252483913&rtpof=true&sd=true' },
-        { code: 'PHY 121', name: 'General Physics II', cat: 'cat-sci', sem: '2', link: 'https://docs.google.com/document/d/1sZJDyBbsMon5_GQXlmWSMcotv3zzxOEN/edit?usp=sharing&ouid=111271384522252483913&rtpof=true&sd=true' }
-    ];
+        { code: 'PHY 121', name: 'General Physics II', cat: 'cat-sci', sem: '2', link: 'https://docs.google.com/document/d/1sZJDyBbsMon5_GQXlmWSMcotv3zzxOEN/edit?usp=sharing&ouid=111271384522252483913&rtpof=true&sd=true' },
+        { code: 'CHM 123', name: 'Chemistry', cat: 'cat-sci', sem: '2', link: 'https://docs.google.com/document/d/1OXboD_cCXPzoZJGTzfc1ZNC-sRpdYo8B/edit?usp=drivesdk&ouid=111271384522252483913&rtpof=true&sd=true' },
+        { code: 'BOT 121', name: 'Botany', cat: 'cat-sci', sem: '2', link: 'https://drive.google.com/file/d/1j10ipkxjVgOFL9gMNPg9YvyoWbH7RKqh/view?usp=drivesdk' },
+        { code: 'ZOO 121', name: 'Zoology', cat: 'cat-sci', sem: '2', link: 'https://drive.google.com/file/d/15POUfK8YNDebXcue6poOdvZk1UMwpXM6/view?usp=sharing' },
+      ];
     
     const courseList = document.getElementById('courseList');
     const searchInput = document.getElementById('searchInput');
@@ -216,27 +219,27 @@
             return;
         }
     
-        filtered.forEach(c => {
-            const card = document.createElement('div');
-            card.className = 'course-card';
-            card.innerHTML = `
-                <div class="card-tag">${c.cat.split('-')[1]}</div>
-                <div class="course-info">
-                    <h3>${c.code}</h3>
-                    <p>${c.name}</p>
-                </div>
-                <div class="card-actions">
-                    <button class="btn-view" onclick="window.open('${c.link}', '_blank')">
-                        <span class="material-symbols-rounded">visibility</span> View PQ
-                    </button>
-                    <button class="btn-share" onclick="copyLink('${c.link}')" title="Copy Link">
-                        <span class="material-symbols-rounded">content_copy</span>
-                    </button>
-                </div>
-            `;
-            courseList.appendChild(card);
-        });
-    }
+filtered.forEach(c => {
+  const card = document.createElement('div');
+  card.className = 'course-card';
+  card.innerHTML = `
+    <div class="card-tag">${c.cat.split('-')[1]}</div>
+    <div class="course-info">
+      <h3>${c.code}</h3>
+      <p>${c.name}</p>
+    </div>
+    <div class="card-actions">
+      <button class="btn-view" onclick="window.open('${c.link}', '_blank')">
+        <span class="material-symbols-rounded">visibility</span> View PQ
+      </button>
+      <button class="btn-share" onclick="copyLink('${c.link}')" title="Copy Link">
+        <span class="material-symbols-rounded">content_copy</span>
+      </button>
+    </div>
+  `;
+  courseList.appendChild(card);
+});
+}
     
     // 3. Updated checkRedirect to allow 100L Semester 2
     function checkRedirect() {
