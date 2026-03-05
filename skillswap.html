@@ -229,9 +229,19 @@
     if(!user) return alert("Log in to join!");
     const projectRef = db.ref(`skillswap_projects/${projectId}`);
     try {
+      // Check if user has already joined
+      const snapshot = await projectRef.once('value');
+      const projectData = snapshot.val();
+      if (projectData && projectData.joinedUsers && projectData.joinedUsers[user.uid]) {
+        return alert("You've already joined this project!");
+      }
+      
       const result = await projectRef.transaction((currentData) => {
         if (currentData && currentData.joined < currentData.needed) {
-          currentData.joined++; return currentData;
+          currentData.joined++;
+          if (!currentData.joinedUsers) currentData.joinedUsers = {};
+          currentData.joinedUsers[user.uid] = true;
+          return currentData;
         }
         return; 
       });
@@ -262,6 +272,7 @@
     Object.keys(allProjects).reverse().forEach(key => {
       const p = allProjects[key];
       const isOwner = user && user.uid === p.ownerId;
+      const hasUserJoined = user && p.joinedUsers && p.joinedUsers[user.uid];
       const isFull = p.joined >= p.needed;
       const progress = (p.joined / p.needed) * 100;
 
@@ -282,9 +293,9 @@
           </div>
           ${isOwner ? 
             `<button class="btn-connect btn-delete" onclick="deleteProject('${key}')"><span class="material-symbols-rounded">delete</span> Delete Post</button>` : 
-            `<button class="btn-connect ${isFull ? 'btn-full' : 'btn-active'}" ${isFull ? 'disabled' : ''} 
+            `<button class="btn-connect ${isFull || hasUserJoined ? 'btn-full' : 'btn-active'}" ${isFull || hasUserJoined ? 'disabled' : ''} 
               onclick="handleJoinClick('${key}', '${p.ownerId}', ${p.joined}, ${p.needed}, '${p.title}', '${p.email}', '${p.whatsapp}')">
-              ${isFull ? 'Group Full' : 'Join Project'}
+              ${hasUserJoined ? 'Already Joined' : isFull ? 'Group Full' : 'Join Project'}
             </button>`
           }
         </div>`;

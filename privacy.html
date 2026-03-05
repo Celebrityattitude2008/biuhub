@@ -37,7 +37,7 @@
   <div class="wrap">
     <div class="card" role="main" aria-labelledby="title">
       <h1 id="title">Privacy Policy</h1>
-      <p class="small">Last updated: 10 February 2026</p>
+      <p class="small">Last updated: 5 March 2026</p>
 
       <p>This Privacy Policy explains what information BIU Student Hub collects, how we use it, how we share it, and the choices you have. The policy applies to the web application and related services that use Firebase Realtime Database for data storage and Google Drive for file hosting.</p>
 
@@ -45,20 +45,28 @@
       <p>We collect the minimum information needed to provide the service and to keep the community safe.</p>
       <ul>
         <li><strong>Account information</strong> Email address and authentication metadata when you sign up using Email/Password or Google sign-in.</li>
-        <li><strong>Profile information</strong> Full name, level, bio, social links, and an optional profile picture link stored as a Google Drive share URL.</li>
-        <li><strong>Calculations</strong> CGPA/GPA calculation entries you save. Each entry includes course list, units, grade points, totals, label, and timestamp.</li>
-        <li><strong>Discussions</strong> Posts you create in community discussions including text, optional image link, author UID, author name, and timestamp.</li>
-        <li><strong>Payment proofs</strong> Drive share links you submit as proof of payment and related metadata such as upload time and status.</li>
-        <li><strong>Usage data</strong> Basic telemetry such as page views and actions for debugging and improving the service. This data is aggregated and anonymized where possible.</li>
+        <li><strong>Profile information</strong> Full name, academic level, bio, social links, and an optional profile picture link stored as a Google Drive share URL. Your profile may include a verification status badge.</li>
+        <li><strong>Academic calculations</strong> CGPA/GPA calculation entries you save. Each entry includes course list, units, grade points, totals, label, and timestamp.</li>
+        <li><strong>Discussions</strong> Posts you create in community discussion boards including text, optional image links, author UID, author name, upvotes, and timestamp.</li>
+        <li><strong>Study materials</strong> Archive submissions such as past questions and study notes. Each submission includes a Google Drive share link, course/category, timestamps, and approval status.</li>
+        <li><strong>SkillSwap partnerships</strong> When you create or join a skill exchange project, we store the project details including your contact information (email/WhatsApp), partner count, course code, category, and description.</li>
+        <li><strong>Subscriptions</strong> Records of your subscription status, renewal dates, and subscription type for tracking purposes.</li>
+        <li><strong>Payment proofs</strong> Drive share links you submit as proof of payment and related metadata such as upload time and verification status.</li>
+        <li><strong>Chat history</strong> Conversations with the Study Assistant AI for improving responses and debugging. Chat messages are associated with your account.</li>
+        <li><strong>Usage data</strong> Basic telemetry such as page views, feature usage, and actions for debugging and improving the service. This data is aggregated and anonymized where possible.</li>
       </ul>
 
       <h2>How we use your data</h2>
       <ul>
-        <li>Provide and operate the service including account management, profile display, CGPA calculations, and discussion posting.</li>
+        <li>Provide and operate the service including account management, profile display, CGPA calculations, discussion posting, and SkillSwap partnerships.</li>
+        <li>Host and display study materials (past questions, notes) and enable resource sharing via Google Drive links without requiring users to have paid storage accounts.</li>
+        <li>Support the Study Assistant AI by providing conversation context and improving chatbot responses based on common questions.</li>
         <li>Enable verification workflows where users submit payment proof and admins review and mark verified status.</li>
-        <li>Store and display Google Drive links for profile pictures, proofs, and past questions so files can be viewed without paid storage.</li>
-        <li>Prevent abuse and moderate content by allowing admins to review reports, proofs, and verification requests.</li>
-        <li>Improve the product by analyzing usage patterns and fixing bugs.</li>
+        <li>Manage subscriptions and notify users of renewal dates and payment requirements.</li>
+        <li>Facilitate SkillSwap partnerships by connecting users with similar interests and allowing direct contact via email or WhatsApp.</li>
+        <li>Prevent abuse and moderate content by allowing admins to review reports, discussions, archive submissions, and verification requests. Administrators may remove posts, ban users, or delete accounts for violating community standards.</li>
+        <li>Broadcast announcements and news updates to the community through the news feed and broadcast system.</li>
+        <li>Improve the product by analyzing usage patterns, feature usage, and fixing bugs.</li>
       </ul>
 
       <h2>Where data is stored</h2>
@@ -70,35 +78,43 @@
       <h2>Sharing and disclosure</h2>
       <ul>
         <li>We do not sell your personal data.</li>
-        <li>Admins may access payment proofs and verification requests to perform reviews.</li>
+        <li>Your profile information is visible to other BIU Student Hub users. This includes your name, academic level, bio, and profile picture if set.</li>
+        <li>Discussion posts are public and visible to all users of the community discussion boards.</li>
+        <li>Study materials (past questions, notes) submitted to the archive are public and visible to all users.</li>
+        <li>SkillSwap projects are visible to users searching for partnerships. Your contact information (email/WhatsApp) is shared with users you connect with or who message you about a partnership.</li>
+        <li>Admins may access payment proofs, verification requests, user discussions, archive submissions, and account data to perform reviews and enforce moderation policies.</li>
+        <li>We broadcast announcements and updates to all users via the news feed and broadcast system.</li>
         <li>We may disclose information if required by law or to protect the rights, property, or safety of the service, users, or others.</li>
       </ul>
 
       <h2>Security</h2>
-      <p>We use Firebase Authentication to manage sign-in and Firebase Realtime Database rules to restrict writes and reads. Admin-only actions are protected by authentication checks. While we take reasonable measures to protect data, no system is completely secure. Keep your account credentials private and use a strong password.</p>
+      <p>We use Firebase Authentication to manage sign-in securely with password hashing and optional email verification. Firebase Realtime Database rules are configured to restrict writes and reads based on user authentication. Admin-only actions are protected by authentication checks and role-based access control. Account verification is managed through WhatsApp links to confirm user identity. While we take reasonable measures to protect data, no system is completely secure. Keep your account credentials private, use a strong password, and enable email verification for extra safety. Do not share your account credentials or authentication tokens with others.</p>
 
       <h2>Retention</h2>
-      <p>We retain profile data, saved calculations, discussions, and verification records until you delete your account or the data is removed by an admin. If you request deletion, we will remove your profile node and associated personal metadata from the database. Copies may remain in backups for a limited period for disaster recovery.</p>
+      <p>We retain profile data, saved calculations, discussions, SkillSwap projects, archive submissions, subscriptions, and verification records until you delete your account or the data is removed by an admin. Chat history with the Study Assistant may be retained for longer periods to improve the service. If you request account deletion, we will remove your profile node and associated personal metadata from the database. Your discussion posts and submitted materials may remain in the database for historical purposes but will be disassociated from your profile. Copies of all data may remain in Firebase backups for a limited period for disaster recovery purposes.</p>
 
       <h2>Your choices and rights</h2>
       <ul>
-        <li><strong>Access</strong> You can view and edit your profile and saved calculations from your profile page.</li>
-        <li><strong>Delete</strong> You can delete your profile data from the profile settings. Deleting your account removes your profile node and personal metadata from the database.</li>
-        <li><strong>Proofs</strong> You can remove or replace Drive links you submitted for verification by editing your profile or payment proof entries.</li>
+        <li><strong>Access</strong> You can view and edit your profile, saved calculations, discussions, SkillSwap partnerships, and subscription status from your profile page and relevant sections.</li>
+        <li><strong>Delete</strong> You can delete your profile data from the profile settings. Deleting your account removes your profile node and personal metadata from the database. Your posts in discussions and SkillSwap projects may remain visible to others but will be disassociated from your profile.</li>
+        <li><strong>Downloads</strong> You can download or remove Google Drive links you submitted for profile pictures, payment proofs, and study materials by editing your profile or submissions.</li>
+        <li><strong>Subscriptions</strong> You can view and manage your active subscriptions from the Subscriptions page.</li>
+        <li><strong>SkillSwap</strong> You can delete your SkillSwap projects or leave partnerships at any time from the SkillSwap page.</li>
+        <li><strong>Chat history</strong> You can clear or review your conversation history with the Study Assistant, though historical records may be retained for service improvement.</li>
         <li><strong>Contact</strong> For data requests or questions use the contact details below.</li>
       </ul>
 
       <h2>Moderation and community safety</h2>
-      <p>Community discussions are moderated. Users can report posts for review. Admins may remove posts that violate community rules. Verification is optional and used as a trust indicator. Removing verification does not delete a user account unless requested.</p>
+      <p>Community discussions, archive submissions, and SkillSwap projects are moderated. Users can report posts for review. Admins may remove posts, delete accounts, or ban users that violate community rules without prior notice. Verification is optional and used as a trust indicator. Admins may revoke verification status for non-compliance with policies. Removing verification does not delete a user account unless requested. Admins also monitor user accounts, usage patterns, and enforce community standards through the Admin Command Center.</p>
 
       <h2>Third-party services</h2>
-      <p>We rely on third-party services for core functionality. Firebase provides authentication and database services. Google Drive hosts files referenced by the app. These providers have their own privacy policies and terms. For details see Firebase privacy documentation and Google Drive privacy documentation.</p>
+      <p>We rely on third-party services for core functionality. Firebase provides authentication and database services to store user accounts, profiles, discussions, calculations, and all application data. Google Drive hosts files referenced by the app including profile pictures, past questions, study notes, and payment proofs — users paste Google Drive share links and we store those URLs. WhatsApp is used for account verification links and user-to-user messaging for SkillSwap partnerships. These providers have their own privacy policies and terms. By using BIU Student Hub, you also agree to the terms of Firebase, Google, and any other third-party services we integrate. For details see <a href="https://firebase.google.com/support/privacy">Firebase privacy documentation</a>, <a href="https://policies.google.com/privacy">Google privacy policies</a>, and the respective privacy policies of any integrated services.</p>
 
       <h2>Changes to this policy</h2>
       <p>We may update this policy from time to time. When we make changes we will update the Last updated date at the top of this page. Significant changes will be communicated through the app or by email when possible.</p>
 
       <h2>Contact</h2>
-      <p>If you have questions about this policy or want to request data access or deletion contact the project admin at <strong>admin@biuhub.com</strong> or use the support channel in the app.</p>
+      <p>If you have questions about this policy or want to request data access or deletion contact the project admin at <strong>pauladamu600@hotmail.com.com</strong> or use the support channel in the app.</p>
 
       <h2>Creator</h2>
       <p>This project and the BIU Student Hub web app were created and maintained by a student contributor. If you need to reach the creator directly for feedback, bug reports, or collaboration, use the contact details below.</p>
@@ -107,12 +123,12 @@
         <div class="contact-row"><span class="label">Name</span><span>Paul Adamu</span></div>
         <div class="contact-row"><span class="label">Level / Department</span><span>100L CSC</span></div>
         <div class="contact-row"><span class="label">Phone</span><span>07041795388</span></div>
-        <div class="contact-row"><span class="label">Email</span><span><a href="mailto:pauladamu600@gmail.com">pauladamu600@gmail.com</a></span></div>
+        <div class="contact-row"><span class="label">Email</span><span><a href="mailto:pauladamu600@hotmail.com">pauladamu600@hotmail.com</a></span></div>
       </div>
 
       <div class="divider"></div>
 
-      <p class="note">Quick tips: Do not paste private documents into public Drive folders. Use a Google Form for sensitive uploads if you prefer admin-only access. Keep your account email secure and enable email verification for extra safety.</p>
+      <p class="note">Quick tips: Do not paste private documents into public Drive folders. Use appropriate Google sharing settings (link sharing) for the content you upload. When creating SkillSwap partnerships, only share contact information with users you trust. Keep your account email secure and enable email verification for extra safety. Review discussion posts before posting and be respectful of community standards. Archive submissions are publicly visible, so only upload materials you are comfortable sharing. Monitor your subscriptions to avoid unexpected renewals.</p>
 
       <footer>
         <div>BIU Student Hub</div>
