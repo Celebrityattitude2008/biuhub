@@ -17,41 +17,46 @@
       --border: rgba(255, 255, 255, 0.05);
     }
 
-    body {
-      margin: 0; background: var(--bg); color: #f1f5f9; font-family: 'Inter', sans-serif;
-    }
-
+    body { margin: 0; background: var(--bg); color: #f1f5f9; font-family: 'Inter', sans-serif; }
     .wrap { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
 
-    /* Suggestion Form */
+    /* Collapsible Logic */
+    #uploadContainer { display: none; margin-bottom: 30px; }
+    .btn-toggle {
+      background: rgba(109, 40, 217, 0.1); border: 1px dashed var(--accent);
+      color: var(--accent-2); padding: 12px; border-radius: 12px; width: 100%;
+      cursor: pointer; margin-bottom: 20px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+
     .suggestion-box {
       background: linear-gradient(145deg, rgba(109, 40, 217, 0.1), rgba(6, 182, 212, 0.05));
       border: 1px solid var(--border); padding: 30px; border-radius: var(--radius);
-      margin-bottom: 40px;
     }
 
     .input-group { margin-bottom: 15px; }
     label { display: block; margin-bottom: 8px; font-size: 14px; color: var(--muted); }
-    input, select {
+    input {
       width: 100%; padding: 12px; border-radius: 12px; background: rgba(0,0,0,0.2);
-      border: 1px solid var(--border); color: #fff; outline: none;
+      border: 1px solid var(--border); color: #fff; outline: none; box-sizing: border-box;
     }
 
     .btn-submit {
       width: 100%; padding: 14px; border-radius: 12px; border: none;
       background: linear-gradient(90deg, var(--accent), var(--accent-2));
-      color: #fff; font-weight: 800; cursor: pointer; margin-top: 10px;
+      color: #fff; font-weight: 800; cursor: pointer;
     }
 
-    /* Assignment Feed */
-    .section-title { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
     .assignment-card {
       background: var(--card); border: 1px solid var(--border); padding: 20px;
       border-radius: 16px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center;
     }
-    .status-badge {
-      font-size: 10px; padding: 4px 8px; border-radius: 6px; background: rgba(6, 182, 212, 0.2); color: var(--accent-2);
+
+    .btn-delete {
+      background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2);
+      padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 12px;
     }
+
+    .action-group { display: flex; gap: 10px; align-items: center; }
   </style>
 </head>
 <body>
@@ -59,42 +64,47 @@
 <div class="wrap">
   <header style="margin-bottom: 40px;">
     <h1>Assignment Hub</h1>
-    <p class="muted">Contribute assignments or download latest ones</p>
+    <p class="muted">Verified students can contribute directly once per day.</p>
   </header>
 
-  <div class="suggestion-box">
-    <h3 style="margin-top:0">Suggest an Assignment</h3>
+  <button class="btn-toggle" onclick="toggleUpload()">
+    <span class="material-symbols-rounded">add_circle</span> 
+    Contribute New Assignment
+  </button>
+
+  <div id="uploadContainer" class="suggestion-box">
+    <h3 style="margin-top:0">Direct Upload</h3>
     <div class="input-group">
       <label>Course Code</label>
       <input type="text" id="courseCode" placeholder="e.g., MTH 111">
     </div>
     <div class="input-group">
-      <label>Assignment Title / Description</label>
-      <input type="text" id="assignTitle" placeholder="e.g., Vectors and Tensors PDF">
+      <label>Title</label>
+      <input type="text" id="assignTitle" placeholder="e.g., Vectors PDF">
     </div>
     <div class="input-group">
-      <label>Google Drive Link (PDF or Doc)</label>
+      <label>Drive Link</label>
       <input type="url" id="assignLink" placeholder="Paste link here">
     </div>
-    <button class="btn-submit" onclick="submitSuggestion()">Submit for Approval</button>
+    <button class="btn-submit" id="mainSubmitBtn" onclick="submitAssignment()">Post Assignment</button>
   </div>
 
-  <div class="section-title">
-    <span class="material-symbols-rounded">assignment</span>
-    <h2>Approved Assignments</h2>
+  <div class="section-title" style="display:flex; align-items:center; gap:10px; margin-bottom:20px;">
+    <span class="material-symbols-rounded">folder_open</span>
+    <h2>Latest Assignments</h2>
   </div>
 
   <div id="assignmentFeed">
-    <div class="assignment-card" style="opacity: 0.5;">
-      <p>Waiting for admin to upload assignments...</p>
-    </div>
+    <p style="color:var(--muted)">Loading assignments...</p>
   </div>
 </div>
 
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script> <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <script>
+  // Firebase Config
   const firebaseConfig = {
     apiKey: "AIzaSyBsVbLw4mvFTJhmORUXCUNyGc98Rripj3M",
     authDomain: "biu-students-hub.firebaseapp.com",
@@ -108,80 +118,123 @@
   const db = firebase.database();
   const auth = firebase.auth();
 
-  // IMPORTANT: This checks if you are actually logged in
-  auth.onAuthStateChanged(user => {
-    if (user) {
-      console.log("Logged in as:", user.email);
-    } else {
-      console.warn("No user detected. Redirecting to login...");
-      // Optional: window.location.href = "login.html";
-    }
-  });
-
-  function submitSuggestion() {
-    const user = auth.currentUser;
-    
-    if (!user) {
-      alert("Error: You are not logged in. Please log in first.");
-      return;
-    }
-
-    const code = document.getElementById('courseCode').value.trim();
-    const title = document.getElementById('assignTitle').value.trim();
-    const link = document.getElementById('assignLink').value.trim();
-
-    if(!code || !title || !link) return alert("Fill all fields!");
-
-    // Adding a loading state to the button
-    const btn = document.querySelector('.btn-submit');
-    btn.innerText = "Uploading...";
-    btn.disabled = true;
-
-    db.ref('pendingAssignments').push({
-      code: code,
-      title: title,
-      link: link,
-      status: 'pending',
-      uploaderEmail: user.email,
-      uid: user.uid,
-      timestamp: Date.now()
-    })
-    .then(() => {
-      alert("Success! Admin will review your submission.");
-      document.querySelectorAll('input').forEach(i => i.value = '');
-    })
-    .catch(err => {
-      console.error("Submission Error:", err);
-      alert("Permission Denied. Check if your Firebase Rules allow writing to 'pendingAssignments'.");
-    })
-    .finally(() => {
-      btn.innerText = "Submit for Approval";
-      btn.disabled = false;
-    });
+  // 1. Toggle Function
+  function toggleUpload() {
+    const container = document.getElementById('uploadContainer');
+    container.style.display = (container.style.display === 'block') ? 'none' : 'block';
   }
 
-  // Load only APPROVED assignments
-  db.ref('approvedAssignments').on('value', (snap) => {
-    const feed = document.getElementById('assignmentFeed');
-    feed.innerHTML = '';
-    if(!snap.exists()) {
-        feed.innerHTML = '<p style="color:var(--muted)">No approved assignments yet.</p>';
+  // 2. Submit Logic with Verification & Timer
+  async function submitAssignment() {
+    const user = auth.currentUser;
+    if (!user) return alert("Log in first!");
+
+    const btn = document.getElementById('mainSubmitBtn');
+    btn.disabled = true;
+    btn.innerText = "Verifying...";
+
+    try {
+      // Fetch user profile
+      const userSnap = await db.ref(`profiles/${user.uid}`).once('value');
+      const userData = userSnap.val();
+
+      // Check Verification
+      if (!userData || userData.verified !== true) {
+        alert("Verification required! Only verified students can post directly.");
+        btn.disabled = false;
+        btn.innerText = "Post Assignment";
         return;
+      }
+
+      // Check 24-Hour Timer
+      const lastUpload = userData.lastAssignmentTime || 0;
+      const now = Date.now();
+      const oneDay = 24 * 60 * 60 * 1000;
+
+      if (now - lastUpload < oneDay) {
+        const remainingMs = oneDay - (now - lastUpload);
+        const hours = Math.floor(remainingMs / (1000 * 60 * 60));
+        const minutes = Math.floor((remainingMs % (1000 * 60 * 60)) / (1000 * 60));
+        alert(`Limit reached: You can post again in ${hours}h ${minutes}m.`);
+        btn.disabled = false;
+        btn.innerText = "Post Assignment";
+        return;
+      }
+
+      // Validate inputs
+      const code = document.getElementById('courseCode').value.trim();
+      const title = document.getElementById('assignTitle').value.trim();
+      const link = document.getElementById('assignLink').value.trim();
+
+      if(!code || !title || !link) {
+        alert("Please fill all fields!");
+        btn.disabled = false;
+        btn.innerText = "Post Assignment";
+        return;
+      }
+
+      // Push Data
+      const newPost = {
+        code, title, link,
+        uid: user.uid,
+        timestamp: now,
+        uploaderEmail: user.email
+      };
+
+      await db.ref('approvedAssignments').push(newPost);
+      await db.ref(`profiles/${user.uid}`).update({ lastAssignmentTime: now });
+      
+      alert("Success! Your assignment is live.");
+      location.reload(); 
+
+    } catch (err) {
+      console.error(err);
+      alert("Error. Check your connection or permissions.");
+      btn.disabled = false;
+      btn.innerText = "Post Assignment";
     }
-    snap.forEach(child => {
-      const item = child.val();
-      feed.innerHTML += `
-        <div class="assignment-card">
-          <div>
-            <strong style="color:var(--accent-2)">${item.code}</strong>
-            <p style="margin:5px 0 0; font-size:14px">${item.title}</p>
+  }
+
+  // 3. Load Feed & Handle Delete Visibility
+  auth.onAuthStateChanged(user => {
+    db.ref('approvedAssignments').on('value', (snap) => {
+      const feed = document.getElementById('assignmentFeed');
+      feed.innerHTML = '';
+      
+      if(!snap.exists()) {
+        feed.innerHTML = '<p style="color:var(--muted)">No assignments posted yet.</p>';
+        return;
+      }
+
+      snap.forEach(child => {
+        const item = child.val();
+        // Check if the current user is the owner
+        const isOwner = user && user.uid === item.uid;
+        
+        feed.innerHTML += `
+          <div class="assignment-card">
+            <div>
+              <strong style="color:var(--accent-2)">${item.code}</strong>
+              <p style="margin:5px 0 0; font-size:14px">${item.title}</p>
+            </div>
+            <div class="action-group">
+              ${isOwner ? `<button class="btn-delete" onclick="deleteItem('${child.key}')">Delete</button>` : ''}
+              <button class="btn-submit" style="width:auto; padding:8px 16px" onclick="window.open('${item.link}')">Get</button>
+            </div>
           </div>
-          <button class="btn-submit" style="width:auto; padding:8px 16px" onclick="window.open('${item.link}')">Download</button>
-        </div>
-      `;
+        `;
+      });
     });
   });
-</script>
 
+  // 4. Delete Function
+  function deleteItem(id) {
+    if(confirm("Are you sure you want to delete your post?")) {
+      db.ref(`approvedAssignments/${id}`).remove()
+        .then(() => alert("Post removed."))
+        .catch(err => alert("Delete failed: " + err.message));
+    }
+  }
+</script>
 </body>
 </html>
