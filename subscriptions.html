@@ -41,7 +41,7 @@
     .brand {
       font-weight: 800; font-size: 18px;
       background: linear-gradient(90deg, var(--accent), var(--accent-2));
-      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     }
 
     .total-card {
@@ -232,7 +232,7 @@
       currentUser = user;
       loadUserSubscriptions();
     } else {
-      window.location.href = '/signup.html';
+      window.location.href = '/login.html';
     }
   });
 

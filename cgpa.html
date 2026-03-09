@@ -355,7 +355,7 @@
       const user = auth.currentUser;
       if(!user) {
         sessionStorage.setItem('postAuthSave', JSON.stringify(payload));
-        alert('Signing in required...'); window.location.href = '/signup.html'; return;
+        alert('Signing in required...'); window.location.href = '/login.html'; return;
       }
       const ref = db.ref(`profiles/${user.uid}/calculations`).push();
       payload.id = ref.key;

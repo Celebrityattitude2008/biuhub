@@ -277,7 +277,7 @@
     const colorMap = { 'assignment': 'var(--evt-assignment)', 'exam': 'var(--evt-exam)', 'personal': 'var(--evt-personal)' };
 
     auth.onAuthStateChanged(user => {
-      if (!user) { window.location.href = '/signup.html'; } 
+      if (!user) { window.location.href = '/login.html'; } 
       else { currentUser = user; fetchEvents(); }
     });
 
