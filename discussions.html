@@ -377,6 +377,16 @@
       });
     }
 
+    db.ref(`profiles/${uid}`).once('value', (snap) => {
+   const data = snap.val();
+   if (data && data.profilePic) {
+      document.getElementById('navProfileImg').src = data.profilePic;
+   } else {
+      // Default avatar if no pic exists
+      document.getElementById('navProfileImg').src = "default-avatar.png";
+   }
+});
+
     postBtn.addEventListener('click', async () => {
       const text = postText.value.trim();
       const imageUrl = postImageLink.value.trim() || null;
