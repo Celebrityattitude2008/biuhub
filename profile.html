@@ -32,6 +32,7 @@
       border: 1px solid var(--border); border-radius: var(--radius); padding: 25px; text-align: center;
     }
 
+    /* Avatar & Image styles */
     .avatar-wrapper { position: relative; width: 100px; height: 100px; margin: 0 auto 15px; }
     .avatar {
       width: 100%; height: 100%; border-radius: 50%;
@@ -54,22 +55,40 @@
     }
     .menu-label { flex: 1; font-weight: 600; font-size: 14px; }
 
-    .upload-zone {
-      border: 2px dashed var(--border); border-radius: 15px; padding: 20px;
-      margin-top: 15px; cursor: pointer; background: rgba(56, 189, 248, 0.02); text-align: center;
+    /* Animated Upload Button */
+    .file-input-label {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      padding: 12px; border-radius: 12px; background: rgba(56, 189, 248, 0.05);
+      border: 1px dashed var(--accent-2); color: var(--accent-2);
+      cursor: pointer; font-weight: 600; transition: all 0.3s ease; margin: 10px 0;
     }
+    .file-input-label:hover { background: rgba(56, 189, 248, 0.15); transform: scale(1.02); }
 
     input, select {
       width: 100%; padding: 12px; border-radius: 12px; margin-top: 5px;
       background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: #fff; outline: none;
     }
 
+    /* Primary Button with Animation */
     .btn {
       width: 100%; padding: 14px; border-radius: 12px; border: none;
       font-weight: 800; cursor: pointer; transition: 0.3s;
       display: flex; align-items: center; justify-content: center; gap: 8px;
     }
-    .btn-primary { background: linear-gradient(90deg, var(--accent), #1d4ed8); color: #fff; }
+    .btn-primary { 
+      background: linear-gradient(90deg, var(--accent), var(--accent-2)); 
+      color: #fff; 
+      box-shadow: 0 4px 15px rgba(56, 189, 248, 0.2);
+      animation: glowPulse 3s infinite;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(56, 189, 248, 0.4); }
+
+    @keyframes glowPulse {
+      0% { box-shadow: 0 0 5px rgba(56, 189, 248, 0.2); }
+      50% { box-shadow: 0 0 20px rgba(56, 189, 248, 0.5); }
+      100% { box-shadow: 0 0 5px rgba(56, 189, 248, 0.2); }
+    }
+
     .btn-danger { background: rgba(244, 63, 94, 0.1); color: var(--danger); border: 1px solid rgba(244, 63, 94, 0.1); margin-top: 20px;}
 
     .section-label { font-size: 11px; font-weight: 800; color: var(--muted); margin: 20px 0 5px 5px; text-transform: uppercase; letter-spacing: 1px; }
@@ -95,18 +114,6 @@
       <div id="verifiedBadge" style="margin-top: 10px;"></div>
     </div>
 
-    <div class="section-label">Media & Verification</div>
-    
-    <div class="profile-card" style="text-align: left;">
-      <div style="font-size: 14px; font-weight: 700; margin-bottom: 5px;">Profile Picture (Google Drive)</div>
-      <div class="upload-zone" onclick="window.open('https://drive.google.com', '_blank')">
-        <span class="material-symbols-rounded" style="color:var(--accent-2)">cloud_upload</span>
-        <span style="font-size: 12px; margin-left: 10px;">1. Upload to Drive & Set to "Anyone with link"</span>
-      </div>
-      <input id="profilePicLink" type="url" placeholder="2. Paste the Share Link here" style="margin-top:10px">
-      <button id="savePicLinkBtn" class="btn btn-primary" style="margin-top:10px; padding: 10px; font-size: 13px;">Update Avatar</button>
-    </div>
-
     <a id="whatsappVerifyLink" href="#" target="_blank" class="menu-item" style="border-color: #25d36633">
       <div class="menu-icon" style="color: #25d366; background: #25d36611;"><span class="material-symbols-rounded">verified</span></div>
       <div class="menu-label">Request Verification</div>
@@ -121,6 +128,17 @@
     </div>
 
     <div id="editForm" class="profile-card" style="display:none; text-align: left;">
+        <label style="font-size:12px; color:var(--accent-2)">Update Profile Image</label>
+        <label for="fileInput" class="file-input-label">
+          <span class="material-symbols-rounded">add_a_photo</span>
+          Choose Photo
+        </label>
+        <input type="file" id="fileInput" accept="image/*" onchange="previewImage()" style="display: none;">
+        
+        <div style="text-align: center;">
+          <img id="imgPreview" src="" style="width:70px; height:70px; border-radius:50%; object-fit:cover; display:none; border:2px solid var(--accent-2); margin: 0 auto 10px;">
+        </div>
+
         <label style="font-size:12px; color:var(--accent-2)">Full Name</label>
         <input id="fullName" type="text" placeholder="Your Name">
         
@@ -132,7 +150,8 @@
             <option value="400">400 Level</option>
             <option value="500">500 Level</option>
         </select>
-        <button id="saveLinksBtn" class="btn btn-primary" style="margin-top:15px">Save Changes</button>
+        
+        <button id="saveChangesBtn" class="btn btn-primary" style="margin-top:15px">Save Changes</button>
     </div>
 
     <button id="signOutBtn" class="btn btn-danger">
@@ -145,7 +164,7 @@
       <span class="material-symbols-rounded">home</span>
       <span>Home</span>
     </a>
-    <a href="archive.html" class="nav-item">
+    <a href="pq.html" class="nav-item">
       <span class="material-symbols-rounded">folder_open</span>
       <span>Archive</span>
     </a>
@@ -176,11 +195,11 @@
     const displayNameEl = document.getElementById('displayName');
     const displayEmailEl = document.getElementById('displayEmail');
     const verifiedBadge = document.getElementById('verifiedBadge');
-    const profilePicLinkInput = document.getElementById('profilePicLink');
     const fullNameInput = document.getElementById('fullName');
     const levelSelect = document.getElementById('levelSelect');
 
-    let currentUser = null; // Store the currently logged in user
+    let currentUser = null; 
+    let base64Image = "";
 
     function toggleEdit() {
       const form = document.getElementById('editForm');
@@ -189,14 +208,28 @@
       form.style.display = isOpen ? 'none' : 'block';
       icon.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
     }
-  
-    function driveViewUrl(url) {
-      if (!url) return null;
-      const match = url.match(/(?:\/d\/|id=)([a-zA-Z0-9_-]+)/);
-      const id = match ? match[1] : null;
-      return id ? `https://drive.google.com/thumbnail?sz=w500&id=${id}` : url;
+
+    function previewImage() {
+      const file = document.getElementById('fileInput').files[0];
+      const reader = new FileReader();
+      const preview = document.getElementById('imgPreview');
+
+      reader.onloadend = function() {
+        base64Image = reader.result; 
+        preview.src = base64Image;
+        preview.style.display = 'block';
+      }
+
+      if (file) {
+        if (file.size > 200000) { 
+          alert("Image too large! Please choose one under 200KB.");
+          document.getElementById('fileInput').value = "";
+          return;
+        }
+        reader.readAsDataURL(file);
+      }
     }
-  
+
     function getInitials(name) {
       if (!name) return 'BI';
       const parts = name.trim().split(' ');
@@ -204,35 +237,29 @@
       return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
     }
   
-    // Listen for changes on the specific user's node
     function loadProfile(user) {
       const userRef = db.ref(`profiles/${user.uid}`);
       
       userRef.on('value', (snapshot) => {
         const data = snapshot.val() || {};
-        
-        // Populate UI elements
         const nameToDisplay = data.fullName || 'Student';
+        
         displayNameEl.textContent = nameToDisplay;
         displayEmailEl.textContent = user.email;
         fullNameInput.value = data.fullName || '';
         levelSelect.value = data.level || '100';
 
-        // Setup WhatsApp Link
         const waMsg = encodeURIComponent(`Hello Admin, I'd like to verify my BIU Hub Profile.\nName: ${nameToDisplay}\nEmail: ${user.email}`);
         document.getElementById('whatsappVerifyLink').href = `https://wa.me/2347041795388?text=${waMsg}`;
     
-        // Handle Avatar
-        if (data.profilePicUrl) {
-          const directUrl = driveViewUrl(data.profilePicUrl);
-          avatarEl.style.backgroundImage = `url('${directUrl}')`;
+        if (data.profilePic) {
+          avatarEl.style.backgroundImage = `url('${data.profilePic}')`;
           initialsEl.textContent = '';
         } else {
           avatarEl.style.backgroundImage = 'none';
           initialsEl.textContent = getInitials(nameToDisplay);
         }
     
-        // Handle Verification Badge
         if (data.verified) {
           verifiedBadge.innerHTML = `<span style="color:var(--accent-2); font-size:12px; font-weight:700;"><span class="material-symbols-rounded" style="font-size:14px; vertical-align:middle">verified</span> Verified Student</span>`;
         } else {
@@ -241,64 +268,50 @@
       });
     }
   
-    // Save Personal Info
-    document.getElementById('saveLinksBtn').addEventListener('click', async () => {
+    // Unified Save Function (Name, Level, and Photo)
+    document.getElementById('saveChangesBtn').addEventListener('click', async () => {
       if (!currentUser) return;
       
-      const updatedName = fullNameInput.value.trim();
-      const updatedLevel = levelSelect.value;
+      const btn = document.getElementById('saveChangesBtn');
+      btn.innerText = "Saving...";
+      btn.disabled = true;
+
+      const updates = {
+        fullName: fullNameInput.value.trim(),
+        level: levelSelect.value,
+      };
+
+      if (base64Image) {
+        updates.profilePic = base64Image;
+      }
 
       try {
-          await db.ref(`profiles/${currentUser.uid}`).update({
-            fullName: updatedName,
-            level: updatedLevel
-          });
+          await db.ref(`profiles/${currentUser.uid}`).update(updates);
           alert('Profile Updated Successfully!');
           toggleEdit();
+          document.getElementById('imgPreview').style.display = 'none';
+          base64Image = ""; 
       } catch (error) {
-          console.error("Update error:", error);
-          alert("Error updating profile. Please try again.");
+          alert("Update error: " + error.message);
+      } finally {
+          btn.innerText = "Save Changes";
+          btn.disabled = false;
       }
     });
   
-    // Save Avatar Link
-    document.getElementById('savePicLinkBtn').addEventListener('click', async () => {
-      if (!currentUser) return;
-      const url = profilePicLinkInput.value.trim();
-      
-      if (!url) {
-          alert('Please paste a link first!');
-          return;
-      }
-
-      try {
-          await db.ref(`profiles/${currentUser.uid}`).update({ profilePicUrl: url });
-          alert('Avatar Updated!');
-          profilePicLinkInput.value = '';
-      } catch (error) {
-          console.error("Avatar update error:", error);
-          alert("Error updating avatar. Please try again.");
-      }
-    });
-  
-    // Sign Out
     document.getElementById('signOutBtn').addEventListener('click', () => {
       if(confirm('Log out of BIU Hub?')) {
           auth.signOut().then(() => {
-              window.location.href = 'index.html'; // Or wherever your login page is
-          }).catch(error => {
-              console.error("Sign out error:", error);
+              window.location.href = 'index.html';
           });
       }
     });
   
-    // Authentication State Observer
     auth.onAuthStateChanged((user) => {
       if (user) {
         currentUser = user;
         loadProfile(user);
       } else {
-        // Redirect to login if not authenticated
         window.location.href = 'login.html'; 
       }
     });
