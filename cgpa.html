@@ -116,8 +116,23 @@
     .nav-item span.material-symbols-rounded { font-size: 24px; }
 
     @media (max-width:980px) { .wrap { grid-template-columns: 1fr; } body { padding-bottom: 120px; } }
-    .fade-in { animation: fadeUp .45s ease-out both; }
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: none; } }
+    @media (max-width: 768px) {
+      .wrap { padding: 10px; }
+      .controls { flex-direction: column; gap: 8px; }
+      select, input { width: 100%; font-size: 14px; }
+      .course-row { flex-direction: column; align-items: stretch; gap: 8px; padding: 12px; }
+      .course-row > div { text-align: center; }
+      .result-grid { grid-template-columns: 1fr; }
+      .result-box { padding: 16px; }
+      .result-val { font-size: 28px; }
+      .predictor { grid-template-columns: 1fr; gap: 8px; }
+      .bottom-nav { padding: 10px 0 20px; }
+      .nav-item span.material-symbols-rounded { font-size: 20px; }
+      .nav-item { font-size: 9px; }
+      .card { padding: 16px; }
+      h1 { font-size: 22px; }
+      .lead { font-size: 13px; }
+    }
   </style>
 </head>
 <body>
@@ -156,7 +171,19 @@
           
           <option value="GST 111|Communication in English|2">GST 111 — Comm. in English (2u)</option>
           <option value="GST 112|Nigerian Peoples|2">GST 112 — Nigerian Peoples & Culture (2u)</option>
-        </select>
+          
+          <option value="MTH 112|Elementary Statistics|2">MTH 112 — Elementary Statistics (2u)</option>
+          <option value="CSC 113|Intro Programming II|3">CSC 113 — Intro Programming II (3u)</option>
+          <option value="ZOO 111|Introductory Zoology|2">ZOO 111 — Introductory Zoology (2u)</option>
+          <option value="CSC 121|Intro to Web Programming|3">CSC 121 — Intro to Web Programming (3u)</option>
+          <option value="MTH 121|Vector and Algebra|2">MTH 121 — Vector and Algebra (2u)</option>
+          <option value="PHY 121|General Physics II|2">PHY 121 — General Physics II (2u)</option>
+          <option value="CHM 123|Chemistry|2">CHM 123 — Chemistry (2u)</option>
+          <option value="BOT 121|Botany|2">BOT 121 — Botany (2u)</option>
+          <option value="CSC 122|Visual Basic|3">CSC 122 — Visual Basic (3u)</option>
+          <option value="GST 121|Use of Library and ICT|2">GST 121 — Use of Library and ICT (2u)</option>
+          <option value="GST 124|Agric or General Knowledge|2">GST 124 — Agric or General Knowledge (2u)</option>
+          <option value="ZOO 121|Zoology|2">ZOO 121 — Zoology (2u)</option>
         
         <input id="unitInput" type="number" placeholder="Unit" style="width:75px" />
         <input id="scoreInput" type="number" placeholder="Score" style="width:85px" />
