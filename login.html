@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>BIU Student Hub</title>
+  <title>BIU Student Hub | Login</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20,400,0,0" rel="stylesheet" />
@@ -22,101 +22,122 @@
       --radius-lg: 24px;
       --radius-md: 16px;
       --radius-sm: 12px;
+      /* Dynamic Glow Variable */
+      --glow-color: var(--accent);
     }
 
     * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
     
     html, body {
-      height: 100%; margin: 0; 
+      min-height: 100vh; margin: 0;
       background-color: var(--bg);
-      background-image: 
+      background-image:
         radial-gradient(circle at 15% 0%, rgba(139, 92, 246, 0.15) 0%, transparent 40%),
         radial-gradient(circle at 85% 100%, rgba(14, 165, 233, 0.1) 0%, transparent 40%);
       color: var(--text);
       display: flex; align-items: center; justify-content: center;
-      overflow: hidden;
+      overflow: auto;
+      -webkit-text-size-adjust: 100%;
     }
 
-    /* Container Logic */
+    /* 1. Container: Clips the rotating light */
     .container {
       position: relative;
       width: 1000px;
       max-width: 95vw;
-      height: 650px;
-      background: rgba(15, 23, 42, 0.6);
+      height: auto;
+      min-height: 520px;
+      max-height: 90vh;
       border-radius: var(--radius-lg);
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-      backdrop-filter: blur(20px);
-      border: 1px solid var(--border);
+      background: transparent;
       overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     }
 
-    /* Form Boxes */
+    /* 2. Pseudo-element background: The rotating beam */
+    .container::before {
+      content: '';
+      position: absolute;
+      width: 150%;
+      height: 150%;
+      background: conic-gradient(transparent, var(--glow-color), transparent 30%);
+      animation: rotate 4s linear infinite;
+      z-index: 0;
+    }
+
+    /* 3. Form Surface: Inset to create the "line" border look */
+    .container-inner {
+      position: absolute;
+      inset: 2px;
+      background: var(--surface);
+      border-radius: inherit;
+      z-index: 1;
+      overflow: hidden;
+      backdrop-filter: blur(20px);
+    }
+
+    /* Shake Animation */
+    @keyframes shake {
+      10%, 90% { transform: translate3d(-1px, 0, 0); }
+      20%, 80% { transform: translate3d(2px, 0, 0); }
+      30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+      40%, 60% { transform: translate3d(4px, 0, 0); }
+    }
+    .apply-shake { animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both; }
+
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* Form Layouts */
     .form-box {
       position: absolute;
       top: 0;
       height: 100%;
-      transition: all 0.6s ease-in-out;
+      transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
       padding: 40px;
       display: flex;
       flex-direction: column;
       justify-content: center;
+      z-index: 2;
     }
 
-    .login-section { left: 0; width: 50%; z-index: 2; }
-    .signup-section { left: 0; width: 50%; opacity: 0; z-index: 1; }
-
-    /* Movement when Active */
-    .container.active .login-section { transform: translateX(100%); opacity: 0; z-index: 1; }
-    .container.active .signup-section { transform: translateX(100%); opacity: 1; z-index: 2; }
-
-    /* The Moving Overlay (Hero Side) */
-    .overlay-container {
+    .login-section, .signup-section {
+      width: 100%;
       position: absolute;
       top: 0;
-      left: 50%;
-      width: 50%;
-      height: 100%;
-      overflow: hidden;
-      transition: transform 0.6s ease-in-out;
-      z-index: 100;
-      border-left: 1px solid var(--border);
+      left: 0;
+      opacity: 0;
+      transform: translateX(100%);
+      pointer-events: none;
+      transition: transform 0.6s ease, opacity 0.6s ease;
     }
 
-    .container.active .overlay-container { transform: translateX(-100%); border-left: none; border-right: 1px solid var(--border); }
-
-    .overlay {
-      background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(15, 23, 42, 0.9) 100%);
-      height: 100%;
-      width: 200%;
+    .login-section {
+      opacity: 1;
       transform: translateX(0);
-      transition: transform 0.6s ease-in-out;
-      display: flex;
+      pointer-events: auto;
     }
 
-    .container.active .overlay { transform: translateX(50%); }
-
-    .overlay-panel {
-      position: absolute;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      padding: 0 40px;
-      text-align: center;
-      top: 0;
-      height: 100%;
-      width: 50%;
-      transition: transform 0.6s ease-in-out;
+    .container.active .login-section {
+      opacity: 0;
+      transform: translateX(-100%);
+      pointer-events: none;
     }
 
-    .overlay-left { transform: translateX(-20%); } /* Text for Login view */
-    .container.active .overlay-left { transform: translateX(0); }
+    .container.active .signup-section {
+      opacity: 1;
+      transform: translateX(0);
+      pointer-events: auto;
+    }
 
-    .overlay-right { right: 0; transform: translateX(0); } /* Text for Signup view */
-    .container.active .overlay-right { transform: translateX(20%); }
+    /* Clicking "Create Account" now slides the signup form in from the right. */
 
-    /* BIU Styling Elements */
+    /* Components */
     .logo-box {
       width: 56px; height: 56px; border-radius: var(--radius-sm);
       background: linear-gradient(135deg, var(--accent), var(--accent-2));
@@ -126,176 +147,211 @@
       margin-bottom: 20px;
     }
 
-    h1 { font-size: 28px; font-weight: 800; margin: 0 0 10px; letter-spacing: -1px; }
-    .lead { color: var(--muted); font-size: 15px; margin-bottom: 25px; line-height: 1.5; }
+    /* How your logic looks in practice */
+.card {
+  position: relative;
+  overflow: hidden; /* Your point 1 */
+}
 
-    .input-group { margin-bottom: 15px; text-align: left; }
-    label { font-size: 12px; font-weight: 600; color: var(--muted); display: block; margin-bottom: 6px; }
+.card::before {
+  content: '';
+  position: absolute;
+  width: 150%; height: 150%;
+  background: conic-gradient(transparent, var(--accent), transparent); /* Your point 2 */
+  animation: rotate 4s linear infinite;
+}
+
+.form-content {
+  position: absolute;
+  inset: 3px; /* Your point 3 */
+  background: var(--surface);
+  border-radius: inherit;
+  z-index: 1;
+}
+
+input {
+  background: transparent; /* Your point 4 */
+  backdrop-filter: blur(5px); /* Adds that premium glass feel */
+}
+
+label {
+  pointer-events: none; /* Your point 5 */
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+    h1 {
+      font-family: 'Lobster Two', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      font-size: 34px;
+      font-weight: 900;
+      margin: 0 0 12px;
+      letter-spacing: -0.8px;
+      text-transform: uppercase;
+      line-height: 1.1;
+    }
+    .lead { color: var(--muted); font-size: 14px; margin-bottom: 25px; line-height: 1.5; }
+
+    .input-group { margin-bottom: 18px; text-align: left; position: relative; }
     
+    /* Labels: Click-through */
+    label { 
+      font-size: 11px; font-weight: 700; color: var(--muted); 
+      display: block; margin-bottom: 8px; text-transform: uppercase;
+      pointer-events: none; 
+    }
+    
+    /* Transparent Inputs */
     input, select {
-      width: 100%; padding: 12px; border-radius: var(--radius-sm);
-      border: 1px solid var(--border); background: rgba(0, 0, 0, 0.3);
+      width: 100%; padding: 12px 16px; border-radius: var(--radius-sm);
+      border: 1px solid var(--border); background: transparent;
       color: white; font-size: 14px; outline: none; transition: 0.2s;
     }
-    input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1); }
+    input:focus { border-color: var(--accent); background: rgba(255,255,255,0.03); }
 
     .btn {
       width: 100%; padding: 14px; border-radius: var(--radius-sm); border: none;
       background: linear-gradient(135deg, var(--accent), var(--accent-2));
       color: white; font-weight: 700; cursor: pointer; transition: 0.3s;
     }
-    .btn:hover { transform: translateY(-2px); filter: brightness(1.1); }
+    .btn:hover { transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3); }
+    .btn:active { transform: scale(0.98); }
     .btn.ghost { background: transparent; border: 1px solid var(--accent); color: var(--text); }
 
-    .divider { display: flex; align-items: center; color: var(--muted); font-size: 11px; margin: 15px 0; }
+    .toggle-link {
+      color: var(--accent-2);
+      font-weight: 700;
+      text-decoration: none;
+      position: relative;
+      transition: color 0.2s ease;
+    }
+    .toggle-link::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      bottom: -2px;
+      width: 0;
+      height: 2px;
+      background: var(--accent-2);
+      transition: width 0.25s ease;
+    }
+    .toggle-link:hover {
+      color: rgba(56, 189, 248, 1);
+    }
+    .toggle-link:hover::after {
+      width: 100%;
+    }
+
+    .divider { display: flex; align-items: center; color: var(--muted); font-size: 11px; margin: 20px 0; }
     .divider::before, .divider::after { content: ''; flex: 1; border-bottom: 1px solid var(--border); margin: 0 10px; }
 
     .google-btn {
-      width: 100%; padding: 12px; border-radius: var(--radius-sm); border: none;
-      background: white; color: #0f172a; font-weight: 700; display: flex; 
-      align-items: center; justify-content: center; gap: 10px; cursor: pointer;
+      width: 100%; padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--border);
+      background: rgba(255,255,255,0.05); color: white; font-weight: 600; 
+      display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer; transition: 0.2s;
     }
-
-    .features { display: flex; gap: 8px; justify-content: center; margin-top: 20px; }
-    .chip {
-      background: rgba(255, 255, 255, 0.04); padding: 8px 12px; border-radius: 100px;
-      font-size: 11px; font-weight: 600; border: 1px solid var(--border);
-      display: flex; align-items: center; gap: 5px;
-    }
+    .google-btn:hover { background: rgba(255,255,255,0.1); }
 
     .pay-box {
       margin-top: 15px; padding: 12px; border-radius: var(--radius-md);
       background: rgba(139, 92, 246, 0.05); border: 1px dashed rgba(139, 92, 246, 0.3);
     }
-    .pay-instructions { display: none; font-size: 12px; color: var(--muted); margin-top: 8px; }
-    .pay-instructions.show { display: block; }
 
-    @media (max-width: 100px) {
+    @media (max-width: 68px) {
       .container { height: auto; min-height: 100vh; width: 100%; border-radius: 0; }
-      .overlay-container { display: none; }
-      .form-box { width: 100%; position: relative; opacity: 1 !important; transform: none !important; }
-      .signup-section { display: none; }
-      .container.active .signup-section { display: flex; }
-      .container.active .login-section { display: none; }
+      .form-box {
+        width: 100%; position: relative; opacity: 1 !important; transform: none !important;
+        padding: 32px 24px;
+      }
+      input, select { font-size: 16px; }
+      .btn { padding: 14px; }
     }
   </style>
 </head>
 <body>
 
   <div class="container" id="container">
+    <div class="container-inner" id="inner-container">
     
-    <section class="form-box signup-section">
-      <form id="signupForm">
-        <h1>Create Account</h1>
-        <p class="lead" style="margin-bottom: 15px;">Join the student hub today.</p>
-        
-        <div class="input-group">
-          <label>Full Name</label>
-          <input type="text" id="regName" placeholder="John Doe" required>
-        </div>
-        <div class="input-group">
-          <label>School Email</label>
-          <input type="email" id="regEmail" placeholder="you@students.biu.edu.ng" required>
-        </div>
-        
-        <div style="display: grid; grid-template-columns: 1fr 100px; gap: 10px;">
+      <section class="form-box signup-section">
+        <form id="signupForm">
+          <h1>Join the Hub</h1>
+          <p class="lead">Start your digital journey at BIU.</p>
+          
+          <div class="input-group">
+            <label>Full Name</label>
+            <input type="text" id="regName" placeholder="John Doe" required>
+          </div>
+          <div class="input-group">
+            <label>School Email</label>
+            <input type="email" id="regEmail" placeholder="you@students.biu.edu.ng" required>
+          </div>
+          
+          <div style="display: grid; grid-template-columns: 1fr 100px; gap: 10px;">
+            <div class="input-group">
+              <label>Password</label>
+              <input type="password" id="regPass" placeholder="••••••••" required>
+            </div>
+            <div class="input-group">
+              <label>Level</label>
+              <select id="regLevel">
+                <option>100L</option><option>200L</option><option>300L</option><option>400L</option>
+              </select>
+            </div>
+          </div>
+
+          <button type="submit" class="btn" id="regBtn">Create Account</button>
+          
+          <div class="divider">OR</div>
+          
+          <button type="button" class="google-btn googleAuth">
+            <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+            Continue with Google
+          </button>
+
+          <p style="font-size: 13px; margin-top: 20px; text-align: center; color: var(--muted);">
+            Already have an account? <a href="#" id="toLogin" class="toggle-link">Login</a>
+          </p>
+        </form>
+      </section>
+
+      <section class="form-box login-section">
+        <form id="loginForm">
+          <h1>Welcome Back</h1>
+          <p class="lead">Connect to your student dashboard.</p>
+          
+          <div class="input-group">
+            <label>Email Address</label>
+            <input type="email" id="logEmail" placeholder="you@students.biu.edu.ng" required>
+          </div>
           <div class="input-group">
             <label>Password</label>
-            <input type="password" id="regPass" placeholder="••••••••" required>
+            <input type="password" id="logPass" placeholder="••••••••" required>
           </div>
-          <div class="input-group">
-            <label>Level</label>
-            <select id="regLevel">
-              <option>100L</option><option>200L</option><option>300L</option><option>400L</option>
-            </select>
-          </div>
-        </div>
 
-        <button type="submit" class="btn" id="regBtn">Sign Up</button>
-        <div class="divider">OR</div>
-        <button type="button" class="google-btn" id="googleSignupBtn">
-          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-          Google
-        </button>
-        
-        <div class="pay-box">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 11px; font-weight: 700;">Verified Badge (Optional)</span>
-            <button type="button" class="btn ghost" id="showPay" style="width: auto; padding: 4px 8px; font-size: 10px;">₦1,000</button>
-          </div>
-          <div id="payInstructions" class="pay-instructions">
-            7041795388 • Opay • Paul Adamu
-          </div>
-        </div>
-        <p style="font-size: 13px; margin-top: 15px; text-align: center; color: var(--muted);">
-          Already have an account? <a href="#" id="toLogin" style="color: var(--accent-2); text-decoration: none; font-weight: 700;">Login</a>
-        </p>
-      </form>
-    </section>
+          <button type="submit" class="btn" id="logBtn">Sign In</button>
+          
+          <div class="divider">OR</div>
+          
+          <button type="button" class="google-btn googleAuth">
+            <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+            Sign in with Google
+          </button>
+          
+          <p style="font-size: 13px; margin-top: 30px; text-align: center; color: var(--muted);">
+            New student? <a href="#" id="toSignup" class="toggle-link">Create Account</a>
+          </p>
+        </form>
+      </section>
 
-    <section class="form-box login-section">
-      <form id="loginForm">
-        <h1>Welcome Back</h1>
-        <p class="lead">Log in to your student dashboard.</p>
-        
-        <div class="input-group">
-          <label>Email Address</label>
-          <input type="email" id="logEmail" placeholder="you@students.biu.edu.ng" required>
-        </div>
-        <div class="input-group">
-          <label>Password</label>
-          <input type="password" id="logPass" placeholder="••••••••" required>
-        </div>
-
-        <button type="submit" class="btn" id="logBtn">Sign In</button>
-        <div class="divider">OR</div>
-        <button type="button" class="google-btn" id="googleBtn">
-          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-          Google
-        </button>
-        
-        <p style="font-size: 13px; margin-top: 20px; text-align: center; color: var(--muted);">
-          New here? <a href="#" id="toSignup" style="color: var(--accent-2); text-decoration: none; font-weight: 700;">Create Account</a>
-        </p>
-      </form>
-    </section>
-
-    <div class="overlay-container">
-      <div class="overlay">
-        <div class="overlay-panel overlay-left">
-          <div class="logo-box">BIU</div>
-          <h1>Student Hub</h1>
-          <p class="lead">Connect with Benson Idahosa University's digital campus.</p>
-          <div class="features">
-            <div class="chip"><span class="material-symbols-rounded" style="font-size: 14px;">auto_stories</span> Books</div>
-            <div class="chip"><span class="material-symbols-rounded" style="font-size: 14px;">groups</span> Community</div>
-          </div>
-        </div>
-        <div class="overlay-panel overlay-right">
-          <div class="logo-box">BIU</div>
-          <h1>Welcome Back!</h1>
-          <p class="lead">Your academic journey continues here. Log in to access your resources.</p>
-          <button class="btn ghost" id="mobileToggle" style="width: 150px;">Learn More</button>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    </div> </div> <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
   <script>
-    // 1. UI Toggle Logic
-    const container = document.getElementById('container');
-    const toSignup = document.getElementById('toSignup');
-    const toLogin = document.getElementById('toLogin');
-
-    toSignup.addEventListener('click', () => container.classList.add('active'));
-    toLogin.addEventListener('click', () => container.classList.remove('active'));
-
-    // 2. Firebase Config (Using your credentials)
+    // 1. Firebase Configuration
     const firebaseConfig = {
       apiKey: "AIzaSyBsVbLw4mvFTJhmORUXCUNyGc98Rripj3M",
       authDomain: "biu-students-hub.firebaseapp.com",
@@ -307,11 +363,41 @@
     const auth = firebase.auth();
     const db = firebase.database();
 
-    // 3. Signup Logic
+    // 2. UI Elements
+    const container = document.getElementById('container');
+    const toSignup = document.getElementById('toSignup');
+    const toLogin = document.getElementById('toLogin');
+    const logEmail = document.getElementById('logEmail');
+    const regEmail = document.getElementById('regEmail');
+
+    // 3. Toggle Logic
+    toSignup.addEventListener('click', (e) => { e.preventDefault(); container.classList.add('active'); });
+    toLogin.addEventListener('click', (e) => { e.preventDefault(); container.classList.remove('active'); });
+
+    // 4. Live Validation Glow
+    const validateEmail = (input) => {
+      input.addEventListener('input', () => {
+        if (input.value.length > 0 && !input.checkValidity()) {
+          container.style.setProperty('--glow-color', 'var(--danger)');
+        } else {
+          container.style.setProperty('--glow-color', 'var(--accent)');
+        }
+      });
+    };
+    validateEmail(logEmail);
+    validateEmail(regEmail);
+
+    // 5. Signup Logic
     document.getElementById('signupForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = document.getElementById('regBtn');
-      btn.disabled = true; btn.textContent = "Processing...";
+      
+      if (!e.target.checkValidity()) {
+        triggerError();
+        return;
+      }
+
+      btn.disabled = true; btn.textContent = "Creating Account...";
       
       try {
         const cred = await auth.createUserWithEmailAndPassword(
@@ -325,14 +411,24 @@
           verified: false,
           createdAt: Date.now()
         });
-        window.location.href = '/index.html';
-      } catch (err) { alert(err.message); btn.disabled = false; btn.textContent = "Sign Up"; }
+        window.location.href = 'index.html';
+      } catch (err) { 
+        alert(err.message); 
+        triggerError();
+        btn.disabled = false; btn.textContent = "Create Account"; 
+      }
     });
 
-    // 4. Login Logic
+    // 6. Login Logic
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       const btn = document.getElementById('logBtn');
+
+      if (!e.target.checkValidity()) {
+        triggerError();
+        return;
+      }
+
       btn.disabled = true; btn.textContent = "Verifying...";
       
       try {
@@ -340,43 +436,54 @@
           document.getElementById('logEmail').value, 
           document.getElementById('logPass').value
         );
-        window.location.href = '/index.html';
-      } catch (err) { alert(err.message); btn.disabled = false; btn.textContent = "Sign In"; }
+        window.location.href = 'index.html';
+      } catch (err) { 
+        alert(err.message); 
+        triggerError();
+        btn.disabled = false; btn.textContent = "Sign In"; 
+      }
     });
 
-    // 5. Google Sign-in (used by both login & signup forms)
-    async function googleSignIn(btnElement) {
+    // 7. Google Auth Logic
+    async function googleSignIn() {
       const provider = new firebase.auth.GoogleAuthProvider();
-      btnElement.disabled = true;
       try {
         const result = await auth.signInWithPopup(provider);
         const user = result.user;
-        // create profile if first-time
         const profileRef = db.ref('profiles/' + user.uid);
         const snap = await profileRef.once('value');
+        
         if (!snap.exists()) {
           await profileRef.set({
-            fullName: user.displayName || '',
+            fullName: user.displayName || 'BIU Student',
             email: user.email,
-            level: '',
+            level: '100L',
             verified: false,
             createdAt: Date.now()
           });
         }
-        window.location.href = '/index.html';
+        window.location.href = 'index.html';
       } catch (err) {
         alert(err.message);
-        console.error('Google sign-in error', err);
-      } finally {
-        btnElement.disabled = false;
+        triggerError();
       }
     }
 
-    document.querySelectorAll('.google-btn').forEach(btn => {
-      btn.addEventListener('click', () => googleSignIn(btn));
+    document.querySelectorAll('.googleAuth').forEach(btn => {
+      btn.addEventListener('click', googleSignIn);
     });
 
-    // 6. Payment Toggle
+    // Helper: Trigger Shake & Red Glow
+    function triggerError() {
+      container.classList.add('apply-shake');
+      container.style.setProperty('--glow-color', 'var(--danger)');
+      setTimeout(() => {
+        container.classList.remove('apply-shake');
+        container.style.setProperty('--glow-color', 'var(--accent)');
+      }, 500);
+    }
+
+    // 8. Payment Toggle
     document.getElementById('showPay').addEventListener('click', () => {
       document.getElementById('payInstructions').classList.toggle('show');
     });
