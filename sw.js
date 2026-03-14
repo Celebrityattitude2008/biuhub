@@ -2,7 +2,12 @@ importScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js'
 importScripts('https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js');
 
 firebase.initializeApp({
-  // Your config
+  apiKey: "AIzaSyBsVbLw4mvFTJhmORUXCUNyGc98Rripj3M",
+  authDomain: "biu-students-hub.firebaseapp.com",
+  projectId: "biu-students-hub",
+  storageBucket: "biu-students-hub.firebasestorage.app",
+  messagingSenderId: "128818531382",
+  appId: "1:128818531382:web:190dc5688d1b9d21321c97"
 });
 
 const messaging = firebase.messaging();

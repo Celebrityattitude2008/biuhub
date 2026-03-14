@@ -278,7 +278,8 @@ async function requestNotificationPermission() {
     const permission = await Notification.requestPermission();
     if (permission === 'granted') {
       const token = await messaging.getToken({ vapidKey: 'BFTHXlc4l3ViDCwQ59CDq6RQMRlvAomu4H_YMKSkuQNcIaweIupjq5IcLWkT4IgYI5D75Qp3mViqpYK6mgIWnAM' }); // Get from Firebase Console
-      // Save token to user's profile: db.ref(`profiles/${user.uid}/fcmToken`).set(token);
+      // Save token to user's profile
+      db.ref(`profiles/${currentUser.uid}/fcmToken`).set(token);
       console.log('FCM Token:', token);
     }
   } catch (error) {
@@ -306,6 +307,26 @@ messaging.onMessage((payload) => {
     let eventsData = {}; 
     const colorMap = { 'assignment': 'var(--evt-assignment)', 'exam': 'var(--evt-exam)', 'personal': 'var(--evt-personal)' };
 
+    const defaultEvents = [
+      {date: '2025-09-09', title: 'Staff Orientation for 2025/2026 Session', type: 'personal', time: '09:00'},
+      {date: '2025-09-11', title: 'Founder\'s Day', type: 'personal', time: '09:00'},
+      {date: '2025-09-22', title: 'Resumption for First Semester 2025/2026', type: 'personal', time: '09:00'},
+      {date: '2025-10-05', title: 'Resumption for Fresh Students', type: 'personal', time: '09:00'},
+      {date: '2025-10-12', title: 'Resumption for Returning Students / Commencement of Lectures', type: 'personal', time: '09:00'},
+      {date: '2025-12-14', title: 'Students Proceed on Christmas Break', type: 'personal', time: '09:00'},
+      {date: '2026-01-05', title: 'Students Resume from Christmas Break', type: 'personal', time: '09:00'},
+      {date: '2026-01-27', title: 'First Semester Examination Begins', type: 'exam', time: '09:00'},
+      {date: '2026-02-15', title: 'Students Proceed on First Semester Break', type: 'personal', time: '09:00'},
+      {date: '2026-03-02', title: 'Resumption for Second Semester', type: 'personal', time: '09:00'},
+      {date: '2026-03-03', title: 'Registration/Commencement of Lectures for Second Semester', type: 'personal', time: '09:00'},
+      {date: '2026-03-10', title: 'Mission\'s Week Begins', type: 'personal', time: '09:00'},
+      {date: '2026-04-14', title: 'JAM Summit/Easter Break Begins', type: 'personal', time: '09:00'},
+      {date: '2026-04-22', title: 'Resumption from Easter Break', type: 'personal', time: '09:00'},
+      {date: '2026-05-26', title: 'Revision Week Begins', type: 'exam', time: '09:00'},
+      {date: '2026-06-02', title: 'Second Semester Examination Begins', type: 'exam', time: '09:00'},
+      {date: '2026-06-21', title: 'Students Proceed on End of Session Vacation', type: 'personal', time: '09:00'}
+    ];
+
     auth.onAuthStateChanged(user => {
       if (!user) { window.location.href = '/login.html'; } 
       else { 
@@ -315,33 +336,34 @@ messaging.onMessage((payload) => {
         if ("Notification" in window && Notification.permission === "default") {
           Notification.requestPermission();
         }
-      }
-    });
 
+        // Background Monitor - Check every 30 seconds for better accuracy
+        setInterval(() => {
+          if (!currentUser) return;
+          
+          const now = new Date();
+          const dateKey = formatDateStr(now.getFullYear(), now.getMonth(), now.getDate());
+          const hours = now.getHours().toString().padStart(2, '0');
+          const minutes = now.getMinutes().toString().padStart(2, '0');
+          const currentTime = `${hours}:${minutes}`;
 
-    // Background Monitor - Check every 30 seconds for better accuracy
-    setInterval(() => {
-      if (!currentUser) return;
-      
-      const now = new Date();
-      const dateKey = formatDateStr(now.getFullYear(), now.getMonth(), now.getDate());
-      const hours = now.getHours().toString().padStart(2, '0');
-      const minutes = now.getMinutes().toString().padStart(2, '0');
-      const currentTime = `${hours}:${minutes}`;
+          console.log(`Checking reminders at ${currentTime} for date ${dateKey}`);
 
-      if (eventsData[dateKey]) {
-        Object.entries(eventsData[dateKey]).forEach(([id, evt]) => {
-          if (evt.time === currentTime && !evt.notified) {
-            console.log(`📅 Notification triggered for: ${evt.title}`);
-            triggerSystemNotification(evt.title, formatAMPM(evt.time));
-            // Mark event as notified
-            db.ref(`profiles/${currentUser.uid}/schedule/${dateKey}/${id}`).update({ notified: true }).catch(err => {
-              console.error('Failed to update notification status:', err);
+          if (eventsData[dateKey]) {
+            Object.entries(eventsData[dateKey]).forEach(([id, evt]) => {
+              if (evt.time === currentTime && !evt.notified) {
+                console.log(`📅 Notification triggered for: ${evt.title}`);
+                triggerSystemNotification(evt.title, formatAMPM(evt.time));
+                // Mark event as notified
+                db.ref(`profiles/${currentUser.uid}/schedule/${dateKey}/${id}`).update({ notified: true }).catch(err => {
+                  console.error('Failed to update notification status:', err);
+                });
+              }
             });
           }
-        });
+        }, 30000);
       }
-    }, 30000);
+    });
 
     function triggerSystemNotification(title, time) {
       if ("Notification" in window && Notification.permission === "granted") {
@@ -349,7 +371,7 @@ messaging.onMessage((payload) => {
           .then(reg => {
             reg.showNotification("⏰ Schedule Reminder", {
               body: `${title} at ${time}`,
-              icon: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%230017e4'><path d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z'/></svg>",
+              icon: "/icon.png",
               vibrate: [200, 100, 200, 100, 200],
               tag: 'task-alert',
               requireInteraction: true
@@ -416,9 +438,30 @@ messaging.onMessage((payload) => {
       const ref = db.ref(`profiles/${currentUser.uid}/schedule`);
       ref.on('value', (snapshot) => {
         eventsData = snapshot.val() || {};
+        addDefaultEvents();
         renderCalendar();
         selectDate(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
       });
+    }
+
+    async function addDefaultEvents() {
+      for (const evt of defaultEvents) {
+        const dateEvents = eventsData[evt.date];
+        if (!dateEvents || !Object.values(dateEvents).some(e => e.title === evt.title)) {
+          try {
+            await db.ref(`profiles/${currentUser.uid}/schedule/${evt.date}`).push({
+              title: evt.title,
+              time: evt.time,
+              type: evt.type,
+              notified: false,
+              createdAt: Date.now()
+            });
+            console.log(`✅ Default event added: ${evt.title} on ${evt.date}`);
+          } catch (err) {
+            console.error('Failed to add default event:', err);
+          }
+        }
+      }
     }
 
     function renderEventsList() {
