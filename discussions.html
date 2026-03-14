@@ -217,11 +217,9 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js"></script>
 
   <script>
-    /* KEEPING YOUR EXISTING FIREBASE LOGIC UNTOUCHED 
-       (I only updated the renderPost function slightly to match the new CSS classes)
-    */
     const firebaseConfig = {
       apiKey: "AIzaSyBsVbLw4mvFTJhmORUXCUNyGc98Rripj3M",
       authDomain: "biu-students-hub.firebaseapp.com",
@@ -260,7 +258,7 @@
     }
 
     function openProfile(uid){
-      window.location.href = `/profile.html?uid=${uid}`;
+      window.location.href = `/viewprofile.html?uid=${uid}`;
     }
 
     function renderPost(post){
@@ -370,22 +368,12 @@
         const div = document.createElement('div');
         div.className = 'contrib-item';
         div.innerHTML = `
-          <a href="/profile.html?uid=${uid}" target="_blank" class="author" style="font-size:13px">${uid.substring(0,8)}...</a>
+          <a href="/viewprofile.html?uid=${uid}" target="_blank" class="author" style="font-size:13px">${uid.substring(0,8)}...</a>
           <span class="small">${cnt} posts</span>
         `;
         topContrib.appendChild(div);
       });
     }
-
-    db.ref(`profiles/${uid}`).once('value', (snap) => {
-   const data = snap.val();
-   if (data && data.profilePic) {
-      document.getElementById('navProfileImg').src = data.profilePic;
-   } else {
-      // Default avatar if no pic exists
-      document.getElementById('navProfileImg').src = "default-avatar.png";
-   }
-});
 
     postBtn.addEventListener('click', async () => {
       const text = postText.value.trim();
@@ -399,7 +387,7 @@
         const payload = {
           authorUid: currentUser.uid,
           authorName: prof.fullName || currentUser.displayName || currentUser.email.split('@')[0],
-          authorProfilePicUrl: prof.profilePicUrl || null,
+          authorProfilePicUrl: prof.profilePic || null,
           authorVerified: !!prof.verified,
           text, imageUrl,
           createdAt: firebase.database.ServerValue.TIMESTAMP
@@ -408,10 +396,13 @@
         postText.value = '';
         postImageLink.value = '';
         await loadPosts();
+        postStatus.textContent = 'Posted!';
+      } catch (error) {
+        postStatus.textContent = 'Failed: ' + error.message;
+        console.error('Post error:', error);
       } finally {
         postBtn.disabled = false;
-        postStatus.textContent = 'Sent.';
-        setTimeout(()=> postStatus.textContent = '', 2000);
+        setTimeout(() => postStatus.textContent = '', 3000);
       }
     });
 
@@ -431,6 +422,33 @@
         postBtn.disabled = true;
         signInBtn.style.display = '';
       }
+    });
+
+    // Client-side notifications
+    async function requestNotificationPermission() {
+      if ('Notification' in window) {
+        const permission = await Notification.requestPermission();
+        if (permission === 'granted') {
+          console.log('Notifications enabled');
+        }
+      }
+    }
+
+    function showNotification(title, body) {
+      if (Notification.permission === 'granted') {
+        new Notification(title, { body, icon: '/icon.png' });
+      }
+    }
+
+    // Listen for broadcasts
+    db.ref('broadcasts').on('child_added', (snap) => {
+      const broadcast = snap.val();
+      showNotification('BIU Hub Broadcast', broadcast.message);
+      // Add to UI
+      const el = document.createElement('div');
+      el.className = 'post';
+      el.innerHTML = `<strong>Broadcast:</strong> ${broadcast.message}`;
+      discussionList.insertBefore(el, discussionList.firstChild);
     });
 
     loadPosts();

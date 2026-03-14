@@ -448,8 +448,39 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js"></script>
 
   <script>
+
+const messaging = firebase.messaging();
+
+// Request permission and get token
+async function requestNotificationPermission() {
+  try {
+    const permission = await Notification.requestPermission();
+    if (permission === 'granted') {
+      const token = await messaging.getToken({ vapidKey: 'BFTHXlc4l3ViDCwQ59CDq6RQMRlvAomu4H_YMKSkuQNcIaweIupjq5IcLWkT4IgYI5D75Qp3mViqpYK6mgIWnAM' }); // Get from Firebase Console
+      // Save token to user's profile: db.ref(`profiles/${user.uid}/fcmToken`).set(token);
+      console.log('FCM Token:', token);
+    }
+  } catch (error) {
+    console.error('Notification permission denied:', error);
+  }
+}
+
+// Call on user sign-in
+auth.onAuthStateChanged(user => {
+  if (user) requestNotificationPermission();
+});
+
+// Handle incoming messages
+messaging.onMessage((payload) => {
+  console.log('Message received:', payload);
+  new Notification(payload.notification.title, {
+    body: payload.notification.body,
+    icon: '/icon.png' // Add an icon
+  });
+});
     // --- Theme Logic ---
     function initTheme() {
       const savedTheme = localStorage.getItem('theme') || 'light';

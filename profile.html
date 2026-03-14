@@ -112,6 +112,9 @@
       <div id="displayName" style="font-size: 20px; font-weight: 800;">Loading...</div>
       <div id="displayEmail" style="color: var(--muted); font-size: 13px;">...</div>
       <div id="verifiedBadge" style="margin-top: 10px;"></div>
+      <button id="shareProfileBtn" class="btn btn-primary" style="margin-top:15px; width:auto; padding:10px 20px;">
+        <span class="material-symbols-rounded">share</span> Share Profile
+      </button>
     </div>
 
     <a id="whatsappVerifyLink" href="#" target="_blank" class="menu-item" style="border-color: #25d36633">
@@ -312,12 +315,14 @@
       }
     });
   
-    document.getElementById('signOutBtn').addEventListener('click', () => {
-      if(confirm('Log out of BIU Hub?')) {
-          auth.signOut().then(() => {
-              window.location.href = 'index.html';
-          });
-      }
+    document.getElementById('shareProfileBtn').addEventListener('click', () => {
+      if (!currentUser) return;
+      const url = `${window.location.origin}/viewprofile.html?uid=${currentUser.uid}`;
+      navigator.clipboard.writeText(url).then(() => {
+        alert('Profile link copied to clipboard!');
+      }).catch(() => {
+        alert('Copy this link: ' + url);
+      });
     });
   
     auth.onAuthStateChanged((user) => {
