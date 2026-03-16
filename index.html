@@ -355,9 +355,9 @@
       </div>
       <span class="feature-label">Support</span>
     </a>
-    <a href="/privacy.html" class="feature-item">
-      <div class="feature-icon-wrapper"><span class="material-symbols-rounded icon-pay">privacy_tip</span></div>
-      <span class="feature-label">Privacy Policy</span>
+    <a href="/hall.html" class="feature-item">
+      <div class="feature-icon-wrapper"><span class="material-symbols-rounded icon-pay">trophy</span></div>
+      <span class="feature-label">Hall of Fame</span>
     </a>
   </div>
 
@@ -451,36 +451,6 @@
   <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-messaging-compat.js"></script>
 
   <script>
-
-const messaging = firebase.messaging();
-
-// Request permission and get token
-async function requestNotificationPermission() {
-  try {
-    const permission = await Notification.requestPermission();
-    if (permission === 'granted') {
-      const token = await messaging.getToken({ vapidKey: 'BFTHXlc4l3ViDCwQ59CDq6RQMRlvAomu4H_YMKSkuQNcIaweIupjq5IcLWkT4IgYI5D75Qp3mViqpYK6mgIWnAM' }); // Get from Firebase Console
-      // Save token to user's profile: db.ref(`profiles/${user.uid}/fcmToken`).set(token);
-      console.log('FCM Token:', token);
-    }
-  } catch (error) {
-    console.error('Notification permission denied:', error);
-  }
-}
-
-// Call on user sign-in
-auth.onAuthStateChanged(user => {
-  if (user) requestNotificationPermission();
-});
-
-// Handle incoming messages
-messaging.onMessage((payload) => {
-  console.log('Message received:', payload);
-  new Notification(payload.notification.title, {
-    body: payload.notification.body,
-    icon: '/icon.png' // Add an icon
-  });
-});
     // --- Theme Logic ---
     function initTheme() {
       const savedTheme = localStorage.getItem('theme') || 'light';
@@ -509,6 +479,7 @@ messaging.onMessage((payload) => {
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
     const db = firebase.database();
+    const messaging = firebase.messaging();
 
     let currentUser = null;
 
@@ -526,6 +497,34 @@ messaging.onMessage((payload) => {
         loadSavedCGPA();
       }
     });
+
+    // Request permission and get token
+async function requestNotificationPermission() {
+  try {
+    const permission = await Notification.requestPermission();
+    if (permission === 'granted') {
+      const token = await messaging.getToken({ vapidKey: 'BFTHXlc4l3ViDCwQ59CDq6RQMRlvAomu4H_YMKSkuQNcIaweIupjq5IcLWkT4IgYI5D75Qp3mViqpYK6mgIWnAM' }); // Get from Firebase Console
+      // Save token to user's profile: db.ref(`profiles/${user.uid}/fcmToken`).set(token);
+      console.log('FCM Token:', token);
+    }
+  } catch (error) {
+    console.error('Notification permission denied:', error);
+  }
+}
+
+// Call on user sign-in
+auth.onAuthStateChanged(user => {
+  if (user) requestNotificationPermission();
+});
+
+// Handle incoming messages
+messaging.onMessage((payload) => {
+  console.log('Message received:', payload);
+  new Notification(payload.notification.title, {
+    body: payload.notification.body,
+    icon: '/icon.png' // Add an icon
+  });
+});
 
     // --- Modal Explorer Logic ---
     function openArchiveModal() { document.getElementById('archiveModal').style.display = 'flex'; }
