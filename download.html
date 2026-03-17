@@ -627,20 +627,15 @@
     });
   }
 
-    // Save apps to Firebase
-    function saveAppsData() {
-      const appsData = {};
-      apps.forEach(app => {
-        appsData[app.id] = {
-          reviews: app.reviews,
-          rating: app.rating,
-          downloads: app.downloads
-        };
-      });
-      db.ref('appStore/apps').set(appsData).catch(error => {
-        console.log('Firebase save error:', error);
-      });
-    }
+  function saveAppsData() {
+  apps.forEach(app => {
+    db.ref('appStore/apps/' + app.id).update({
+      reviews: app.reviews || [],
+      rating: app.rating || 0,
+      downloads: app.downloads || 0
+    });
+  });
+}
 
     // Go back to index
     function goBack() {
@@ -790,36 +785,69 @@
       `).join('');
     }
 
-    // Submit review
-    function submitReview() {
-  // ... (keep your existing validation code)
-
-  const app = apps.find(a => a.id === currentAppId);
-  const newReview = {
-    name: name,
-    rating: selectedRating,
-    text: text,
-    date: new Date().toISOString(),
-    helpful: 0
-  };
-
-  app.reviews.unshift(newReview);
+function submitReview() {
+    // 1. You MUST define these variables first
+    const nameInput = document.getElementById('reviewerName');
+    const textInput = document.getElementById('reviewText');
+    
+    const name = nameInput ? nameInput.value.trim() : "";
+    const text = textInput ? textInput.value.trim() : "";
   
-  // Recalculate Rating
-  const totalRating = app.reviews.reduce((sum, r) => sum + r.rating, 0);
-  app.rating = totalRating / app.reviews.length;
-
-  // Save to Firebase: Explicitly target this app to avoid wiping others
-  db.ref(`appStore/apps/${currentAppId}`).update({
-    reviews: app.reviews,
-    rating: app.rating
-  });
-
-  renderApps();
-  renderReviews(currentAppId);
-  resetReviewForm();
-  showToast('Review submitted!');
-}
+    // 2. Check for errors
+    if (!name) {
+      showToast('Please enter your name');
+      return;
+    }
+    if (selectedRating === 0) {
+      showToast('Please select a rating');
+      return;
+    }
+    if (!text) {
+      showToast('Please write a review');
+      return;
+    }
+  
+    // 3. Find the app
+    const app = apps.find(a => a.id === currentAppId);
+    if (!app) return;
+  
+    // 4. Create the new review object
+    const newReview = {
+      name: name,
+      rating: selectedRating,
+      text: text, // Now 'text' is defined!
+      date: new Date().toISOString(),
+      helpful: 0
+    };
+  
+    // 5. Update Local Data
+    if (!app.reviews) app.reviews = [];
+    app.reviews.unshift(newReview);
+  
+    // Recalculate average rating
+    const totalRating = app.reviews.reduce((sum, r) => sum + r.rating, 0);
+    app.rating = totalRating / app.reviews.length;
+  
+    // 6. Save to Firebase
+    db.ref(`appStore/apps/${currentAppId}`).update({
+      reviews: app.reviews,
+      rating: app.rating
+    }).then(() => {
+      showToast('Review submitted successfully!');
+    }).catch(error => {
+      console.error("Firebase error:", error);
+      showToast('Saved locally, but server error occurred.');
+    });
+  
+    // 7. Update UI
+    renderApps();
+    renderReviews(currentAppId);
+    resetReviewForm();
+    
+    // Update the modal stars and count immediately
+    document.getElementById('modalAppRating').innerHTML = generateStars(app.rating);
+    document.getElementById('modalAppReviewCount').textContent = `${app.reviews.length} reviews`;
+  }
 
     // Toggle helpful
     function toggleHelpful(appId, reviewIndex) {
