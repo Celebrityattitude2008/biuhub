@@ -606,26 +606,26 @@
       }
     ];
 
-    // Load apps from Firebase
-    function loadAppsData() {
-      db.ref('appStore/apps').once('value').then(snapshot => {
-        const data = snapshot.val();
-        if (data) {
-          apps.forEach(app => {
-            const savedApp = data[app.id];
-            if (savedApp) {
-              app.reviews = savedApp.reviews || [];
-              app.rating = savedApp.rating || app.rating;
-              app.downloads = savedApp.downloads || 0;
-            }
-          });
-        }
-        renderApps();
-      }).catch(error => {
-        console.log('Firebase load error (offline?), using local data');
-        renderApps();
-      });
-    }
+  function loadAppsData() {
+    db.ref('appStore/apps').once('value').then(snapshot => {
+      const firebaseData = snapshot.val();
+      if (firebaseData) {
+        apps.forEach(app => {
+          const savedApp = firebaseData[app.id];
+          if (savedApp) {
+            // Merge Firebase data into the local app object
+            app.reviews = savedApp.reviews || [];
+            app.rating = parseFloat(savedApp.rating) || app.rating;
+            app.downloads = parseInt(savedApp.downloads) || 0;
+          }
+        });
+      }
+      renderApps(); // Render ONLY after the loop finishes
+    }).catch(error => {
+      console.error('Firebase load error:', error);
+      renderApps(); // Fallback to local data
+    });
+  }
 
     // Save apps to Firebase
     function saveAppsData() {
@@ -792,46 +792,34 @@
 
     // Submit review
     function submitReview() {
-      const name = document.getElementById('reviewerName').value.trim();
-      const text = document.getElementById('reviewText').value.trim();
+  // ... (keep your existing validation code)
 
-      if (!name) {
-        showToast('Please enter your name');
-        return;
-      }
+  const app = apps.find(a => a.id === currentAppId);
+  const newReview = {
+    name: name,
+    rating: selectedRating,
+    text: text,
+    date: new Date().toISOString(),
+    helpful: 0
+  };
 
-      if (selectedRating === 0) {
-        showToast('Please select a rating');
-        return;
-      }
+  app.reviews.unshift(newReview);
+  
+  // Recalculate Rating
+  const totalRating = app.reviews.reduce((sum, r) => sum + r.rating, 0);
+  app.rating = totalRating / app.reviews.length;
 
-      if (!text) {
-        showToast('Please write a review');
-        return;
-      }
+  // Save to Firebase: Explicitly target this app to avoid wiping others
+  db.ref(`appStore/apps/${currentAppId}`).update({
+    reviews: app.reviews,
+    rating: app.rating
+  });
 
-      const app = apps.find(a => a.id === currentAppId);
-      app.reviews.unshift({
-        name: name,
-        rating: selectedRating,
-        text: text,
-        date: new Date().toISOString(),
-        helpful: 0
-      });
-
-      // Update app rating
-      const totalRating = app.reviews.reduce((sum, r) => sum + r.rating, 0);
-      app.rating = totalRating / app.reviews.length;
-
-      saveAppsData();
-      renderApps();
-      renderReviews(currentAppId);
-      resetReviewForm();
-      showToast('Review submitted successfully!');
-
-      document.getElementById('modalAppRating').innerHTML = generateStars(app.rating);
-      document.getElementById('modalAppReviewCount').textContent = `${app.reviews.length} reviews`;
-    }
+  renderApps();
+  renderReviews(currentAppId);
+  resetReviewForm();
+  showToast('Review submitted!');
+}
 
     // Toggle helpful
     function toggleHelpful(appId, reviewIndex) {
@@ -860,32 +848,22 @@
       renderApps(filtered);
     }
 
-    // Download app
     function downloadApp(appId) {
-      const app = apps.find(a => a.id === appId);
-      
-      // Increment download counter
-      app.downloads = (app.downloads || 0) + 1;
-      
-      // Update Firebase
-      db.ref(`appStore/apps/${appId}/downloads`).set(app.downloads).catch(error => {
-        console.log('Firebase update error:', error);
-      });
-      
-      // Re-render to show updated count
-      renderApps();
-      
-      // If download URL exists, redirect to it
-      if (app.downloadUrl) {
-        showToast(`Downloading ${app.name}... (${app.downloads} total downloads)`);
-        setTimeout(() => {
-          window.location.href = app.downloadUrl;
-        }, 500);
-      } else {
-        showToast(`${app.name} is coming soon!`);
-      }
-    }
-
+  const app = apps.find(a => a.id === appId);
+  
+  // Increment local counter
+  app.downloads = (app.downloads || 0) + 1;
+  
+  // Update ONLY the download count in Firebase
+  db.ref(`appStore/apps/${appId}/downloads`).set(app.downloads);
+  
+  renderApps(); 
+  
+  if (app.downloadUrl) {
+    showToast(`Downloading ${app.name}...`);
+    setTimeout(() => { window.location.href = app.downloadUrl; }, 500);
+  }
+}
     // Show toast notification
     function showToast(message) {
       const toast = document.createElement('div');
