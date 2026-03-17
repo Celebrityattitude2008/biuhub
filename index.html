@@ -12,7 +12,7 @@
 
   <style>
     :root {
-      /* Light Mode Variables (Default) */
+
       --bg: #f8f9fb;
       --card-bg: #ffffff;
       --text-main: #1a1f36;
@@ -26,7 +26,6 @@
     }
 
     [data-theme="dark"] {
-      /* Dark Mode Variables */
       --bg: #0f172a;
       --card-bg: #1e293b;
       --text-main: #f1f5f9;
@@ -101,7 +100,6 @@
         100% { transform: scale(1); }
     }
 
-    /* Colored Icons (using specific colors to match your design) */
     .icon-ai { color: #8b5cf6; }
     .icon-lib { color: #0ea5e9; }
     .icon-sch { color: #f97316; }
@@ -285,10 +283,9 @@
         100% { box-shadow: 0 0 0 0 rgba(109, 40, 217, 0); }
     }
 
-    /* Mobile tweak - makes it slightly smaller */
     @media (max-width: 480px) {
         .apk-badge { bottom: 15px; right: 15px; padding: 6px 12px 6px 6px; }
-        .bot-txt { display: none; } /* Only shows "Get the App" on tiny screens */
+        .bot-txt { display: none; } 
         .apk-text { padding-right: 5px; }
     }
 </style>
@@ -296,7 +293,7 @@
 
   <div class="section-title">Features</div>
   <div class="features-grid">
-    <!-- Primary utilities first -->
+
     <a href="/chatbot.html" class="feature-item">
       <div class="feature-icon-wrapper"><span class="material-symbols-rounded icon-ai">smart_toy</span></div>
       <span class="feature-label">AI Assistant</span>
@@ -314,7 +311,6 @@
       <span class="feature-label">CGPA Tracker</span>
     </a>
 
-    <!-- core content tools -->
     <a href="/assignment.html" class="feature-item">
       <div class="feature-icon-wrapper">
       <span class="badge new" style="background:#10b981;animation:badge-pulse 1.5s infinite;">New</span>
@@ -337,7 +333,6 @@
       <span class="feature-label">Marketplace</span>
     </a>
 
-    <!-- communication features -->
     <a href="/discussions.html" class="feature-item">
       <div class="feature-icon-wrapper"><span class="material-symbols-rounded icon-chat">forum</span></div>
       <span class="feature-label">Chat</span>
@@ -347,13 +342,16 @@
       <span class="feature-label">News</span>
     </a>
 
-    <!-- support & legal links -->
     <a href="/support.html" class="feature-item">
       <div class="feature-icon-wrapper">
         <span class="badge new" style="background:#10b981;animation:badge-pulse 1.5s infinite;">New</span>
         <span class="material-symbols-rounded icon-pro">help</span>
       </div>
       <span class="feature-label">Support</span>
+    </a>
+    <a href="/download.html" class="feature-item">
+      <div class="feature-icon-wrapper"><span class="material-symbols-rounded icon-app">download</span></div>
+      <span class="feature-label">App Store</span>
     </a>
     <a href="/hall.html" class="feature-item">
       <div class="feature-icon-wrapper"><span class="material-symbols-rounded icon-pay">trophy</span></div>
@@ -373,7 +371,6 @@
     </div>
   </div>
 
-  <!-- Social Section -->
   <div class="social-section">
     <div class="social-title">Connect With Us</div>
     <div class="social-grid">
